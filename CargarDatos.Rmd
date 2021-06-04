@@ -1,0 +1,40 @@
+---
+title: CargarDatos 
+author: Mauro Loprete 
+date: 04 de June
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Carga de datos
+
+```{r}
+Datos <- read.table(
+    "UScrime.txt",
+    header = TRUE,
+    dec = ","
+)
+```
+
+# Primera idea: Incluir todas las variables : 
+```{r}
+lm(
+    y ~ . ,
+    data = Datos
+) |> summary()
+```
+
+En este caso se puede ver que pocas variables son significativas, pero el modelo en general si lo es ...
+
+
+Pasos siguientes : 
+
+- Hay que empezar el proceso de ... (Backward/Forward/Stepwise)
+
+- Diagnostico ...
+
+
+
