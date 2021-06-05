@@ -7,6 +7,8 @@ output: pdf_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(reshape2)
 ```
 
 # Carga de datos
@@ -24,7 +26,7 @@ Datos <- read.table(
 lm(
     y ~ . ,
     data = Datos
-) |> summary()
+) %>% summary()
 ```
 
 En este caso se puede ver que pocas variables son significativas, pero el modelo en general si lo es ...
@@ -36,5 +38,33 @@ Pasos siguientes :
 
 - Diagnostico ...
 
-
+```{r}
+qplot(x=Var1,
+      y=Var2,
+      data = melt(cor(Datos, use = "p")),
+      fill = value,
+      geom="tile"
+)+scale_fill_gradient2(limits = c(-1, 1),
+                       low = "#A50303", high = "#250455")+
+  theme(aspect.ratio = 1,
+        plot.title = element_text(
+          face = "bold",
+          color = "#280434FF"),
+        plot.subtitle = element_text(
+          size=8,
+          color="#5C485F"
+        ),
+        axis.text.x = element_text(
+          color = "#8C04C2"
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        )
+        )+
+  labs(title="Mapa de correlación de variables",
+       subtitle = "Variables referidas a tasa de criminalidad en USA",
+       x="Variables",
+       y="",
+       fill="Coef Corr.")
+```
 
