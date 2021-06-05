@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 20.7) (preloaded format=pdflatex 2020.9.10)  5 JUN 2021 18:51
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 20.7) (preloaded format=pdflatex 2020.9.10)  5 JUN 2021 20:48
 entering extended mode
 **./Entrega.tex
 (Entrega.tex
@@ -457,10 +457,15 @@ Package caption Info: End \AtBeginDocument code.
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
+<CaratulaIgnatenko.png, id=15, 682.80093pt x 558.58687pt>
+File: CaratulaIgnatenko.png Graphic file (type png)
+<use CaratulaIgnatenko.png>
+Package pdftex.def Info: CaratulaIgnatenko.png  used on input line 78.
+(pdftex.def)             Requested size: 398.33858pt x 325.88132pt.
 [1
 
-{C:/Users/Usuario/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map}]
-(Entrega.toc
+{C:/Users/Usuario/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map} <./Caratul
+aIgnatenko.png>] (Entrega.toc
 LaTeX Font Info:    Trying to load font information for U+msa on input line 3.
 
 ("C:\Users\Usuario\AppData\Local\Programs\MiKTeX 2.9\tex/latex/amsfonts\umsa.fd
@@ -484,41 +489,41 @@ pdfTeX warning (ext4): destination with the same identifier (name{page.1}) has
 been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.88 \newpage
+l.89 \newpage
               [1] [2]
-Underfull \hbox (badness 10000) in paragraph at lines 97--99
+Underfull \hbox (badness 10000) in paragraph at lines 98--100
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 100--102
+Underfull \hbox (badness 10000) in paragraph at lines 101--103
 
  []
 
-Package color Info: Redefining color shadecolor on input line 108.
-<figure/unnamed-chunk-2-1.pdf, id=37, 505.89pt x 505.89pt>
+Package color Info: Redefining color shadecolor on input line 109.
+<figure/unnamed-chunk-2-1.pdf, id=38, 505.89pt x 505.89pt>
 File: figure/unnamed-chunk-2-1.pdf Graphic file (type pdf)
 <use figure/unnamed-chunk-2-1.pdf>
-Package pdftex.def Info: figure/unnamed-chunk-2-1.pdf  used on input line 109.
+Package pdftex.def Info: figure/unnamed-chunk-2-1.pdf  used on input line 110.
 (pdftex.def)             Requested size: 466.62503pt x 466.63635pt.
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 112.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 113.
 [3 <./figure/unnamed-chunk-2-1.pdf>]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 112.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 113.
  (Entrega.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 112.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 112.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 113.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 113.
 Package rerunfilecheck Info: File `Entrega.out' has not changed.
 (rerunfilecheck)             Checksum: 3D88A6CB4D484997F2253D05326A2FAB;197.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 112.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 113.
  ) 
 Here is how much of TeX's memory you used:
- 8365 strings out of 481165
- 132945 string characters out of 2901125
+ 8372 strings out of 481165
+ 133095 string characters out of 2901125
  398201 words of memory out of 3000000
- 23823 multiletter control sequences out of 15000+200000
+ 23828 multiletter control sequences out of 15000+200000
  542609 words of font info for 57 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
- 43i,5n,43p,986b,340s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 43i,5n,43p,986b,348s stack positions out of 5000i,500n,10000p,200000b,50000s
 <C:/Users/Usuario/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfon
 ts/cm/cmbx10.pfb><C:/Users/Usuario/AppData/Local/Programs/MiKTeX 2.9/fonts/type
 1/public/amsfonts/cm/cmbx12.pfb><C:/Users/Usuario/AppData/Local/Programs/MiKTeX
@@ -527,9 +532,9 @@ ts/cm/cmbx10.pfb><C:/Users/Usuario/AppData/Local/Programs/MiKTeX 2.9/fonts/type
 /AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:
 /Users/Usuario/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm
 /cmti10.pfb>
-Output written on Entrega.pdf (4 pages, 90819 bytes).
+Output written on Entrega.pdf (4 pages, 123864 bytes).
 PDF statistics:
- 74 PDF objects out of 1000 (max. 8388607)
+ 75 PDF objects out of 1000 (max. 8388607)
  9 named destinations out of 1000 (max. 500000)
- 30 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 35 words of extra memory for PDF output out of 10000 (max. 10000000)
 
