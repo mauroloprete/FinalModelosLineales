@@ -1,0 +1,97 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{ulem}
+\usepackage{stackengine}
+\usepackage{appendix}
+\usepackage{caption}
+%usepackage[spanish]{babel}
+\usepackage[left=2.30cm,top=2.54cm,right=2.30cm,bottom=2.54cm]{geometry}
+\setlength{\parindent}{0pt}
+\usepackage[font=small,labelfont=bf]{caption}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\renewcommand{\listfigurename}{Lista de Figuras}
+\renewcommand{\contentsname}{Lista de Contenidos}
+\renewcommand{\figurename}{Figura}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+\begin{titlepage}
+  \centering
+  \vspace{5cm}
+  {\scshape\Huge Tasa de criminalidad en USA \par}
+  \vspace{3cm}
+  \vfill
+  {\scshape\Large Modelos Líneales \par}
+  \vspace{3cm}
+  {\Large Ignacio Acosta - Sofía Itté - Mauro Loprete \par}
+  {\Large 1er semestre 2021 \par}
+\end{titlepage}
+\tableofcontents
+\setkeys{Gin}{width=0.8\textwidth}
+\listoffigures
+\newpage
+
+
+<<include=FALSE>>=
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(reshape2)
+
+Datos <- read.table(
+    "UScrime.txt",
+    header = TRUE,
+    dec = ","
+)
+@
+\section{Introducción}
+
+\newpage
+\section{Análisis Exploratorio de datos}
+
+El objetivo de esta sección es presentar las variables a estudiar y como las mismas se relacionan entre sí.
+\\
+
+Para ello se hará uso de distintas medidas de resumen univariadas y bivariadas, así como también un herramental gráfico variado que simplificará el entendimiento de las mismas.
+\\
+
+Es esta sección fundamental al momento de discutir el modelo final y como a partir de distintas técnicas estadísticas discutidas en el curso se puede simplificar un \textit{modelo completo} que se presentará en secciones siguientes.
+
+\subsection{Correlación entre variables}
+
+<<echo=FALSE>>=
+qplot(x=Var1,
+      y=Var2,
+      data = melt(cor(Datos, use = "p")),
+      fill = value,
+      geom="tile"
+)+scale_fill_gradient2(limits = c(-1, 1),
+                       low = "#A50303", high = "#250455")+
+  theme(aspect.ratio = 1,
+        plot.title = element_text(
+          face = "bold",
+          color = "#280434FF"),
+        plot.subtitle = element_text(
+          size=8,
+          color="#5C485F"
+        ),
+        axis.text.x = element_text(
+          color = "#8C04C2",
+          angle=90
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        )
+        )+
+  labs(title="Mapa de correlación de variables",
+       subtitle = "Variables referidas a tasa de criminalidad en USA",
+       x="Variables",
+       y="",
+       fill="Coef Corr.")
+@ 
+\end{document}

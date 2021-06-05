@@ -55,7 +55,8 @@ qplot(x=Var1,
           color="#5C485F"
         ),
         axis.text.x = element_text(
-          color = "#8C04C2"
+          color = "#8C04C2",
+          angle=90
         ),
         axis.text.y = element_text(
           color="#8C04C2"
