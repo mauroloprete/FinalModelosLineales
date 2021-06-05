@@ -1,6 +1,6 @@
 ---
 title: CargarDatos 
-author: Mauro Loprete 
+author: Ignacio Acosta, Mauro Loprete y Sofía Itté
 date: 04 de June
 output: pdf_document
 ---
