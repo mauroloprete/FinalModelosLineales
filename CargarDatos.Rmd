@@ -68,4 +68,264 @@ qplot(x=Var1,
        y="",
        fill="Coef Corr.")
 ```
+# Histogramas
+```{r}
+# Multiple plot function, la hizo Dios.
 
+multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
+  library(grid)
+
+  # Make a list from the ... arguments and plotlist
+  plots <- c(list(...), plotlist)
+
+  numPlots = length(plots)
+
+  # If layout is NULL, then use 'cols' to determine layout
+  if (is.null(layout)) {
+    # Make the panel
+    # ncol: Number of columns of plots
+    # nrow: Number of rows needed, calculated from # of cols
+    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
+                    ncol = cols, nrow = ceiling(numPlots/cols))
+  }
+
+ if (numPlots==1) {
+    print(plots[[1]])
+
+  } else {
+    # Set up the page
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+
+    # Make each plot, in the correct location
+    for (i in 1:numPlots) {
+      # Get the i,j matrix positions of the regions that contain this subplot
+      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+
+      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+                                      layout.pos.col = matchidx$col))
+    }
+  }
+}
+
+HistM<-ggplot(Datos,aes(x=M))+
+  geom_histogram(binwidth = 5,
+                 fill="#8F3A84FF",
+                 colour="black")+
+  theme(aspect.ratio = 1,
+        plot.subtitle = element_text(
+          size=6.5
+        ),
+        plot.title = element_text(
+          face="bold",
+          size=10,
+          color = "#280434FF"
+        ),
+        axis.text.x = element_text(
+          color = "#8C04C2"
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        ))+
+  labs(title="Histograma variable M",
+       subtitle="Número de hombres entre 14 y 24
+       años por 1000 habitantes",
+       x="Cantidad de Hombres",
+       y="Cantidad de Estados")
+
+
+BarpSo<-ggplot(data=Datos, aes(x=factor(So))) +
+  geom_bar(stat="count", 
+           fill="#8F3A84FF",
+           colour="black")+
+  theme(plot.subtitle = element_text(
+          size=6.5
+        ),
+        plot.title = element_text(
+          face = "bold",
+          size=10,
+          color = "#280434FF"
+        ),
+        axis.text.x = element_text(
+          color = "#8C04C2"
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        ),
+        aspect.ratio=1)+
+  labs(title = "Barplot variable So",
+       subtitle = "¿Es este un estado sureño?",
+       x="Respuesta",
+       y="Cantidad de respuestas")
+
+HistEd<-ggplot(Datos,aes(x=Ed))+
+  geom_histogram(binwidth = 5,
+                 fill="#8F3A84FF",
+                 colour="black")+
+  theme(aspect.ratio = 1,
+        plot.subtitle = element_text(
+          size=6.5
+        ),
+        plot.title = element_text(
+          size=10,
+          face="bold",
+          color = "#280434FF"
+        ),
+        axis.text.x = element_text(
+          color = "#8C04C2"
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        ))+
+  labs(title="Histograma variable Ed",
+       subtitle="Escolaridad del Estado",
+       x="Puntuación",
+       y="Cantidad de Estados")
+
+HistPo1<-ggplot(Datos,aes(x=Po1))+
+  geom_histogram(binwidth = 5,
+                 fill="#8F3A84FF",
+                 colour="black")+
+  theme(aspect.ratio = 1,
+        plot.subtitle = element_text(
+          size=6.5
+        ),
+        plot.title = element_text(
+          face="bold",
+          size=10,
+          color = "#280434FF"
+        ),
+        axis.text.x = element_text(
+          color = "#8C04C2"
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        ))+
+  labs(title="Histograma variable Po1",
+       subtitle = "1960",
+       x="Gasto",
+       y="Cantidad de Estados")
+
+HistPo2<-ggplot(Datos,aes(x=Po2))+
+  geom_histogram(binwidth = 5,
+                 fill="#8F3A84FF",
+                 colour="black")+
+  theme(aspect.ratio = 1,
+        plot.subtitle = element_text(
+          size=6.5
+        ),
+        plot.title = element_text(
+          face="bold",
+          size=10,
+          color = "#280434FF"
+        ),
+        axis.text.x = element_text(
+          color = "#8C04C2"
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        ))+
+  labs(title="Histograma variable Po2",
+       subtitle = "1959",
+       x="Gasto",
+       y="Cantidad de Estados")
+
+HistLF<-ggplot(Datos,aes(x=LF))+
+  geom_histogram(binwidth = 5,
+                 fill="#8F3A84FF",
+                 colour="black")+
+  theme(aspect.ratio = 1,
+        plot.subtitle = element_text(
+          size=6.5
+        ),
+        plot.title = element_text(
+          face="bold",
+          size=10,
+          color = "#280434FF"
+        ),
+        axis.text.x = element_text(
+          color = "#8C04C2"
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        ))+
+  labs(title="Histograma variable LF",
+       subtitle = "TPFLM de 14 a 24 años",
+       x="Gasto",
+       y="Cantidad de Estados")
+
+HistMF<-ggplot(Datos,aes(x=M.F))+
+  geom_histogram(binwidth = 15,
+                 fill="#8F3A84FF",
+                 colour="black")+
+  theme(aspect.ratio = 1,
+        plot.subtitle = element_text(
+          size=6.5
+        ),
+        plot.title = element_text(
+          face="bold",
+          size=10,
+          color = "#280434FF"
+        ),
+        axis.text.x = element_text(
+          color = "#8C04C2"
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        ))+
+  labs(title="Histograma variable M.F",
+       subtitle = "Cantidad de hombres cada 1000 mujeres",
+       x="Cantidad de Hombres",
+       y="Cantidad de Estados")
+
+HistPop<-ggplot(Datos,aes(x=Pop))+
+  geom_histogram(binwidth = 15,
+                 fill="#8F3A84FF",
+                 colour="black")+
+  theme(aspect.ratio = 1,
+        plot.subtitle = element_text(
+          size=6.5
+        ),
+        plot.title = element_text(
+          face="bold",
+          size=10,
+          color = "#280434FF"
+        ),
+        axis.text.x = element_text(
+          color = "#8C04C2"
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        ))+
+  labs(title="Histograma variable Pop",
+       subtitle = "Tamaño de la población en cienmiles",
+       x="Pop",
+       y="Cantidad de Estados")
+
+HistNW<-ggplot(Datos,aes(x=NW))+
+  geom_histogram(binwidth = 15,
+                 fill="#8F3A84FF",
+                 colour="black")+
+  theme(aspect.ratio = 1,
+        plot.subtitle = element_text(
+          size=6.5
+        ),
+        plot.title = element_text(
+          face="bold",
+          size=10,
+          color = "#280434FF"
+        ),
+        axis.text.x = element_text(
+          color = "#8C04C2"
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        ))+
+  labs(title="Histograma variable NW",
+       subtitle = "Cantidad de no caucásicos cada 1000 habitantes",
+       x="Cantidad de no caucásicos",
+       y="Cantidad de Estados")
+
+
+multiplot(HistM,BarpSo,HistEd,HistPo1,HistPo2,HistLF,HistMF,HistPop,HistNW,cols=3)
+```
