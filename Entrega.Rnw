@@ -51,7 +51,31 @@ Datos <- read.table(
 )
 @
 \section{Introducción}
-
+<<echo=FALSE>>=
+ggplot(Datos,aes(x=y))+
+  geom_histogram(binwidth = 100,
+                 fill="#8F3A84FF",
+                 colour="black")+
+  theme(aspect.ratio = 1,
+        plot.subtitle = element_text(
+          size=6.5
+        ),
+        plot.title = element_text(
+          face="bold",
+          size=10,
+          color = "#280434FF"
+        ),
+        axis.text.x = element_text(
+          color = "#8C04C2"
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        ))+
+  labs(title="Histograma de Y",
+       subtitle = "Tasa de criminalidad",
+       x="Número de ofensas reportadas",
+       y="Cantidad de Estados")
+@
 \newpage
 \section{Análisis Exploratorio de datos}
 
@@ -71,6 +95,7 @@ Se estudiarán medidas de resumen y a partir de histogramas tendremos un primer 
 
 \newpage
 \subsubsection{Histogramas y Barplots}
+\centering
 <<echo=FALSE>>=
 # Multiple plot function, la hizo Dios.
 
@@ -328,7 +353,164 @@ HistNW<-ggplot(Datos,aes(x=NW))+
        x="Cantidad de no caucásicos",
        y="Cantidad de Estados")
 
-multiplot(HistM,BarpSo,HistEd,HistPo1,HistPo2,HistLF,HistMF,HistPop,HistNW,cols=3)
+HistU1<-ggplot(Datos,aes(x=U1))+
+  geom_histogram(binwidth = 10,
+                 fill="#8F3A84FF",
+                 colour="black")+
+  theme(aspect.ratio = 1,
+        plot.subtitle = element_text(
+          size=6.5
+        ),
+        plot.title = element_text(
+          face="bold",
+          size=10,
+          color = "#280434FF"
+        ),
+        axis.text.x = element_text(
+          color = "#8C04C2"
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        ))+
+  labs(title="Histograma variable U1",
+       subtitle = "TD cada 1000 habitantes,
+hombres de 14 a 24 ",
+       x="U1",
+       y="Cantidad de Estados")
+
+HistU2<-ggplot(Datos,aes(x=U2))+
+  geom_histogram(binwidth = 10,
+                 fill="#8F3A84FF",
+                 colour="black")+
+  theme(aspect.ratio = 1,
+        plot.subtitle = element_text(
+          size=6.5
+        ),
+        plot.title = element_text(
+          face="bold",
+          size=10,
+          color = "#280434FF"
+        ),
+        axis.text.x = element_text(
+          color = "#8C04C2"
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        ))+
+  labs(title="Histograma variable U1",
+       subtitle = "TD cada 1000 habitantes, 
+hombres de 35 a 39 ",
+       x="U2",
+       y="Cantidad de Estados")
+
+HistGDP<-ggplot(Datos,aes(x=GDP))+
+  geom_histogram(binwidth = 50,
+                 fill="#8F3A84FF",
+                 colour="black")+
+  theme(aspect.ratio = 1,
+        plot.subtitle = element_text(
+          size=6.5
+        ),
+        plot.title = element_text(
+          face="bold",
+          size=10,
+          color = "#280434FF"
+        ),
+        axis.text.x = element_text(
+          color = "#8C04C2"
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        ))+
+  labs(title="Histograma variable GDP",
+       subtitle = "PIB per cápita",
+       x="GDP",
+       y="Cantidad de Estados")+
+  scale_x_continuous(breaks = c(200,300,400,500,600,700))+
+  scale_y_continuous(breaks = c(2,4,6,8,10,12,14,16))
+
+HistIneq<-ggplot(Datos,aes(x=Ineq))+
+  geom_histogram(binwidth = 10,
+                 fill="#8F3A84FF",
+                 colour="black")+
+  theme(aspect.ratio = 1,
+        plot.subtitle = element_text(
+          size=6.5
+        ),
+        plot.title = element_text(
+          face="bold",
+          size=10,
+          color = "#280434FF"
+        ),
+        axis.text.x = element_text(
+          color = "#8C04C2"
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        ))+
+  labs(title="Histograma variable Ineq",
+       subtitle = "Desigualdad de Ingresos",
+       x="Ineq",
+       y="Cantidad de Estados")+
+   scale_x_continuous(breaks = c(100,150,200,250,300))+
+   scale_y_continuous(breaks = c(2,4,6,8,10,12))
+
+HistProb<-ggplot(Datos,aes(x=Prob))+
+  geom_histogram(binwidth = 0.02,
+                 fill="#8F3A84FF",
+                 colour="black")+
+  theme(aspect.ratio = 1,
+        plot.subtitle = element_text(
+          size=6.5
+        ),
+        plot.title = element_text(
+          face="bold",
+          size=10,
+          color = "#280434FF"
+        ),
+        axis.text.x = element_text(
+          color = "#8C04C2",
+          angle = 90
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        ))+
+  labs(title="Histograma variable Prob",
+       subtitle = "Probabilidad de encarcelamiento",
+       x="P",
+       y="Cantidad de Estados")+
+  scale_x_continuous(breaks = c(0,0.02,0.04,0.06,0.08,0.10,0.12))
+
+HistTime<-ggplot(Datos,aes(x=Time))+
+  geom_histogram(binwidth = 8,
+                 fill="#8F3A84FF",
+                 colour="black")+
+  theme(aspect.ratio = 1,
+        plot.subtitle = element_text(
+          size=6.5
+        ),
+        plot.title = element_text(
+          face="bold",
+          size=10,
+          color = "#280434FF"
+        ),
+        axis.text.x = element_text(
+          color = "#8C04C2"
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        ))+
+  labs(title="Histograma variable Time",
+       subtitle = "Tiempo promedio de estadía en cárceles estatales",
+       x="Tiempo",
+       y="Cantidad de Estados")
+
+multiplot(HistM,BarpSo,HistEd,HistPo1,HistNW,HistPo2,HistLF,HistMF,HistPop,cols=3)
+@
+\newpage
+\centering
+<<echo=FALSE>>=
+multiplot(HistU1,HistU2,HistGDP,HistIneq,HistProb,HistTime,cols=3)
 @
 \newpage
 

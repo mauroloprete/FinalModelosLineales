@@ -2,4 +2,4 @@
 \contentsline {section}{\numberline {2}Análisis Exploratorio de datos}{3}{section.2}%
 \contentsline {subsection}{\numberline {2.1}Análisis Univariado}{3}{subsection.2.1}%
 \contentsline {subsubsection}{\numberline {2.1.1}Histogramas y Barplots}{4}{subsubsection.2.1.1}%
-\contentsline {subsubsection}{\numberline {2.1.2}Correlación entre variables}{5}{subsubsection.2.1.2}%
+\contentsline {subsubsection}{\numberline {2.1.2}Correlación entre variables}{6}{subsubsection.2.1.2}%
