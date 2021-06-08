@@ -41,9 +41,15 @@
 
 <<include=FALSE>>=
 knitr::opts_chunk$set(echo = TRUE)
-library(tidyverse)
-library(reshape2)
-library(knitr)
+if(!require(pacman)) {
+  install.packages("pacman")
+}
+p_load(
+  tidyverse,
+  reshape2,
+  knitr,
+  tidymodels
+)
 
 Datos <- read.table(
     "UScrime.txt",
