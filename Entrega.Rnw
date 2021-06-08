@@ -8,7 +8,7 @@
 \usepackage{stackengine}
 \usepackage{appendix}
 \usepackage{caption}
-%usepackage[spanish]{babel}
+\usepackage[spanish]{babel}
 \usepackage[left=2.10cm,top=2.54cm,right=2.30cm,bottom=2.54cm]{geometry}
 \setlength{\parindent}{0pt}
 \usepackage[font=small,labelfont=bf]{caption}
@@ -43,6 +43,7 @@
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(reshape2)
+library(knitr)
 
 Datos <- read.table(
     "UScrime.txt",
@@ -119,6 +120,8 @@ Se estudiarán medidas de resumen y a partir de histogramas tendremos un primer 
 \end{center}
 \newpage
 \subsubsection{Histogramas y Barplots}
+
+{
 \centering
 <<echo=FALSE>>=
 # Multiple plot function, la hizo Dios.
@@ -531,12 +534,15 @@ HistTime<-ggplot(Datos,aes(x=Time))+
 
 multiplot(HistM,BarpSo,HistEd,HistPo1,HistNW,HistPo2,HistLF,HistMF,HistPop,cols=3)
 @
+}
 \newpage
-
-\begin{center}
+{
+\centering
 <<echo=FALSE>>=
 multiplot(HistU1,HistU2,HistGDP,HistIneq,HistProb,HistTime,cols=3)
 @
+}
+
 \end{center}
 
 \newpage
@@ -572,5 +578,55 @@ qplot(x=Var1,
        x="Variables",
        y="",
        fill="Coef Corr.")
-@ 
+@
+
+
+
+
+\subsubsection{Estadisticas descriptivas}
+
+
+<<echo = F>>=
+Datos %>%
+  select(
+    -So
+  ) %>% 
+  summarise_if(
+    is.numeric,
+    summary
+  ) %>%
+  mutate(
+    Estadistico = c(
+      "Min",
+      "1er Qu.",
+      "Mediana",
+      "Media",
+      "3er Qu",
+      "Max"
+    )
+  ) %>% 
+  relocate(
+    where(is.numeric),
+    .after = where(is.character)
+  ) %>%
+  mutate_if(
+    is.numeric,
+    format,
+    digits = 2
+  ) %>% 
+  pivot_longer(
+    cols = -Estadistico,
+    names_to = "Variable",
+    values_to = "Valor"
+  ) %>% 
+  pivot_wider(
+    values_from = "Valor",
+    names_from = "Estadistico"
+  ) %>% 
+  kable(
+    row.names = F,
+    caption = "Resumen descriptivo",
+  )
+@
+
 \end{document}
