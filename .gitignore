@@ -58,3 +58,4 @@ figure/*
 *.fdb_latexmk
 *.fls
 *.tex
+*.lof

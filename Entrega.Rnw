@@ -549,7 +549,6 @@ multiplot(HistU1,HistU2,HistGDP,HistIneq,HistProb,HistTime,cols=3)
 @
 }
 
-\end{center}
 
 \newpage
 
