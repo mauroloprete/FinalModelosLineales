@@ -12,6 +12,17 @@
 \usepackage[left=2.10cm,top=2.54cm,right=2.30cm,bottom=2.54cm]{geometry}
 \setlength{\parindent}{0pt}
 \usepackage[font=small,labelfont=bf]{caption}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage[table]{xcolor}
+\usepackage{wrapfig}
+\usepackage{float}
+\usepackage{colortbl}
+\usepackage{pdflscape}
+\usepackage{tabu}
+\usepackage{threeparttable}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \renewcommand{\listfigurename}{Lista de Figuras}
@@ -29,6 +40,7 @@
   \vfill
   \vfill
   {\scshape\LARGE Modelos Líneales \par}
+  {\scshape\Large Trabajo final \par}
   \vspace{3cm}
   {\Large Ignacio Acosta - Sofía Itté - Mauro Loprete \par}
   {\Large 1er semestre 2021 \par}
@@ -40,7 +52,7 @@
 
 
 <<include=FALSE>>=
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
 if(!require(pacman)) {
   install.packages("pacman")
 }
@@ -48,7 +60,9 @@ pacman::p_load(
   tidyverse,
   reshape2,
   knitr,
-  tidymodels
+  tidymodels,
+  kableExtra,
+  magrittr
 )
 
 Datos <- read.table(
@@ -56,6 +70,7 @@ Datos <- read.table(
     header = TRUE,
     dec = ","
 )
+
 @
 \section{Introducción}
 <<echo=FALSE>>=
@@ -107,17 +122,17 @@ Se estudiarán medidas de resumen y a partir de histogramas tendremos un primer 
 \hline
 \textbf{Nombre} & \multicolumn{1}{c|}{\textbf{Descripción}}                                                                                                              & \multicolumn{1}{c|}{\textbf{Clasificación}} \\ \hline
 \textbf{Y}      & Tasa de criminalidad, número de ofensas reportadas a la policía por habitante                                                                          & Cuantitativa                                \\ \hline
-\textbf{M}      & Número de hombres entre 14 y 24 años cada 10000 habitantes                                                                                             & Cuantitativa                                \\ \hline
+\textbf{M}      & Número de hombres entre 14 y 24 años cada 1000 habitantes                                                                                             & Cuantitativa                                \\ \hline
 \textbf{So}     & Variables indicadora de los estados del sur (0=No, 1=Si)                                                                                               & Cualitativa                                 \\ \hline
 \textbf{Ed}     & Indice que refeleja la escolaridad del estado                                                                                                          & Cuantitativa                                \\ \hline
 \textbf{Po1}    & Gasto per cápita en policía realizado por el gobierno estatal o local en 1960                                                                          & Cuantitativa                                \\ \hline
-\textbf{Po2}    & Gasto per cápita en policía realizado por el gobierno estatal o local en 1995                                                                          & Cuantitativa                                \\ \hline
+\textbf{Po2}    & Gasto per cápita en policía realizado por el gobierno estatal o local en 1959                                                                          & Cuantitativa                                \\ \hline
 \textbf{LF}     & \begin{tabular}[c]{@{}l@{}}Tasa de participación en la fuerza laboral civil de sexo masculino entre 14 y 24 \\ años, cada 1000 habitantes\end{tabular} & Cuantitativa                                \\ \hline
 \textbf{M.F}    & Número de hombres por cada 1000 mujeres                                                                                                                & Cuantitativa                                \\ \hline
 \textbf{Pop}    & Tamaño de la población del estado cada 100000 habitantes                                                                                               & Cuantitativa                                \\ \hline
-\textbf{NW}     & Número de caucásicos cada 1000 habitantes                                                                                                              & Cuantitativa                                \\ \hline
-\textbf{U1}     & Tasa de desempleo urbana de hombres entre 14 y 24 años cada 1000 habitantes                                                                            & Cuantitativa                                \\ \hline
-\textbf{U2}     & Tasa de desempleo urbana de hombres entre 35 y 39 años cada 1000 habitantes                                                                            & Cuantitativa                                \\ \hline
+\textbf{NW}     & Número de no caucásicos cada 1000 habitantes                                                                                                              & Cuantitativa                                \\ \hline
+\textbf{U1}     & Tasa de desempleo urbana de hombres entre 14 y 24 años por 1000 habitantes                                                                            & Cuantitativa                                \\ \hline
+\textbf{U2}     & Tasa de desempleo urbana de hombres entre 35 y 39 años por 1000 habitantes                                                                            & Cuantitativa                                \\ \hline
 \textbf{GDP}    & Producto bruto interno per cápita                                                                                                                      & Cuantitativa                                \\ \hline
 \textbf{Ineq}   & Desigualdad del ingreso                                                                                                                                & Cuantitativa                                \\ \hline
 \textbf{Prob}   & Probabilidad de encarcelamiento                                                                                                                        & Cuantitativa                                \\ \hline
@@ -539,27 +554,69 @@ HistTime<-ggplot(Datos,aes(x=Time))+
 multiplot(HistM,BarpSo,HistEd,HistPo1,HistNW,HistPo2,HistLF,HistMF,HistPop,cols=3)
 @
 }
+
 \newpage
+{
+\centering
+<<echo=FALSE>>=
+multiplot(HistU1,HistU2,HistGDP,HistIneq,HistProb,HistTime,cols=3)
+@
+}
+
+\newpage
+
 \subsubsection{Medidas de resumen}
+
+Continuando el ánalisis de los gráficos presentados anteriormente, se presenta en forma de tabla 
+el resumen de las variables númericas. A
+
 
 
 <<echo = F>>=
-Datos %>%
+DatosTab <- Datos
+names(DatosTab) <- c(
+  "Número de Hombres 14-24 / 1.000",
+  "Indicadora Estado Sur",
+  "Indice Escolaridad",
+  "Gasto per cápita 1.960",
+  "Gasto per cápita 1.959",
+  "Tasa participación masculina 14-24 por 1.000",
+  "Hombres cada 1.000 mujeres",
+  "Población cada 100.000",
+  "Número de no caucásicos cada 1.000 habitantes",
+  "Tasa desempleo urbana Hombres 14-24 por 1.000",
+  "Tasa desempleo urbana Hombres 35-39 por 1.000",
+  "Producto bruto interno per cápita",
+  "Desigualdad ingreso",
+  "Probabilidad Encarcelamiento",
+  "Tiempo de estadía en carceles",
+  "Tasa de criminalidad"
+)
+
+summaryMod <- function(x) {
+  c(
+    quantile(x, probs = seq(0, 1, 0.25)),
+    mean(x),
+    sd(x)
+  )
+}
+DatosTab %>%
   select(
-    -So
+    -"Indicadora Estado Sur"
   ) %>% 
   summarise_if(
     is.numeric,
-    summary
-  ) %>%
+    summaryMod
+  ) %>% 
   mutate(
     Estadistico = c(
       "Min",
       "1er Qu.",
       "Mediana",
+      "3er Qu.",
+      "Max",
       "Media",
-      "3er Qu",
-      "Max"
+      "Desvío.Std"
     )
   ) %>% 
   relocate(
@@ -580,26 +637,19 @@ Datos %>%
     values_from = "Valor",
     names_from = "Estadistico"
   ) %>% 
-  kable(
-    row.names = F,
-    caption = "Resumen descriptivo",
+  kbl(
+    booktabs = T, 
+    caption = "Resumen descriptivo (Variables númericas)"
+  ) %>% 
+  kable_styling(
+    latex_options = c("striped", "hold_position"),
+    font_size = 7.5
   )
 @
 
-\newpage
-{
-\centering
-<<echo=FALSE>>=
-multiplot(HistU1,HistU2,HistGDP,HistIneq,HistProb,HistTime,cols=3)
-@
-}
-
-
-\newpage
-
 \subsubsection{Correlación entre variables}
 
-<<echo=FALSE>>=
+<<echo=FALSE,out.width = "0.8\\textwidth",fig.align = "center">>=
 qplot(x=Var1,
       y=Var2,
       data = melt(cor(Datos, use = "p")),
@@ -631,6 +681,105 @@ qplot(x=Var1,
 @
 
 
+\section{Especificación y selección de modelos}
+
+En este apartado se explicitará el procedimiento de especificación y selección de variables 
+para dada la información disponible explicar la \textit{Tasa de Criminalidad en el 1960 para los Estados de USA}.
+
+
+\subsection{Modelo completo}
+
+Como una primera aproximación, se construye un modelo donde se incluyen todas las variables de nuestra tabla de datos. 
+
+<<>>=
+lm(
+    y ~ . ,
+    data = Datos
+) %>% 
+  glance() %>% 
+  mutate(
+    "$R^{2}.adj$" = adj.r.squared*100,
+    "RSE" = sigma,
+    "F Obs." = statistic,
+    "P-valor*100" = p.value*100,
+    "Regresión.gl" = df,
+    "Residuos.gl" = df.residual,
+    .keep = "none"
+  ) %>% 
+  summarise_if(
+    is.numeric,
+    ~round(.x,3)
+  ) %>% 
+  kbl(
+    booktabs = T,
+    caption = "Test sobre el modelo completo",
+    escape = FALSE
+  ) %>% 
+    kable_styling(
+    latex_options = c("striped", "hold_position"),
+    font_size = 7.5
+  )
+@
+
+En base al cuadro anterior se puede apreciar que si hacemos hincapie al $R^{2}_{a}$ que hace referencia a la variabilidad de 
+que podemos explicar con nuestro modelo respecto a la tasa de criminalidad, se puede considerar un valor \textit{aceptable}.
+
+Si consideramos la siguiente prueba $H_{0})\beta_{1} = \beta{2} = \cdots = \beta_{k} =0$ y el siguiente estadístco de prueba: 
+
+\begin{equation}
+  F_{obs} = \frac{SCE/Regresion.gl}{RSE^2} 
+\end{equation}
+
+Siendo $SCE$ la suma de cuadrados explicados por la regresión $\sum{\left(\hat{y}_{i}-\bar{y}\right)^{2}}$ y $RSE^{2} = SCR/Residos.gl = \frac{\sum{\left(y_{i}-\hat{y}_{i}\right)^{2}}}{Residuos.gl}$ el cuadrado del error estandar de los Residuos,
+resultando para este caso particular $SCE = 5.525.982$ y $RSE^{2} = 43707.93$ podemos obtener el $F_{obs}$ que nos permite rechazar $H_{0}$. 
+De esta manera, podemos decir que el modelo es globalmente significativo,a continuación veremos el test de significación de cada variable.
+<<>>=
+lm(
+    y ~ . ,
+    data = Datos
+) %>% 
+  tidy() %>% 
+  summarise_if(
+    is.numeric,
+    ~round(.x,3)
+  ) %>% 
+  mutate(
+    Variable = c("Intercepto",names(DatosTab)[-length(DatosTab)]),
+    "Estimación" = estimate,
+    "Error estandar" = std.error,
+    "Estadístico F" = statistic,
+    "P valor" = p.value,
+    "$\\left(H_{0}^{\\alpha = 0.05}\\right)\\beta_{i} = 0$" = case_when(
+      p.value < 0.05 ~ "Se rechaza H0",
+      p.value >= 0.05 ~ "No se rechaza H0"
+    ),
+    .keep = "none"
+  ) %>% 
+  kbl(
+    booktabs = T, 
+    caption = "Estimación,error estandar y test individual del modelo completo ",
+    escape = FALSE
+  ) %>% 
+  kable_styling(
+    latex_options = c("striped", "hold_position"),
+    font_size = 7.5
+  )
+@
+
+En base al cuadro anterior se puede ver que no existe evidencia estadístca suficiente para rechazar que no existe
+una relación lineal de las variables incluidas para explicar la \textit{tasa de criminalidad} 
+a exepción de la \textit{Cantidad de Hombres de 14-24 cada mil habitantes},\textit{la desigualdad en el ingreso} y la
+\textit{probabilidad de encarcelamiento}. 
+
+En resumen, el modelo es globalmente significativo, pero en solo 3 variables podemos afirmar que sean significativas en el modelo,
+es por esto que respetando el concepto de parsimonia y por una alta correlación entre variables, debemos de trabajar en 
+la selección de las variables a utilizar.
+
+\subsection{Aca iría la selección de modelos}
+
+\section{Diagnostico}
+
+\section{Conclusiones}
 
 
 
