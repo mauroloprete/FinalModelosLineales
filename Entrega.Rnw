@@ -8,8 +8,8 @@
 \usepackage{stackengine}
 \usepackage{appendix}
 \usepackage{caption}
-%usepackage[spanish]{babel}
-\usepackage[left=2.30cm,top=2.54cm,right=2.30cm,bottom=2.54cm]{geometry}
+\usepackage[spanish]{babel}
+\usepackage[left=2.10cm,top=2.54cm,right=2.30cm,bottom=2.54cm]{geometry}
 \setlength{\parindent}{0pt}
 \usepackage[font=small,labelfont=bf]{caption}
 
@@ -41,8 +41,15 @@
 
 <<include=FALSE>>=
 knitr::opts_chunk$set(echo = TRUE)
-library(tidyverse)
-library(reshape2)
+if(!require(pacman)) {
+  install.packages("pacman")
+}
+pacman::p_load(
+  tidyverse,
+  reshape2,
+  knitr,
+  tidymodels
+)
 
 Datos <- read.table(
     "UScrime.txt",
@@ -93,30 +100,34 @@ En esta primer sección se hará especial enfásis en las variables por sí mism
 
 Se estudiarán medidas de resumen y a partir de histogramas tendremos un primer acercamiento a la distribución de las mismas y su comportamiento.
 
+\begin{center}
 \begin{table}[h]
-\begin{tabular}{|c|l|l|l|}
+\begin{tabular}{|c|l|l|}
 \hline
-\textbf{Nombre} & \multicolumn{1}{c|}{\textbf{Descripción}}                                                                                                              & \multicolumn{1}{c|}{\textbf{Clasificación}} & \multicolumn{1}{c|}{\textbf{Unidad}} \\ \hline
-\textbf{Y}      & Tasa de criminalidad, número de ofensas reportadas a la policía por habitante                                                                          & Cuantitativa                                &                                      \\ \hline
-\textbf{M}      & Número de hombres entre 14 y 24 años cada 10000 habitantes                                                                                             & Cuantitativa                                &                                      \\ \hline
-\textbf{So}     & Variables indicadora de los estados del sur (0=No, 1=Si)                                                                                               & Cualitativa                                 &                                      \\ \hline
-\textbf{Ed}     & Indice que refeleja la escolaridad del estado                                                                                                          & Cuantitativa                                &                                      \\ \hline
-\textbf{Po1}    & Gasto per cápita en policía realizado por el gobierno estatal o local en 1960                                                                          & Cuantitativa                                &                                      \\ \hline
-\textbf{Po2}    & Gasto per cápita en policía realizado por el gobierno estatal o local en 1995                                                                          & Cuantitativa                                &                                      \\ \hline
-\textbf{LF}     & \begin{tabular}[c]{@{}l@{}}Tasa de participación en la fuerza laboral civil de sexo masculino entre 14 y 24 \\ años, cada 1000 habitantes\end{tabular} & Cuantitativa                                &                                      \\ \hline
-\textbf{M.F}    & Número de hombres por cada 1000 mujeres                                                                                                                & Cuantitativa                                &                                      \\ \hline
-\textbf{Pop}    & Tamaño de la población del estado cada 100000 habitantes                                                                                               & Cuantitativa                                &                                      \\ \hline
-\textbf{NW}     & Número de caucásicos cada 1000 habitantes                                                                                                              & Cuantitativa                                &                                      \\ \hline
-\textbf{U1}     & Tasa de desempleo urbana de hombres entre 14 y 24 años cada 1000 habitantes                                                                            & Cuantitativa                                &                                      \\ \hline
-\textbf{U2}     & Tasa de desempleo urbana de hombres entre 35 y 39 años cada 1000 habitantes                                                                            & Cuantitativa                                &                                      \\ \hline
-\textbf{GDP}    & Producto bruto interno per cápita                                                                                                                      & Cuantitativa                                &                                      \\ \hline
-\textbf{Ineq}   & Desigualdad del ingreso                                                                                                                                & Cuantitativa                                &                                      \\ \hline
-\textbf{Prob}   & Probabilidad de encarcelamiento                                                                                                                        & Cuantitativa                                &                                      \\ \hline
-\textbf{Time}   & Tiempo promedio de estadía en cárceles estatales                                                                                                       & Cuantitativa                                &                                      \\ \hline
+\textbf{Nombre} & \multicolumn{1}{c|}{\textbf{Descripción}}                                                                                                              & \multicolumn{1}{c|}{\textbf{Clasificación}} \\ \hline
+\textbf{Y}      & Tasa de criminalidad, número de ofensas reportadas a la policía por habitante                                                                          & Cuantitativa                                \\ \hline
+\textbf{M}      & Número de hombres entre 14 y 24 años cada 10000 habitantes                                                                                             & Cuantitativa                                \\ \hline
+\textbf{So}     & Variables indicadora de los estados del sur (0=No, 1=Si)                                                                                               & Cualitativa                                 \\ \hline
+\textbf{Ed}     & Indice que refeleja la escolaridad del estado                                                                                                          & Cuantitativa                                \\ \hline
+\textbf{Po1}    & Gasto per cápita en policía realizado por el gobierno estatal o local en 1960                                                                          & Cuantitativa                                \\ \hline
+\textbf{Po2}    & Gasto per cápita en policía realizado por el gobierno estatal o local en 1995                                                                          & Cuantitativa                                \\ \hline
+\textbf{LF}     & \begin{tabular}[c]{@{}l@{}}Tasa de participación en la fuerza laboral civil de sexo masculino entre 14 y 24 \\ años, cada 1000 habitantes\end{tabular} & Cuantitativa                                \\ \hline
+\textbf{M.F}    & Número de hombres por cada 1000 mujeres                                                                                                                & Cuantitativa                                \\ \hline
+\textbf{Pop}    & Tamaño de la población del estado cada 100000 habitantes                                                                                               & Cuantitativa                                \\ \hline
+\textbf{NW}     & Número de caucásicos cada 1000 habitantes                                                                                                              & Cuantitativa                                \\ \hline
+\textbf{U1}     & Tasa de desempleo urbana de hombres entre 14 y 24 años cada 1000 habitantes                                                                            & Cuantitativa                                \\ \hline
+\textbf{U2}     & Tasa de desempleo urbana de hombres entre 35 y 39 años cada 1000 habitantes                                                                            & Cuantitativa                                \\ \hline
+\textbf{GDP}    & Producto bruto interno per cápita                                                                                                                      & Cuantitativa                                \\ \hline
+\textbf{Ineq}   & Desigualdad del ingreso                                                                                                                                & Cuantitativa                                \\ \hline
+\textbf{Prob}   & Probabilidad de encarcelamiento                                                                                                                        & Cuantitativa                                \\ \hline
+\textbf{Time}   & Tiempo promedio de estadía en cárceles estatales                                                                                                       & Cuantitativa                                \\ \hline
 \end{tabular}
 \end{table}
+\end{center}
 \newpage
 \subsubsection{Histogramas y Barplots}
+
+{
 \centering
 <<echo=FALSE>>=
 # Multiple plot function, la hizo Dios.
@@ -529,11 +540,16 @@ HistTime<-ggplot(Datos,aes(x=Time))+
 
 multiplot(HistM,BarpSo,HistEd,HistPo1,HistNW,HistPo2,HistLF,HistMF,HistPop,cols=3)
 @
+}
 \newpage
+{
 \centering
 <<echo=FALSE>>=
 multiplot(HistU1,HistU2,HistGDP,HistIneq,HistProb,HistTime,cols=3)
 @
+}
+
+
 \newpage
 
 \subsubsection{Correlación entre variables}
@@ -567,5 +583,55 @@ qplot(x=Var1,
        x="Variables",
        y="",
        fill="Coef Corr.")
-@ 
+@
+
+
+
+
+\subsubsection{Estadisticas descriptivas}
+
+
+<<echo = F>>=
+Datos %>%
+  select(
+    -So
+  ) %>% 
+  summarise_if(
+    is.numeric,
+    summary
+  ) %>%
+  mutate(
+    Estadistico = c(
+      "Min",
+      "1er Qu.",
+      "Mediana",
+      "Media",
+      "3er Qu",
+      "Max"
+    )
+  ) %>% 
+  relocate(
+    where(is.numeric),
+    .after = where(is.character)
+  ) %>%
+  mutate_if(
+    is.numeric,
+    format,
+    digits = 2
+  ) %>% 
+  pivot_longer(
+    cols = -Estadistico,
+    names_to = "Variable",
+    values_to = "Valor"
+  ) %>% 
+  pivot_wider(
+    values_from = "Valor",
+    names_from = "Estadistico"
+  ) %>% 
+  kable(
+    row.names = F,
+    caption = "Resumen descriptivo",
+  )
+@
+
 \end{document}
