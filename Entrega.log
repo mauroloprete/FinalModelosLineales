@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 20.7) (preloaded format=pdflatex 2020.9.10)  6 JUN 2021 19:46
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 20.7) (preloaded format=pdflatex 2020.9.10)  12 JUN 2021 13:54
 entering extended mode
 **./Entrega.tex
 (Entrega.tex
@@ -322,6 +322,42 @@ Package caption Info: Standard document class detected.
 \c@continuedfloat=\count199
 Package caption Info: hyperref package is loaded.
 )
+("C:\Users\Usuario\AppData\Local\Programs\MiKTeX 2.9\tex/generic/babel\babel.st
+y"
+Package: babel 2020/09/01 3.48 The Babel package
+
+("C:\Users\Usuario\AppData\Local\Programs\MiKTeX 2.9\tex/generic/babel\babel.de
+f"
+File: babel.def 2020/09/01 3.48 Babel common definitions
+\babel@savecnt=\count266
+\U@D=\dimen157
+\l@babelnohyphens=\language83
+
+("C:\Users\Usuario\AppData\Local\Programs\MiKTeX 2.9\tex/generic/babel\txtbabel
+.def")
+\bbl@readstream=\read2
+)
+\bbl@dirlevel=\count267
+
+*************************************
+* Local config file bblopts.cfg used
+*
+
+("C:\Users\Usuario\AppData\Local\Programs\MiKTeX 2.9\tex/latex/arabi\bblopts.cf
+g"
+File: bblopts.cfg 2005/09/08 v0.1 add Arabic and Farsi to "declared" options of
+ babel
+)
+("C:\Users\Usuario\AppData\Local\Programs\MiKTeX 2.9\tex/latex/babel-spanish\sp
+anish.ldf"
+Language: spanish.ldf 2016/03/03 v5.0p Spanish support from the babel system
+\es@quottoks=\toks20
+\es@quotdepth=\count268
+Package babel Info: Making " an active character on input line 561.
+Package babel Info: Making . an active character on input line 662.
+Package babel Info: Making < an active character on input line 707.
+Package babel Info: Making > an active character on input line 707.
+))
 ("C:\Users\Usuario\AppData\Local\Programs\MiKTeX 2.9\tex/latex/geometry\geometr
 y.sty"
 Package: geometry 2020/01/02 v5.9 Page Geometry
@@ -330,18 +366,18 @@ Package: geometry 2020/01/02 v5.9 Page Geometry
 ty"
 Package: ifvtex 2019/10/25 v1.7 ifvtex legacy package. Use iftex instead.
 )
-\Gm@cnth=\count266
-\Gm@cntv=\count267
-\c@Gm@tempcnt=\count268
-\Gm@bindingoffset=\dimen157
-\Gm@wd@mp=\dimen158
-\Gm@odd@mp=\dimen159
-\Gm@even@mp=\dimen160
-\Gm@layoutwidth=\dimen161
-\Gm@layoutheight=\dimen162
-\Gm@layouthoffset=\dimen163
-\Gm@layoutvoffset=\dimen164
-\Gm@dimlist=\toks20
+\Gm@cnth=\count269
+\Gm@cntv=\count270
+\c@Gm@tempcnt=\count271
+\Gm@bindingoffset=\dimen158
+\Gm@wd@mp=\dimen159
+\Gm@odd@mp=\dimen160
+\Gm@even@mp=\dimen161
+\Gm@layoutwidth=\dimen162
+\Gm@layoutheight=\dimen163
+\Gm@layouthoffset=\dimen164
+\Gm@layoutvoffset=\dimen165
+\Gm@dimlist=\toks21
 
 ("C:\Users\Usuario\AppData\Local\Programs\MiKTeX 2.9\tex/latex/geometry\geometr
 y.cfg"))
@@ -353,42 +389,45 @@ tim
 ("C:\Users\Usuario\AppData\Local\Programs\MiKTeX 2.9\tex/latex/l3backend\l3back
 end-pdftex.def"
 File: l3backend-pdftex.def 2020-09-01 L3 backend support: PDF output (pdfTeX)
-\l__kernel_color_stack_int=\count269
+\l__kernel_color_stack_int=\count272
 \l__pdf_internal_box=\box52
-) (Entrega.aux)
+) (Entrega.aux
+LaTeX Info: Redefining \. on input line 25.
+LaTeX Info: Redefining \% on input line 25.
+)
 \openout1 = `Entrega.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 73.
-LaTeX Font Info:    ... okay on input line 73.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 73.
-LaTeX Font Info:    ... okay on input line 73.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 73.
-LaTeX Font Info:    ... okay on input line 73.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 73.
-LaTeX Font Info:    ... okay on input line 73.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 73.
-LaTeX Font Info:    ... okay on input line 73.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 73.
-LaTeX Font Info:    ... okay on input line 73.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 73.
-LaTeX Font Info:    ... okay on input line 73.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 73.
-LaTeX Font Info:    ... okay on input line 73.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 74.
+LaTeX Font Info:    ... okay on input line 74.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 74.
+LaTeX Font Info:    ... okay on input line 74.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 74.
+LaTeX Font Info:    ... okay on input line 74.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 74.
+LaTeX Font Info:    ... okay on input line 74.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 74.
+LaTeX Font Info:    ... okay on input line 74.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 74.
+LaTeX Font Info:    ... okay on input line 74.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 74.
+LaTeX Font Info:    ... okay on input line 74.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 74.
+LaTeX Font Info:    ... okay on input line 74.
 
 ("C:\Users\Usuario\AppData\Local\Programs\MiKTeX 2.9\tex/context/base/mkii\supp
 -pdf.mkii"
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count270
-\scratchdimen=\dimen165
+\scratchcounter=\count273
+\scratchdimen=\dimen166
 \scratchbox=\box53
-\nofMPsegments=\count271
-\nofMParguments=\count272
-\everyMPshowfont=\toks21
-\MPscratchCnt=\count273
-\MPscratchDim=\dimen166
-\MPnumerator=\count274
-\makeMPintoPDFobject=\count275
-\everyMPtoPDFconversion=\toks22
+\nofMPsegments=\count274
+\nofMParguments=\count275
+\everyMPshowfont=\toks22
+\MPscratchCnt=\count276
+\MPscratchDim=\dimen167
+\MPnumerator=\count277
+\makeMPintoPDFobject=\count278
+\everyMPtoPDFconversion=\toks23
 )
 ("C:\Users\Usuario\AppData\Local\Programs\MiKTeX 2.9\tex/latex/epstopdf-pkg\eps
 topdf-base.sty"
@@ -397,7 +436,7 @@ Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
 85.
 )
 \AtBeginShipoutBox=\box54
-Package hyperref Info: Link coloring OFF on input line 73.
+Package hyperref Info: Link coloring OFF on input line 74.
 
 ("C:\Users\Usuario\AppData\Local\Programs\MiKTeX 2.9\tex/latex/hyperref\nameref
 .sty"
@@ -411,17 +450,19 @@ Package: refcount 2019/12/15 v3.6 Data extraction from label references (HO)
 \gettitlestring.sty"
 Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
 )
-\c@section@level=\count276
+\c@section@level=\count279
 )
-LaTeX Info: Redefining \ref on input line 73.
-LaTeX Info: Redefining \pageref on input line 73.
-LaTeX Info: Redefining \nameref on input line 73.
+LaTeX Info: Redefining \ref on input line 74.
+LaTeX Info: Redefining \pageref on input line 74.
+LaTeX Info: Redefining \nameref on input line 74.
  (Entrega.out) (Entrega.out)
 \@outlinefile=\write3
 \openout3 = `Entrega.out'.
 
 Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: End \AtBeginDocument code.
+LaTeX Info: Redefining \. on input line 74.
+LaTeX Info: Redefining \% on input line 74.
 
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
@@ -431,14 +472,14 @@ Package caption Info: End \AtBeginDocument code.
 * layout: <same size as paper>
 * layoutoffset:(h,v)=(0.0pt,0.0pt)
 * modes: 
-* h-part:(L,W,R)=(65.44142pt, 466.62503pt, 65.44142pt)
+* h-part:(L,W,R)=(59.75095pt, 472.3155pt, 65.44142pt)
 * v-part:(T,H,B)=(72.2698pt, 700.50723pt, 72.2698pt)
 * \paperwidth=597.50787pt
 * \paperheight=845.04684pt
-* \textwidth=466.62503pt
+* \textwidth=472.3155pt
 * \textheight=700.50723pt
-* \oddsidemargin=-6.82857pt
-* \evensidemargin=-6.82857pt
+* \oddsidemargin=-12.51904pt
+* \evensidemargin=-12.51904pt
 * \topmargin=-37.00018pt
 * \headheight=12.0pt
 * \headsep=25.0pt
@@ -457,22 +498,24 @@ Package caption Info: End \AtBeginDocument code.
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-<CaratulaIgnatenko.png, id=23, 682.80093pt x 558.58687pt>
+<CaratulaIgnatenko.png, id=27, 682.80093pt x 558.58687pt>
 File: CaratulaIgnatenko.png Graphic file (type png)
 <use CaratulaIgnatenko.png>
-Package pdftex.def Info: CaratulaIgnatenko.png  used on input line 78.
+Package pdftex.def Info: CaratulaIgnatenko.png  used on input line 79.
 (pdftex.def)             Requested size: 398.33858pt x 325.88132pt.
 [1
 
 {C:/Users/Usuario/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map} <./Caratul
 aIgnatenko.png>] (Entrega.toc
-LaTeX Font Info:    Trying to load font information for U+msa on input line 3.
+LaTeX Info: Redefining \. on input line 1.
+LaTeX Info: Redefining \% on input line 1.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 4.
 
 ("C:\Users\Usuario\AppData\Local\Programs\MiKTeX 2.9\tex/latex/amsfonts\umsa.fd
 "
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 3.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 4.
 
 ("C:\Users\Usuario\AppData\Local\Programs\MiKTeX 2.9\tex/latex/amsfonts\umsb.fd
 "
@@ -481,7 +524,10 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 \tf@toc=\write4
 \openout4 = `Entrega.toc'.
 
- (Entrega.lof)
+ (Entrega.lof
+LaTeX Info: Redefining \. on input line 1.
+LaTeX Info: Redefining \% on input line 1.
+)
 \tf@lof=\write5
 \openout5 = `Entrega.lof'.
 
@@ -489,14 +535,14 @@ pdfTeX warning (ext4): destination with the same identifier (name{page.1}) has
 been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.89 \newpage
+l.90 \newpage
               [1]
-Package color Info: Redefining color shadecolor on input line 95.
-<figure/unnamed-chunk-2-1.pdf, id=44, 505.89pt x 505.89pt>
+Package color Info: Redefining color shadecolor on input line 96.
+<figure/unnamed-chunk-2-1.pdf, id=49, 505.89pt x 505.89pt>
 File: figure/unnamed-chunk-2-1.pdf Graphic file (type pdf)
 <use figure/unnamed-chunk-2-1.pdf>
-Package pdftex.def Info: figure/unnamed-chunk-2-1.pdf  used on input line 96.
-(pdftex.def)             Requested size: 466.62503pt x 466.63635pt.
+Package pdftex.def Info: figure/unnamed-chunk-2-1.pdf  used on input line 97.
+(pdftex.def)             Requested size: 472.3155pt x 472.32544pt.
  [2 <./figure/unnamed-chunk-2-1.pdf>]
 Underfull \hbox (badness 10000) in paragraph at lines 102--104
 
@@ -513,50 +559,54 @@ Underfull \hbox (badness 10000) in paragraph at lines 111--113
  []
 
 
-Overfull \hbox (114.49638pt too wide) in paragraph at lines 117--137
+Overfull \hbox (56.51167pt too wide) in paragraph at lines 118--138
 [][] 
  []
 
 [3]
-Package color Info: Redefining color shadecolor on input line 142.
-<figure/unnamed-chunk-3-1.pdf, id=61, 505.89pt x 505.89pt>
+Package color Info: Redefining color shadecolor on input line 146.
+<figure/unnamed-chunk-3-1.pdf, id=66, 505.89pt x 505.89pt>
 File: figure/unnamed-chunk-3-1.pdf Graphic file (type pdf)
 <use figure/unnamed-chunk-3-1.pdf>
-Package pdftex.def Info: figure/unnamed-chunk-3-1.pdf  used on input line 143.
-(pdftex.def)             Requested size: 466.62503pt x 466.63635pt.
+Package pdftex.def Info: figure/unnamed-chunk-3-1.pdf  used on input line 147.
+(pdftex.def)             Requested size: 472.3155pt x 472.32544pt.
  [4 <./figure/unnamed-chunk-3-1.pdf>]
-Package color Info: Redefining color shadecolor on input line 149.
-<figure/unnamed-chunk-4-1.pdf, id=72, 505.89pt x 505.89pt>
+Package color Info: Redefining color shadecolor on input line 155.
+ [5]
+Package color Info: Redefining color shadecolor on input line 202.
+<figure/unnamed-chunk-4-1.pdf, id=82, 505.89pt x 505.89pt>
 File: figure/unnamed-chunk-4-1.pdf Graphic file (type pdf)
 <use figure/unnamed-chunk-4-1.pdf>
-Package pdftex.def Info: figure/unnamed-chunk-4-1.pdf  used on input line 150.
-(pdftex.def)             Requested size: 466.62503pt x 466.63635pt.
- [5 <./figure/unnamed-chunk-4-1.pdf>]
-Package color Info: Redefining color shadecolor on input line 158.
-<figure/unnamed-chunk-5-1.pdf, id=83, 505.89pt x 505.89pt>
+Package pdftex.def Info: figure/unnamed-chunk-4-1.pdf  used on input line 203.
+(pdftex.def)             Requested size: 472.3155pt x 472.32544pt.
+ [6 <./figure/unnamed-chunk-4-1.pdf>]
+Package color Info: Redefining color shadecolor on input line 213.
+<figure/unnamed-chunk-5-1.pdf, id=94, 505.89pt x 505.89pt>
 File: figure/unnamed-chunk-5-1.pdf Graphic file (type pdf)
 <use figure/unnamed-chunk-5-1.pdf>
-Package pdftex.def Info: figure/unnamed-chunk-5-1.pdf  used on input line 159.
-(pdftex.def)             Requested size: 466.62503pt x 466.63635pt.
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 162.
-
-[6 <./figure/unnamed-chunk-5-1.pdf>]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 162.
- (Entrega.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 162.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 162.
+Package pdftex.def Info: figure/unnamed-chunk-5-1.pdf  used on input line 214.
+(pdftex.def)             Requested size: 472.3155pt x 472.32544pt.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 221.
+ [7 <./figure/unnamed-chunk-5-1.pdf>]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 221.
+ (Entrega.aux
+LaTeX Info: Redefining \. on input line 25.
+LaTeX Info: Redefining \% on input line 25.
+)
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 221.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 221.
 Package rerunfilecheck Info: File `Entrega.out' has not changed.
-(rerunfilecheck)             Checksum: BB71FC364DDC3F2BB389827BDC2AA702;359.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 162.
+(rerunfilecheck)             Checksum: 3310C56FFB27B53CE4F09CCEED99889D;436.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 221.
  ) 
 Here is how much of TeX's memory you used:
- 8405 strings out of 481165
- 133953 string characters out of 2901125
- 404201 words of memory out of 3000000
- 23852 multiletter control sequences out of 15000+200000
- 542609 words of font info for 57 fonts, out of 3000000 for 9000
+ 9509 strings out of 481165
+ 149461 string characters out of 2901125
+ 436758 words of memory out of 3000000
+ 24934 multiletter control sequences out of 15000+200000
+ 542917 words of font info for 58 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
- 43i,15n,43p,986b,348s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 43i,15n,43p,986b,392s stack positions out of 5000i,500n,10000p,200000b,50000s
 <C:/Users/Usuario/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfon
 ts/cm/cmbx10.pfb><C:/Users/Usuario/AppData/Local/Programs/MiKTeX 2.9/fonts/type
 1/public/amsfonts/cm/cmbx12.pfb><C:/Users/Usuario/AppData/Local/Programs/MiKTeX
@@ -565,9 +615,9 @@ ts/cm/cmbx10.pfb><C:/Users/Usuario/AppData/Local/Programs/MiKTeX 2.9/fonts/type
 /AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:
 /Users/Usuario/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm
 /cmti10.pfb>
-Output written on Entrega.pdf (7 pages, 158692 bytes).
+Output written on Entrega.pdf (8 pages, 161933 bytes).
 PDF statistics:
- 122 PDF objects out of 1000 (max. 8388607)
- 15 named destinations out of 1000 (max. 500000)
- 66 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 132 PDF objects out of 1000 (max. 8388607)
+ 18 named destinations out of 1000 (max. 500000)
+ 74 words of extra memory for PDF output out of 10000 (max. 10000000)
 

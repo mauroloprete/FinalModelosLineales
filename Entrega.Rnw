@@ -59,8 +59,9 @@ Datos <- read.table(
 @
 \section{Introducción}
 <<echo=FALSE>>=
+Sturges<-log2(47)+1
 ggplot(Datos,aes(x=y))+
-  geom_histogram(binwidth = 100,
+  geom_histogram(bins = Sturges,
                  fill="#8F3A84FF",
                  colour="black")+
   theme(aspect.ratio = 1,
@@ -169,7 +170,7 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
 }
 
 HistM<-ggplot(Datos,aes(x=M))+
-  geom_histogram(binwidth = 5,
+  geom_histogram(bins=Sturges,
                  fill="#8F3A84FF",
                  colour="black")+
   theme(aspect.ratio = 1,
@@ -219,7 +220,7 @@ BarpSo<-ggplot(data=Datos, aes(x=factor(So))) +
        y="Cantidad de respuestas")
 
 HistEd<-ggplot(Datos,aes(x=Ed))+
-  geom_histogram(binwidth = 5,
+  geom_histogram(bins=Sturges,
                  fill="#8F3A84FF",
                  colour="black")+
   theme(aspect.ratio = 1,
@@ -243,7 +244,7 @@ HistEd<-ggplot(Datos,aes(x=Ed))+
        y="Cantidad de Estados")
 
 HistPo1<-ggplot(Datos,aes(x=Po1))+
-  geom_histogram(binwidth = 5,
+  geom_histogram(bins=Sturges,
                  fill="#8F3A84FF",
                  colour="black")+
   theme(aspect.ratio = 1,
@@ -267,7 +268,7 @@ HistPo1<-ggplot(Datos,aes(x=Po1))+
        y="Cantidad de Estados")
 
 HistPo2<-ggplot(Datos,aes(x=Po2))+
-  geom_histogram(binwidth = 5,
+  geom_histogram(bins=Sturges,
                  fill="#8F3A84FF",
                  colour="black")+
   theme(aspect.ratio = 1,
@@ -291,7 +292,7 @@ HistPo2<-ggplot(Datos,aes(x=Po2))+
        y="Cantidad de Estados")
 
 HistLF<-ggplot(Datos,aes(x=LF))+
-  geom_histogram(binwidth = 5,
+  geom_histogram(bins=Sturges,
                  fill="#8F3A84FF",
                  colour="black")+
   theme(aspect.ratio = 1,
@@ -315,7 +316,7 @@ HistLF<-ggplot(Datos,aes(x=LF))+
        y="Cantidad de Estados")
 
 HistMF<-ggplot(Datos,aes(x=M.F))+
-  geom_histogram(binwidth = 15,
+  geom_histogram(bins=Sturges,
                  fill="#8F3A84FF",
                  colour="black")+
   theme(aspect.ratio = 1,
@@ -339,7 +340,7 @@ HistMF<-ggplot(Datos,aes(x=M.F))+
        y="Cantidad de Estados")
 
 HistPop<-ggplot(Datos,aes(x=Pop))+
-  geom_histogram(binwidth = 15,
+  geom_histogram(bins=Sturges,
                  fill="#8F3A84FF",
                  colour="black")+
   theme(aspect.ratio = 1,
@@ -363,7 +364,7 @@ HistPop<-ggplot(Datos,aes(x=Pop))+
        y="Cantidad de Estados")
 
 HistNW<-ggplot(Datos,aes(x=NW))+
-  geom_histogram(binwidth = 15,
+  geom_histogram(bins=Sturges,
                  fill="#8F3A84FF",
                  colour="black")+
   theme(aspect.ratio = 1,
@@ -387,7 +388,7 @@ HistNW<-ggplot(Datos,aes(x=NW))+
        y="Cantidad de Estados")
 
 HistU1<-ggplot(Datos,aes(x=U1))+
-  geom_histogram(binwidth = 10,
+  geom_histogram(bins=Sturges,
                  fill="#8F3A84FF",
                  colour="black")+
   theme(aspect.ratio = 1,
@@ -412,7 +413,7 @@ hombres de 14 a 24 ",
        y="Cantidad de Estados")
 
 HistU2<-ggplot(Datos,aes(x=U2))+
-  geom_histogram(binwidth = 10,
+  geom_histogram(bins=Sturges,
                  fill="#8F3A84FF",
                  colour="black")+
   theme(aspect.ratio = 1,
@@ -430,14 +431,14 @@ HistU2<-ggplot(Datos,aes(x=U2))+
         axis.text.y = element_text(
           color="#8C04C2"
         ))+
-  labs(title="Histograma variable U1",
+  labs(title="Histograma variable U2",
        subtitle = "TD cada 1000 habitantes, 
 hombres de 35 a 39 ",
        x="U2",
        y="Cantidad de Estados")
 
 HistGDP<-ggplot(Datos,aes(x=GDP))+
-  geom_histogram(binwidth = 50,
+  geom_histogram(bins=Sturges,
                  fill="#8F3A84FF",
                  colour="black")+
   theme(aspect.ratio = 1,
@@ -459,11 +460,10 @@ HistGDP<-ggplot(Datos,aes(x=GDP))+
        subtitle = "PIB per cápita",
        x="GDP",
        y="Cantidad de Estados")+
-  scale_x_continuous(breaks = c(200,300,400,500,600,700))+
   scale_y_continuous(breaks = c(2,4,6,8,10,12,14,16))
 
 HistIneq<-ggplot(Datos,aes(x=Ineq))+
-  geom_histogram(binwidth = 10,
+  geom_histogram(bins=Sturges,
                  fill="#8F3A84FF",
                  colour="black")+
   theme(aspect.ratio = 1,
@@ -485,11 +485,10 @@ HistIneq<-ggplot(Datos,aes(x=Ineq))+
        subtitle = "Desigualdad de Ingresos",
        x="Ineq",
        y="Cantidad de Estados")+
-   scale_x_continuous(breaks = c(100,150,200,250,300))+
    scale_y_continuous(breaks = c(2,4,6,8,10,12))
 
 HistProb<-ggplot(Datos,aes(x=Prob))+
-  geom_histogram(binwidth = 0.02,
+  geom_histogram(bins=Sturges,
                  fill="#8F3A84FF",
                  colour="black")+
   theme(aspect.ratio = 1,
@@ -511,11 +510,10 @@ HistProb<-ggplot(Datos,aes(x=Prob))+
   labs(title="Histograma variable Prob",
        subtitle = "Probabilidad de encarcelamiento",
        x="P",
-       y="Cantidad de Estados")+
-  scale_x_continuous(breaks = c(0,0.02,0.04,0.06,0.08,0.10,0.12))
+       y="Cantidad de Estados")
 
 HistTime<-ggplot(Datos,aes(x=Time))+
-  geom_histogram(binwidth = 8,
+  geom_histogram(bins=Sturges,
                  fill="#8F3A84FF",
                  colour="black")+
   theme(aspect.ratio = 1,
@@ -541,6 +539,53 @@ HistTime<-ggplot(Datos,aes(x=Time))+
 multiplot(HistM,BarpSo,HistEd,HistPo1,HistNW,HistPo2,HistLF,HistMF,HistPop,cols=3)
 @
 }
+\newpage
+\subsubsection{Medidas de resumen}
+
+
+<<echo = F>>=
+Datos %>%
+  select(
+    -So
+  ) %>% 
+  summarise_if(
+    is.numeric,
+    summary
+  ) %>%
+  mutate(
+    Estadistico = c(
+      "Min",
+      "1er Qu.",
+      "Mediana",
+      "Media",
+      "3er Qu",
+      "Max"
+    )
+  ) %>% 
+  relocate(
+    where(is.numeric),
+    .after = where(is.character)
+  ) %>%
+  mutate_if(
+    is.numeric,
+    format,
+    digits = 2
+  ) %>% 
+  pivot_longer(
+    cols = -Estadistico,
+    names_to = "Variable",
+    values_to = "Valor"
+  ) %>% 
+  pivot_wider(
+    values_from = "Valor",
+    names_from = "Estadistico"
+  ) %>% 
+  kable(
+    row.names = F,
+    caption = "Resumen descriptivo",
+  )
+@
+
 \newpage
 {
 \centering
@@ -588,50 +633,5 @@ qplot(x=Var1,
 
 
 
-\subsubsection{Estadisticas descriptivas}
-
-
-<<echo = F>>=
-Datos %>%
-  select(
-    -So
-  ) %>% 
-  summarise_if(
-    is.numeric,
-    summary
-  ) %>%
-  mutate(
-    Estadistico = c(
-      "Min",
-      "1er Qu.",
-      "Mediana",
-      "Media",
-      "3er Qu",
-      "Max"
-    )
-  ) %>% 
-  relocate(
-    where(is.numeric),
-    .after = where(is.character)
-  ) %>%
-  mutate_if(
-    is.numeric,
-    format,
-    digits = 2
-  ) %>% 
-  pivot_longer(
-    cols = -Estadistico,
-    names_to = "Variable",
-    values_to = "Valor"
-  ) %>% 
-  pivot_wider(
-    values_from = "Valor",
-    names_from = "Estadistico"
-  ) %>% 
-  kable(
-    row.names = F,
-    caption = "Resumen descriptivo",
-  )
-@
 
 \end{document}
