@@ -23,6 +23,8 @@
 \usepackage{pdflscape}
 \usepackage{tabu}
 \usepackage{threeparttable}
+\usepackage{amsmath}
+\spanishdecimal{.}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -591,9 +593,8 @@ La variable Ineq también cuenta con una distribución asimétrica pero a difere
 \subsubsection{Medidas de resumen}
 
 Continuando el ánalisis de los gráficos presentados anteriormente, se presenta en forma de tabla 
-el resumen de las variables númericas. A
-
-
+el resumen de las variables númericas. En el mismo se presenta el valor minimo y máximo de cada variable, medidas de tendencia central como lo es el primer y tercer cuartil, junto a la mediana. 
+A su vez, para analizar la dispersión se incluye la media aritmetica y una medida de variabilidad de la misma, como es el Coeficiente de variación. 
 
 <<>>=
 DatosTab <- Datos
@@ -620,7 +621,7 @@ summaryMod <- function(x) {
   c(
     quantile(x, probs = seq(0, 1, 0.25)),
     mean(x),
-    sd(x)/mean(x)
+    (sd(x)/mean(x))*100
   )
 }
 DatosTab %>%
@@ -639,7 +640,7 @@ DatosTab %>%
       "3er Qu.",
       "Max",
       "Media",
-      "CV"
+      "CV*100"
     )
   ) %>% 
   relocate(
@@ -662,18 +663,24 @@ DatosTab %>%
   ) %>% 
   kbl(
     booktabs = T, 
-    caption = "Resumen descriptivo (Variables númericas)"
+    caption = "Medidas descriptivas para variables númericas"
   ) %>% 
   kable_styling(
     latex_options = c("striped", "hold_position"),
-    font_size = 7.5
+    font_size = 8.5
   )
 @
 
+Una vez presenatado el cuadro anterior, podemos agregar al ánalisis de la sección anterior y haciendo hincapie en que nuestras variables son estrcictamente positivas.
+Utilizando el \textbf{CV} se puede apreciar que las variables de referida a población representa una gran variabilidad,algo similar ocurre con el \textit{Número de no caucásicos por cada 1000 habitantes}.
+Esto podría determinar la forma en la que de incluye en el modelo, a continuación veremos la correlación parcial dos a dos de las posibles variables explicativas de nuestro modelo. 
+
+\newpage
 
 \subsubsection{Correlación entre variables}
 
-<<out.width = "0.8\\textwidth",fig.align = "center",fig.cap = "Mapa de correlación de variables incluidas">>=
+
+<<out.width = "1\\textwidth",fig.align = "center",fig.cap = "Mapa de correlación de variables incluidas">>=
 qplot(x=Var1,
       y=Var2,
       data = melt(cor(Datos, use = "p")),
@@ -705,15 +712,146 @@ qplot(x=Var1,
 @
 
 
+\newpage
+
 \section{Especificación y selección de modelos}
 
 En este apartado se explicitará el procedimiento de especificación y selección de variables 
-para dada la información disponible explicar la \textit{Tasa de Criminalidad en el 1960 para los Estados de USA}.
+para que dada la información disponible explicar la \textit{Tasa de Criminalidad en el 1960 para los Estados de USA}. 
+\\
+Considerando los ánalisis anteriores, antes de asignarle una forma a cada variable, utilizando diagramas de dispersión la para ver la relación que tienen con la variable Respuesta,
+haciendo enfasis en aquellas que en el mapa de correlación se presentan colores gris claro o blancos, en concreto: 
 
+\begin{itemize}
+  \item {\textbf{M} : \textit{Número de hombres entre 14 y 24 años por 1.000 habitantes}}
+  \item {\textbf{NW} : \textit{Número de no caucásicos por cada 1000 habitantes}}
+  \item {\textbf{U1} : \textit{Tasa de desempleo urbana por 1000 habitantes de hombres entre los 14 y 24 años}}
+\end{itemize}
+
+La justificación de esto se debe a que el coeficiente correlación toma en cuenta solo relaciones lineales por lo que deberíamos de indagar un poco mas la interacción, siendo crucial en la inclusión en el modelo.
+
+\vspace{-4.5cm}
+
+<<>>=
+Datos %>% 
+  ggplot(
+    aes(
+      x = M,
+      y = y
+    )
+  ) +
+  geom_point() + 
+  theme(
+    aspect.ratio = 1,
+    plot.subtitle = element_text(
+      size = 4.5
+    ),
+    plot.title = element_text(
+      face = "bold",
+      size = 6.5,
+      color = "#280434FF"
+    ),
+    axis.text.x = element_text(
+      color = "#8C04C2"
+    ),
+    axis.text.y = element_text(
+      color="#8C04C2"
+    )
+  ) + 
+  labs(  
+    title = "Número Hombres entre 14 y 24 años",
+    subtitle = "por 1000 habitantes vs Tasa Criminalidad"
+  ) -> PlotM
+
+Datos %>% 
+  ggplot(
+    aes(
+      x = NW,
+      y = y
+    )
+  ) +
+  geom_point() + 
+  theme(
+    aspect.ratio = 1,
+    plot.subtitle = element_text(
+      size = 4.5
+    ),
+    plot.title = element_text(
+      face="bold",
+      size = 6.5,
+      color = "#280434FF"
+    ),
+    axis.text.x = element_text(
+      color = "#8C04C2"
+    ),
+    axis.text.y = element_text(
+      color="#8C04C2"
+    )
+  ) + 
+  labs(
+    title = "Número de no caucásicos",
+    subtitle = "por cada 1000 habitantes vs Tasa Criminalidad"
+  ) -> PlotNW
+
+Datos %>% 
+  ggplot(
+    aes(
+      x = U1,
+      y = y
+    )
+  ) +
+  geom_point() + 
+  theme(
+    aspect.ratio = 1,
+    plot.subtitle = element_text(
+      size=4.5
+    ),
+    plot.title = element_text(
+      face="bold",
+      size = 6.5,
+      color = "#280434FF"
+    ),
+    axis.text.x = element_text(
+      color = "#8C04C2"
+    ),
+    axis.text.y = element_text(
+      color="#8C04C2"
+    )
+  ) + 
+  labs(
+    title = "Tasa de desempleo urbana ",
+    subtitle = "por 1000 habitantes de hombres entre los 14 y 24 años \n vs Tasa Criminalidad"
+  ) -> PlotU1
+
+multiplot(
+  PlotM,
+  PlotNW,
+  PlotU1,
+  cols = 3
+)
+@
+
+\vspace{-4.5cm}
+
+A la luz de los gráficos no podemos establecer una transformación para ninguna de las tres variables, aunque hay que considerar que para la variable \textbf{NW} podemos asegurar que no existe
+un patrón que indique relación entre las dos variables y a exepción de \textbf{Po1} \textit{El gasto per cápita en policía por el gobierno en 1960} y \textbf{Po2} \textit{El gasto per cápita en policía por el gobierno en 1960},
+la correlación es considerable, estando implicita en las demás variables por lo que no se incluirá en el modelo completo.
+\\
+Por otra parte, para \textbf{M} y \textbf{U1} no podemos establecer una forma "conocida" pero podemos afirmar una relación creciente por lo no que serán descartadas,
+de esta manera, el modelo completo tendrá todas las variables a exepción de \textit{Número de no caucásicos por cada 1.000 habitantes} \textbf{NW}.
+\\
+En la siguiente sección mostraremos el procedimiento que en primera instancia, un modelo completo sin transformaciones previas de las variables independientes.
+
+\newpage
 
 \subsection{Modelo completo}
 
-Como una primera aproximación, se construye un modelo donde se incluyen todas las variables de nuestra tabla de datos. 
+Como una primera aproximación, se construye un modelo donde se incluyen todas las variables de nuestra tabla de datos, en concreto un modelo de regresión 
+con la siguiente forma funcional :
+
+\begin{equation*}
+  \hat{y} = \beta_{0} + \beta_{1}Time + \beta_{2}Prob + \cdots \beta_{M}M
+\end{equation*}
 
 <<>>=
 lm(
@@ -745,18 +883,23 @@ lm(
   )
 @
 
-En base al cuadro anterior se puede apreciar que si hacemos hincapie al $R^{2}_{a}$ que hace referencia a la variabilidad de 
-que podemos explicar con nuestro modelo respecto a la tasa de criminalidad, se puede considerar un valor \textit{aceptable}.
+Recordando que el $R^{2}_{a}$ hace referencia a la variabilidad de que podemos explicar con nuestro modelo respecto para la tasa de criminalidad,
+se puede considerar un valor \textit{aceptable}, mientras que a lo que refiere a la significación del modelo, considerando la prueba y el estadístico $F$ :
 
-Si consideramos la siguiente prueba $H_{0})\beta_{1} = \beta{2} = \cdots = \beta_{k} =0$ y el siguiente estadístco de prueba: 
+\begin{equation*}
+  H_{0})\beta_{1} = \beta{2} = \cdots = \beta_{k} = 0
+\end{equation*}
 
-\begin{equation}
-  F_{obs} = \frac{SCE/Regresion.gl}{RSE^2} 
-\end{equation}
+\begin{align*}
+  F_{obs} = \frac{SCE/Regresion.gl}{RSE^2}  = \frac{SCE/Regresion.gl}{SCR/Residuos.gl} = \frac{\sum{\left(\hat{y}_{i}-\bar{y}\right)^{2}}/Regresion.gl}{\sum{\left(y_{i}-\hat{y}_{i}\right)^{2}}/Residuos.gl}
+\end{align*}
 
-Siendo $SCE$ la suma de cuadrados explicados por la regresión $\sum{\left(\hat{y}_{i}-\bar{y}\right)^{2}}$ y $RSE^{2} = SCR/Residos.gl = \frac{\sum{\left(y_{i}-\hat{y}_{i}\right)^{2}}}{Residuos.gl}$ el cuadrado del error estandar de los Residuos,
-resultando para este caso particular $SCE = 5.525.982$ y $RSE^{2} = 43707.93$ podemos obtener el $F_{obs}$ que nos permite rechazar $H_{0}$. 
-De esta manera, podemos decir que el modelo es globalmente significativo,a continuación veremos el test de significación de cada variable.
+
+Siendo $SCE$ la suma de cuadrados explicados por la regresión y $RSE^{2}$ el cuadrado del error estandar de los Residuos, resultando para este caso particular $SCE = 5.525.982$ y $RSE^{2} = 43707,93$,
+de esta manera podemos obtener el $F_{obs}$ que nos permite rechazar $H_{0}$ y así afirmar que el modelo es globalmente significativo.
+
+Ahora continuación se pondra a prueba la siginificación de cada variable en forma marignal, los resultados se muestran el siguiente cuadro : 
+
 <<>>=
 lm(
     y ~ . ,
@@ -790,14 +933,11 @@ lm(
   )
 @
 
-En base al cuadro anterior se puede ver que no existe evidencia estadístca suficiente para rechazar que no existe
-una relación lineal de las variables incluidas para explicar la \textit{tasa de criminalidad} 
-a exepción de la \textit{Cantidad de Hombres de 14-24 cada mil habitantes},\textit{la desigualdad en el ingreso} y la
-\textit{probabilidad de encarcelamiento}. 
+De esta manera se puede ver que no existe evidencia estadístca suficiente para rechazar que no existe una relación lineal de las variables incluidas para explicar la \textit{tasa de criminalidad} 
+a exepción de la \textit{Cantidad de Hombres de 14-24 cada mil habitantes},\textit{la desigualdad en el ingreso} y la \textit{probabilidad de encarcelamiento}. 
 
-En resumen, el modelo es globalmente significativo, pero en solo 3 variables podemos afirmar que sean significativas en el modelo,
-es por esto que respetando el concepto de parsimonia y por una alta correlación entre variables, debemos de trabajar en 
-la selección de las variables a utilizar.
+En resumen, el modelo es globalmente significativo, pero en solo 3 de ellas podemos afirmar que sean significativas marginalmente en el modelo, es por esto que respetando el concepto de parsimonia 
+y por una alta correlación entre variables, debemos de trabajar en la selección de las variables a utilizar.
 
 \subsection{Aca iría la selección de modelos}
 
