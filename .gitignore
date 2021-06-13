@@ -31,7 +31,7 @@ FinalModelosLineales.Rproj
 
 # Archivos Auxiliares latex : 
 
-figure/*
+figure/*.pdf
 *.aux
 *.glo
 *.idx
@@ -59,3 +59,4 @@ figure/*
 *.fls
 *.tex
 *.lof
+Entrega.log
