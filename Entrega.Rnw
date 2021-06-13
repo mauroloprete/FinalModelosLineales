@@ -52,7 +52,10 @@
 
 
 <<include=FALSE>>=
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(
+  echo = FALSE,
+  fig.pos = 'H'
+)
 if(!require(pacman)) {
   install.packages("pacman")
 }
@@ -73,7 +76,7 @@ Datos <- read.table(
 
 @
 \section{Introducción}
-<<echo=FALSE>>=
+<<fig.cap = "Histograma de la Tasa de Criminalidad",out.width = "0.8\\textwidth",fig.align = "center">>=
 Sturges<-log2(47)+1
 ggplot(Datos,aes(x=y))+
   geom_histogram(bins = Sturges,
@@ -138,6 +141,7 @@ Se estudiarán medidas de resumen y a partir de histogramas tendremos un primer 
 \textbf{Prob}   & Probabilidad de encarcelamiento                                                                                                                        & Cuantitativa                                \\ \hline
 \textbf{Time}   & Tiempo promedio de estadía en cárceles estatales                                                                                                       & Cuantitativa                                \\ \hline
 \end{tabular}
+\caption{Variables a trabajar}
 \end{table}
 \end{center}
 \newpage
@@ -145,7 +149,7 @@ Se estudiarán medidas de resumen y a partir de histogramas tendremos un primer 
 
 {
 \centering
-<<echo=FALSE>>=
+<<echo=FALSE,fig.cap = "Histogramas (1)">>=
 # Multiple plot function, la hizo Dios.
 
 multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
@@ -558,7 +562,7 @@ multiplot(HistM,BarpSo,HistEd,HistPo1,HistNW,HistPo2,HistLF,HistMF,HistPop,cols=
 \newpage
 {
 \centering
-<<echo=FALSE>>=
+<<fig.cap = "Histogramas (2)">>=
 multiplot(HistU1,HistU2,HistGDP,HistIneq,HistProb,HistTime,cols=3)
 @
 }
@@ -582,7 +586,7 @@ el resumen de las variables númericas. A
 
 
 
-<<echo = F>>=
+<<>>=
 DatosTab <- Datos
 names(DatosTab) <- c(
   "Número de Hombres 14-24 / 1.000",
@@ -657,9 +661,10 @@ DatosTab %>%
   )
 @
 
+
 \subsubsection{Correlación entre variables}
 
-<<echo=FALSE,out.width = "0.8\\textwidth",fig.align = "center">>=
+<<out.width = "0.8\\textwidth",fig.align = "center",fig.cap = "Mapa de correlación de variables incluidas">>=
 qplot(x=Var1,
       y=Var2,
       data = melt(cor(Datos, use = "p")),
