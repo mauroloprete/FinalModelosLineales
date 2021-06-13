@@ -24,10 +24,12 @@
 \usepackage{tabu}
 \usepackage{threeparttable}
 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \renewcommand{\listfigurename}{Lista de Figuras}
 \renewcommand{\contentsname}{Lista de Contenidos}
 \renewcommand{\figurename}{Figura}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -99,6 +101,11 @@ ggplot(Datos,aes(x=y))+
        x="Número de ofensas reportadas",
        y="Cantidad de Estados")
 @
+
+Por último, el histograma de la variable Y. Cuenta con una distribución asimétrica, tiene un intervalo modal entre los valores de 500 y 800 ofensas reportadas en casi 13 Estados.
+Podemos afirmar que la mayoría de las observaciones están concentradas entre 342 que es su valor mínimo y 831 que es la mediana. Dado que su valor máximo es el 1993, el histograma cuenta
+con una cola hacia la derecha.
+
 \newpage
 \section{Análisis Exploratorio de datos}
 
@@ -563,15 +570,17 @@ multiplot(HistU1,HistU2,HistGDP,HistIneq,HistProb,HistTime,cols=3)
 @
 }
 
-Los histogramas de las variables M, Po1, Nw, Po2, M.F, Pop, U1, U2, Prob y Time cuentan con una distribución asimétrica. Cuenta con menor variabilidad entre el valor mínimo y la mediana,
-dejado asi mayor variabilidad de observaciones entre la mediana y el valor máximo generando una cola hacia la derecha.
-Por otro lado, los histogramas de las variables Ed y GDP también cuentan con una distribución asimétrica, pero en este caso cuenta con menor variabilidad entre la mediana
-y el valor máximo, dejando mayor variabilidad entre el valor mínimo y la mediana generando asi una cola hacia la izquierda.
-La variable LF cuenta con una distribución casi simétrica ya que su media y su mediana solo difieren en 1. Tiene un intervalo modal que va desde el valor 530 a 590.
-La variable ineq cuenta con una distribución asimétrica, tiene un intervalo modal entre los valores de …a…. Cuenta con menor variabilidad entre el primer y el tercer cuartil.
-Por último, el histograma de la variable Y. Cuenta con una distribución asimétrica, tiene un intervalo modal entre los valores de 500 y 800 ofensas reportadas en casi 13 Estados.
-Podemos afirmar que la mayoría de las observaciones están concentradas entre 342 que es su valor mínimo y 831 que es la mediana. Dado que su valor máximo es el 1993, el histograma cuenta
-con una cola hacia la derecha.
+Como se verá en los histogramas presentados a continuación y haciendo uso de la tabla (más precisamente del \textbf{CV}) es claro que las variables, de manera generalizada, presentan una variabilidad baja.
+\\
+
+De manera más específica, los histogramas de las variables M, Po1, Nw, Po2, M.F, Pop, U1, U2, Prob y Time cuentan con una distribución asimétrica. La variabilidad entre los valores comprendidos hasta la mediana (aunque baja, como ya se mencionó) es menor que en el resto de las observaciones.
+\\
+
+En el caso de la variable GDP y LF, la distribución a diferencia del resto es apróximadamente simétrica. La mediana y la media difieren en un número despreciable.
+\\
+
+La variable Ineq también cuenta con una distribución asimétrica pero a diferencia de las demás,cuenta con menor variabilidad entre las observaciones en el tramo central (primer cuartil a tercer cuartil).
+
 
 \newpage
 
@@ -607,7 +616,7 @@ summaryMod <- function(x) {
   c(
     quantile(x, probs = seq(0, 1, 0.25)),
     mean(x),
-    sd(x)
+    sd(x)/mean(x)
   )
 }
 DatosTab %>%
@@ -626,7 +635,7 @@ DatosTab %>%
       "3er Qu.",
       "Max",
       "Media",
-      "Desvío.Std"
+      "CV"
     )
   ) %>% 
   relocate(
