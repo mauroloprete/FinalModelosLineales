@@ -717,7 +717,6 @@ qplot(x=Var1,
 
 
 El objetivo de esta sección es la aplicación de las distintas técnicas estadísticas impartidas en el curso para así llegar a un modelo final que no solo sea significativo al momento de estimar a \textbf{y}, sino que también se adecúe a los supuestos y propiedades deseadas (ganando de esta manera fidelidad).
-
 \\
 
 En una primer instancia se planteará un \textit{modelo inicial} constituído por parte de las variables de las cuales se poseen datos.
@@ -733,35 +732,34 @@ Esto se evidencia en los tests de hipótesis en donde se analiza el aporte de ca
 
 En principio, a partir del "arsenal" descriptivo es claro que:
 \begin{itemize}
-\item \textbf{Ineq} y \textbf{GDP} tienen una correlación negativa altísima (-0.884).
-\item \textbf{P01} y \textbf{P02} poseen una correlación negativa casi perfecta (0.994)
-\item \textbf{Ineq} y \textbf{Ed} tienen también una correlación negativa bastante alta (-0,794)
+\item {\textbf{Ineq} y \textbf{GDP} tienen una correlación negativa altísima (-0.884).}
+\item {\textbf{P01} y \textbf{P02} poseen una correlación negativa casi perfecta (0.994)}
+\item {\textbf{Ineq} y \textbf{Ed} tienen también una correlación negativa bastante alta (-0,794)}
 \end{itemize}
 
 A partir de lo afirmado, se procederá a "descartar" a alguna de las variables que constituye cada dupla respaldándose en el valor del coeficiente de correlación existente entre las variables explicativas y \textbf{y}.
 
 
 \begin{multicols}{5}
-\begin{equation*}
-\rho _{y,Ineq}=-0,179
-\end{equation*}
+  \begin{equation*}
+    \rho _{y,Ineq}=-0,179
+  \end{equation*}
 
-\begin{equation*}
-\rho _{y,GDP}=0,441
-\end{equation*}
+  \begin{equation*}
+    \rho _{y,GDP}=0,441
+  \end{equation*}
 
-\begin{equation*}
-\rho _{y,P01}=0,688
-\end{equation*}
+  \begin{equation*}
+    \rho _{y,P01}=0,688
+  \end{equation*}
 
-\begin{equation*}
-\rho _{y,P02}=0,667
-\end{equation*}
+  \begin{equation*}
+    \rho _{y,P02}=0,667
+  \end{equation*}
 
-\begin{equation*}
-\rho _{y,Ed}=0,323
-\end{equation*}
-
+  \begin{equation*}
+    \rho _{y,Ed}=0,323
+  \end{equation*}
 \end{multicols}
 
 Se elige aquella variable cuyo coeficiente de correlación con \textbf{y} en valor absoluto sea mayor.
@@ -778,13 +776,13 @@ Otro aspecto a considerar es , ¿qué tan correlacionadas se encuentran las mism
 Un caso partícular es el de las variables \textbf{S01} y \textbf{NW} que claramente se encuentran relacionadas (con un coeficiente de correlación de 0,767). A su vez resalta como ambas variables tienen una correlación con \textbf{y} prácticamente despreciable
 
 \begin{multicols}{2}
-\begin{equation*}
-\rho _{y,S0}=-0,09
-\end{equation*}
+  \begin{equation*}
+    \rho _{y,S0}=-0,09
+  \end{equation*}
 
-\begin{equation*}
-\rho _{y,NW}=0,03
-\end{equation*}
+  \begin{equation*}
+    \rho _{y,NW}=0,03
+  \end{equation*}
 \end{multicols}
 
 En base a lo último es claro que estas 2 variables no serán significativas para explicar a \textbf{y} y que en cualquier proceso de selección computarizado serán descartadas.
@@ -913,6 +911,7 @@ Con base en esta última afirmación es que se promueve el uso de distintas téc
 En este apartado se explicitará el procedimiento de especificación y selección de variables 
 para que dada la información disponible explicar la \textit{Tasa de Criminalidad en el 1960 para los Estados de USA}. 
 \\
+
 Considerando los ánalisis anteriores, antes de asignarle una forma a cada variable, utilizando diagramas de dispersión la para ver la relación que tienen con la variable Respuesta,
 haciendo enfasis en aquellas que en el mapa de correlación se presentan colores gris claro o blancos, en concreto: 
 
@@ -1031,11 +1030,12 @@ A la luz de los gráficos no podemos establecer una transformación para ninguna
 un patrón que indique relación entre las dos variables y a exepción de \textbf{Po1} \textit{El gasto per cápita en policía por el gobierno en 1960} y \textbf{Po2} \textit{El gasto per cápita en policía por el gobierno en 1960},
 la correlación es considerable, estando implicita en las demás variables por lo que no se incluirá en el modelo completo.
 \\
+
 Por otra parte, para \textbf{M} y \textbf{U1} no podemos establecer una forma "conocida" pero podemos afirmar una relación creciente por lo no que serán descartadas,
 de esta manera, el modelo completo tendrá todas las variables a exepción de \textit{Número de no caucásicos por cada 1.000 habitantes} \textbf{NW}.
 \\
-En la siguiente sección mostraremos el procedimiento que en primera instancia, un modelo completo sin transformaciones previas de las variables independientes.
 
+En la siguiente sección mostraremos el procedimiento que en primera instancia, un modelo completo sin transformaciones previas de las variables independientes.
 
 
 \end{document}
