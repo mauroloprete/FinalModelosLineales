@@ -715,7 +715,9 @@ qplot(x=Var1,
 
 \section{Especificación y selección de modelos}
 
+
 El objetivo de esta sección es la aplicación de las distintas técnicas estadísticas impartidas en el curso para así llegar a un modelo final que no solo sea significativo al momento de estimar a \textbf{y}, sino que también se adecúe a los supuestos y propiedades deseadas (ganando de esta manera fidelidad).
+
 \\
 
 En una primer instancia se planteará un \textit{modelo inicial} constituído por parte de las variables de las cuales se poseen datos.
