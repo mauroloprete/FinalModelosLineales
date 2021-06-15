@@ -23,7 +23,7 @@ LPlot <- function(data,mapping) {
         mapping = mapping
     ) +
     geom_point(
-        color = "#E8DAEF"
+        color = "#C39BD3"
     ) +
     geom_smooth(
         method = "lm",
