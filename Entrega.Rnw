@@ -23,6 +23,7 @@
 \usepackage{pdflscape}
 \usepackage{tabu}
 \usepackage{threeparttable}
+\usepackage{multicol}
 \usepackage{amsmath}
 \spanishdecimal{.}
 
@@ -714,6 +715,199 @@ qplot(x=Var1,
 
 \section{Especificación y selección de modelos}
 
+El objetivo de esta sección es la aplicación de las distintas técnicas estadísticas impartidas en el curso para así llegar a un modelo final que no solo sea significativo al momento de estimar a \textbf{y}, sino que también se adecúe a los supuestos y propiedades deseadas (ganando de esta manera fidelidad).
+\\
+
+En una primer instancia se planteará un \textit{modelo inicial} constituído por parte de las variables de las cuales se poseen datos.
+\\
+
+Claro está, se podría haber planteado en primera instancia un \textit{modelo completo} (es decír, que contenga absolutamente a todas las variables). No es esto errado, pero si desconsiderado con el extenso análisis descriptivo planteado con anterioridad.
+\\
+
+Como ya es sabido, variables que presentan una correlación muy alta no son marginalmente significativas al momento de definir la variable de respuesta.
+\\
+
+Esto se evidencia en los tests de hipótesis en donde se analiza el aporte de cada variable dada las demás variables. Una correlación alta entre variables, podría indicar que parte de la información que aportan una de ellas está también presente en otra y esa cantidad de información se vió cuantificada de manera previa. Lo que tarde o temprano llevaría a descartar alguna de ellas.
+
+En principio, a partir del "arsenal" descriptivo es claro que:
+\begin{itemize}
+\item \textbf{Ineq} y \textbf{GDP} tienen una correlación negativa altísima (-0.884).
+\item \textbf{P01} y \textbf{P02} poseen una correlación negativa casi perfecta (0.994)
+\item \textbf{Ineq} y \textbf{Ed} tienen también una correlación negativa bastante alta (-0,794)
+\end{itemize}
+
+A partir de lo afirmado, se procederá a "descartar" a alguna de las variables que constituye cada dupla respaldándose en el valor del coeficiente de correlación existente entre las variables explicativas y \textbf{y}.
+
+
+\begin{multicols}{5}
+\begin{equation*}
+\rho _{y,Ineq}=-0,179
+\end{equation*}
+
+\begin{equation*}
+\rho _{y,GDP}=0,441
+\end{equation*}
+
+\begin{equation*}
+\rho _{y,P01}=0,688
+\end{equation*}
+
+\begin{equation*}
+\rho _{y,P02}=0,667
+\end{equation*}
+
+\begin{equation*}
+\rho _{y,Ed}=0,323
+\end{equation*}
+
+\end{multicols}
+
+Se elige aquella variable cuyo coeficiente de correlación con \textbf{y} en valor absoluto sea mayor.
+\\
+
+Trás esto, se decide que \textbf{Ineq} y \textbf{P02} no sean incluídos en el modelo inicial ya que se entiende que las mismas no tendrán un aporte significativo en presencia de sus pares.
+\\
+
+A manera de resumen podría decirse que este primer acercamiento al modelo sigue fielmente el principio de \textit{parsimonia}\footnote{Frugalidad y moderación en los gastos.}.
+\\
+
+Otro aspecto a considerar es , ¿qué tan correlacionadas se encuentran las mismas variables con y?.
+
+Un caso partícular es el de las variables \textbf{S01} y \textbf{NW} que claramente se encuentran relacionadas (con un coeficiente de correlación de 0,767). A su vez resalta como ambas variables tienen una correlación con \textbf{y} prácticamente despreciable
+
+\begin{multicols}{2}
+\begin{equation*}
+\rho _{y,S0}=-0,09
+\end{equation*}
+
+\begin{equation*}
+\rho _{y,NW}=0,03
+\end{equation*}
+\end{multicols}
+
+En base a lo último es claro que estas 2 variables no serán significativas para explicar a \textbf{y} y que en cualquier proceso de selección computarizado serán descartadas.
+\\
+
+Quedan entonces determinadas las variables a conformar el modelo inicial, que será analizado con detenimiento en la sección siguiente.
+
+\newpage
+\subsection{Modelo Inicial}
+
+Como una primera aproximación, se construye un modelo donde se incluyen todas las variables de la tabla de datos, en concreto el siguiente modelo de regresión:
+
+\begin{equation*}
+  \hat{y} = \beta_{0} + \beta_{1}Time + \beta_{2}Prob + \cdots \beta_{M}M
+\end{equation*}
+
+<<>>=
+lm(
+    y ~ . ,
+    data = Datos
+) %>% 
+  glance() %>% 
+  mutate(
+    "$R^{2}.adj$" = adj.r.squared*100,
+    "RSE" = sigma,
+    "F Obs." = statistic,
+    "P-valor*100" = p.value*100,
+    "Regresión.gl" = df,
+    "Residuos.gl" = df.residual,
+    .keep = "none"
+  ) %>% 
+  summarise_if(
+    is.numeric,
+    ~round(.x,3)
+  ) %>% 
+  kbl(
+    booktabs = T,
+    caption = "Test sobre el modelo completo",
+    escape = FALSE
+  ) %>% 
+    kable_styling(
+    latex_options = c("striped", "hold_position"),
+    font_size = 7.5
+  )
+@
+
+Recordando que el $R^{2}_{a}$ hace referencia al porcentaje de variabilidad de \textbf{y} que es explicada con el modelo estimado,
+se considera al mismo como \textit{aceptable}. Por otro lado, haciendo referecia a la significación del modelo, se consideranda el siguiente test de hipótesis y el estadístico $F$ :
+
+\begin{equation*}
+  H_{0})\beta_{1} = \beta{2} = \cdots = \beta_{k} = 0
+\end{equation*}
+
+\begin{equation*}
+  H_{1})\text{No }H_{0} 
+\end{equation*}
+
+\begin{align*}
+  F_{obs} = \frac{SCE/Regresion.gl}{RSE^2}  = \frac{SCE/Regresion.gl}{SCR/Residuos.gl} = \frac{\sum{\left(\hat{y}_{i}-\bar{y}\right)^{2}}/Regresion.gl}{\sum{\left(y_{i}-\hat{y}_{i}\right)^{2}}/Residuos.gl}
+\end{align*}
+
+
+Siendo $SCE$ la suma de cuadrados explicados por la regresión y $RSE^{2}$ el cuadrado del error estandar de los residuos, resulta para este caso partícular $SCE = 5.525.982$ y $RSE^{2} = 43707,93$,
+de esta manera se obtiene el $F_{obs}$ que permite rechazar $H_{0}$ y así afirmar que el modelo es estadísticamente significativo para explicar a \textbf{y}.
+\\
+
+A continuación se testea la siginificación de cada variable en forma independiente, los resultados se muestran en el siguiente cuadro : 
+
+<<>>=
+lm(
+    y ~ . ,
+    data = Datos
+) %>% 
+  tidy() %>% 
+  summarise_if(
+    is.numeric,
+    ~round(.x,3)
+  ) %>% 
+  mutate(
+    Variable = c("Intercepto",names(DatosTab)[-length(DatosTab)]),
+    "Estimación" = estimate,
+    "Error estandar" = std.error,
+    "Estadístico F" = statistic,
+    "P valor" = p.value,
+    "$\\left(H_{0}^{\\alpha = 0.05}\\right)\\beta_{i} = 0$" = case_when(
+      p.value < 0.05 ~ "Se rechaza H0",
+      p.value >= 0.05 ~ "No se rechaza H0"
+    ),
+    .keep = "none"
+  ) %>% 
+  kbl(
+    booktabs = T, 
+    caption = "Estimación,error estandar y test individual del modelo completo ",
+    escape = FALSE
+  ) %>% 
+  kable_styling(
+    latex_options = c("striped", "hold_position"),
+    font_size = 7.5
+  )
+@
+
+\newpage
+A partir del cuadro presentado y conforme a los tests realizados, se ve claramente que son tan solo 3 las variables que de manera independiente (\textbf{y muy importantemente, en presencia de todas las demás}) logran un aporte significativo al momento de explicar el comportamiento de la tasa de criminalidad.
+\\
+
+Ellas son \textit{U1,Ineq y Prob}.
+\\
+
+¿Significa esto que se debe descartar el resto de las varibles y plantear un modelo caracterízado por tan solo las 3?, la respuesta es \textbf{no}. 
+\\
+
+Como bien se menciona anteriormente, los tests analizan el aporte dada las demás variables. Una correlación alta entre variables, podría indicar que parte de la información que aportan una de ellas está también presente en otra y esa cantidad de información se vió cuantificada de manera previa.
+\\
+
+Con base en esta última afirmación es que se promueve el uso de distintas técnicas que nos permitirán elegír las variables de manera más acertada (y teniendo en cuenta este panorama).
+
+
+\subsection{Aca iría la selección de modelos}
+
+\section{Diagnostico}
+
+\section{Conclusiones}
+
+\section{discutir}
+
 En este apartado se explicitará el procedimiento de especificación y selección de variables 
 para que dada la información disponible explicar la \textit{Tasa de Criminalidad en el 1960 para los Estados de USA}. 
 \\
@@ -839,123 +1033,6 @@ Por otra parte, para \textbf{M} y \textbf{U1} no podemos establecer una forma "c
 de esta manera, el modelo completo tendrá todas las variables a exepción de \textit{Número de no caucásicos por cada 1.000 habitantes} \textbf{NW}.
 \\
 En la siguiente sección mostraremos el procedimiento que en primera instancia, un modelo completo sin transformaciones previas de las variables independientes.
-
-\newpage
-
-\subsection{Modelo completo}
-
-Como una primera aproximación, se construye un modelo donde se incluyen todas las variables de la tabla de datos, en concreto el siguiente modelo de regresión:
-
-\begin{equation*}
-  \hat{y} = \beta_{0} + \beta_{1}Time + \beta_{2}Prob + \cdots \beta_{M}M
-\end{equation*}
-
-<<>>=
-lm(
-    y ~ . ,
-    data = Datos
-) %>% 
-  glance() %>% 
-  mutate(
-    "$R^{2}.adj$" = adj.r.squared*100,
-    "RSE" = sigma,
-    "F Obs." = statistic,
-    "P-valor*100" = p.value*100,
-    "Regresión.gl" = df,
-    "Residuos.gl" = df.residual,
-    .keep = "none"
-  ) %>% 
-  summarise_if(
-    is.numeric,
-    ~round(.x,3)
-  ) %>% 
-  kbl(
-    booktabs = T,
-    caption = "Test sobre el modelo completo",
-    escape = FALSE
-  ) %>% 
-    kable_styling(
-    latex_options = c("striped", "hold_position"),
-    font_size = 7.5
-  )
-@
-
-Recordando que el $R^{2}_{a}$ hace referencia al porcentaje de variabilidad de \textbf{y} que es explicada con el modelo estimado,
-se considera al mismo como \textit{aceptable}. Por otro lado, haciendo referecia a la significación del modelo, se consideranda el siguiente test de hipótesis y el estadístico $F$ :
-
-\begin{equation*}
-  H_{0})\beta_{1} = \beta{2} = \cdots = \beta_{k} = 0
-\end{equation*}
-
-\begin{equation*}
-  H_{1})\text{No }H_{0} 
-\end{equation*}
-
-\begin{align*}
-  F_{obs} = \frac{SCE/Regresion.gl}{RSE^2}  = \frac{SCE/Regresion.gl}{SCR/Residuos.gl} = \frac{\sum{\left(\hat{y}_{i}-\bar{y}\right)^{2}}/Regresion.gl}{\sum{\left(y_{i}-\hat{y}_{i}\right)^{2}}/Residuos.gl}
-\end{align*}
-
-
-Siendo $SCE$ la suma de cuadrados explicados por la regresión y $RSE^{2}$ el cuadrado del error estandar de los residuos, resulta para este caso partícular $SCE = 5.525.982$ y $RSE^{2} = 43707,93$,
-de esta manera se obtiene el $F_{obs}$ que permite rechazar $H_{0}$ y así afirmar que el modelo es estadísticamente significativo para explicar a \textbf{y}.
-\\
-
-A continuación se testea la siginificación de cada variable en forma independiente, los resultados se muestran en el siguiente cuadro : 
-
-<<>>=
-lm(
-    y ~ . ,
-    data = Datos
-) %>% 
-  tidy() %>% 
-  summarise_if(
-    is.numeric,
-    ~round(.x,3)
-  ) %>% 
-  mutate(
-    Variable = c("Intercepto",names(DatosTab)[-length(DatosTab)]),
-    "Estimación" = estimate,
-    "Error estandar" = std.error,
-    "Estadístico F" = statistic,
-    "P valor" = p.value,
-    "$\\left(H_{0}^{\\alpha = 0.05}\\right)\\beta_{i} = 0$" = case_when(
-      p.value < 0.05 ~ "Se rechaza H0",
-      p.value >= 0.05 ~ "No se rechaza H0"
-    ),
-    .keep = "none"
-  ) %>% 
-  kbl(
-    booktabs = T, 
-    caption = "Estimación,error estandar y test individual del modelo completo ",
-    escape = FALSE
-  ) %>% 
-  kable_styling(
-    latex_options = c("striped", "hold_position"),
-    font_size = 7.5
-  )
-@
-
-\newpage
-A partir del cuadro presentado y conforme a los tests realizados, se ve claramente que son tan solo 3 las variables que de manera independiente (\textbf{y muy importantemente, en presencia de todas las demás}) logran un aporte significativo al momento de explicar el comportamiento de la tasa de criminalidad.
-\\
-
-Ellas son \textit{U1,Ineq y Prob}.
-\\
-
-¿Significa esto que se debe descartar el resto de las varibles y plantear un modelo caracterízado por tan solo las 3?, la respuesta es \textbf{no}. 
-\\
-
-Como bien se menciona anteriormente, los tests analizan el aporte dada las demás variables. Una correlación alta entre variables, podría indicar que parte de la información que aportan una de ellas está también presente en otra y esa cantidad de información se vió cuantificada de manera previa.
-\\
-
-Con base en esta última afirmación es que se promueve el uso de distintas técnicas que nos permitirán elegír las variables de manera más acertada (y teniendo en cuenta este panorama).
-
-
-\subsection{Aca iría la selección de modelos}
-
-\section{Diagnostico}
-
-\section{Conclusiones}
 
 
 
