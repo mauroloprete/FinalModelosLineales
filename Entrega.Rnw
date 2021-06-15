@@ -714,6 +714,8 @@ qplot(x=Var1,
 
 \section{Especificación y selección de modelos}
 
+En esta sección se mostrara el procedimiento de especificación y selección de varia
+
 En este apartado se explicitará el procedimiento de especificación y selección de variables 
 para que dada la información disponible explicar la \textit{Tasa de Criminalidad en el 1960 para los Estados de USA}. 
 \\
