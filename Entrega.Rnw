@@ -70,7 +70,8 @@ pacman::p_load(
   knitr,
   tidymodels,
   kableExtra,
-  magrittr
+  magrittr,
+  GGally
 )
 
 Datos <- read.table(
@@ -710,6 +711,11 @@ qplot(x=Var1,
        fill="Coef Corr.")
 @
 
+\begin{figure}
+  \includegraphics[width = 1.05\textwidth]{Grafico.png}
+\end{figure}
+
+
 
 \newpage
 
@@ -735,12 +741,13 @@ En principio, a partir del "arsenal" descriptivo es claro que:
 \item {\textbf{Ineq} y \textbf{GDP} tienen una correlación negativa altísima (-0.884).}
 \item {\textbf{P01} y \textbf{P02} poseen una correlación negativa casi perfecta (0.994)}
 \item {\textbf{Ineq} y \textbf{Ed} tienen también una correlación negativa bastante alta (-0,794)}
+\item {\textbf{SO} y \textbf{NW} mantienen una correlación positiva y de nivel alto (0,767)}
 \end{itemize}
 
 A partir de lo afirmado, se procederá a "descartar" a alguna de las variables que constituye cada dupla respaldándose en el valor del coeficiente de correlación existente entre las variables explicativas y \textbf{y}.
 
 
-\begin{multicols}{5}
+\begin{multicols}{4}
   \begin{equation*}
     \rho _{y,Ineq}=-0,179
   \end{equation*}
@@ -760,22 +767,7 @@ A partir de lo afirmado, se procederá a "descartar" a alguna de las variables q
   \begin{equation*}
     \rho _{y,Ed}=0,323
   \end{equation*}
-\end{multicols}
 
-Se elige aquella variable cuyo coeficiente de correlación con \textbf{y} en valor absoluto sea mayor.
-\\
-
-Trás esto, se decide que \textbf{Ineq} y \textbf{P02} no sean incluídos en el modelo inicial ya que se entiende que las mismas no tendrán un aporte significativo en presencia de sus pares.
-\\
-
-A manera de resumen podría decirse que este primer acercamiento al modelo sigue fielmente el principio de \textit{parsimonia}\footnote{Frugalidad y moderación en los gastos.}.
-\\
-
-Otro aspecto a considerar es , ¿qué tan correlacionadas se encuentran las mismas variables con y?.
-
-Un caso partícular es el de las variables \textbf{S01} y \textbf{NW} que claramente se encuentran relacionadas (con un coeficiente de correlación de 0,767). A su vez resalta como ambas variables tienen una correlación con \textbf{y} prácticamente despreciable
-
-\begin{multicols}{2}
   \begin{equation*}
     \rho _{y,S0}=-0,09
   \end{equation*}
@@ -785,12 +777,21 @@ Un caso partícular es el de las variables \textbf{S01} y \textbf{NW} que claram
   \end{equation*}
 \end{multicols}
 
-En base a lo último es claro que estas 2 variables no serán significativas para explicar a \textbf{y} y que en cualquier proceso de selección computarizado serán descartadas.
+Se elige aquella variable cuyo coeficiente de correlación con \textbf{y} en valor absoluto sea mayor.
+\\
+
+Trás esto, se decide que \textbf{Ineq} , \textbf{P02} y \textbf{NW} no sean incluídos en el modelo inicial ya que se entiende que las mismas no tendrán un aporte significativo en presencia de sus pares.
+\\
+
+A manera de resumen podría decirse que este primer acercamiento al modelo sigue fielmente el principio de \textit{parsimonia}\footnote{Frugalidad y moderación en los gastos.}.
 \\
 
 Quedan entonces determinadas las variables a conformar el modelo inicial, que será analizado con detenimiento en la sección siguiente.
 
 \newpage
+
+\subsection{Análisis de multicolinealidad}
+
 \subsection{Modelo Inicial}
 
 Como una primera aproximación, se construye un modelo donde se incluyen todas las variables de la tabla de datos, en concreto el siguiente modelo de regresión:
