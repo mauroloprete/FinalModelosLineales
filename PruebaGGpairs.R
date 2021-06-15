@@ -52,6 +52,12 @@ Datos  %>%
  ggpairs(
      lower = list(
          continuous = LPlot
+     ),
+     upper = list(
+         continuous = wrap(
+             "cor",
+             color = "#4A235A"
+         )
      )
  ) +
  theme(
@@ -61,4 +67,12 @@ Datos  %>%
       axis.text.y = element_text(
         color = "#8C04C2"
       )
+ )
+ ggsave(
+     "Grafico.png",
+      width = 15,
+      height = 13,
+      dpi = 300,
+      units = "in",
+      device = 'png'
  )
