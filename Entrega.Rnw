@@ -982,17 +982,13 @@ vif(ModeloCompleto) %>%
     "Prueba" = case_when(
       x >= 10 ~ "Problema de colinealidad",
       x < 10 ~ "No hay problema de colinealidad"
-    )
+    ),
+    .keep = "none"
   ) %>%  
   mutate_if(
     is.numeric,
     round,
     3
-  ) %>% 
-  select(
-    Variable,
-    VIF,
-    Prueba
   ) %>% 
   kbl(
     booktabs = T, 
@@ -1011,6 +1007,43 @@ que continuaremos con la selección a pasos por el método Forward.
 \subsection{Método Forward}
 
 Poner aca el script del Forward, el objeto "ModeloCompleto" tiene el modelo que estamos especificando.
+
+<<>>=
+lm(
+  y ~ M + So + Ed + Po1 + LF + M.F + Pop + U1 + U2 + GDP + Prob + Time,
+  data = Datos
+) %>% 
+  mixlm::forward() %>%  
+  tidy() %>% 
+    mutate(
+    Variable = c(
+      "Intercepto",
+      "Gasto per cápita en policía en 1960",
+      "Número de hombres entre 14 y 24 / 1000",
+      "Número de hombres por cada 1000 mujeres",
+      "Probabilidad de encarcelamiento",
+      "Variable indicadora de loes estados del sur"
+    ),
+    "Estimación" = estimate,
+    "Error estandar" = std.error,
+    "Estadístico F" = statistic,
+    "P valor" = p.value,
+    "$\\left(H_{0}^{\\alpha = 0.05}\\right)\\beta_{i} = 0$" = case_when(
+      p.value < 0.05 ~ "Se rechaza H0",
+      p.value >= 0.05 ~ "No se rechaza H0"
+    ),
+    .keep = "none"
+  ) %>% 
+  kbl(
+    booktabs = T, 
+    caption = "Estimación,error estandar y test individual tras aplicar el método Forward ",
+    escape = FALSE
+  ) %>% 
+  kable_styling(
+    latex_options = c("striped", "hold_position"),
+    font_size = 7.5
+  )
+@
 
 \section{Diagnostico}
 
