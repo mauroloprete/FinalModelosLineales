@@ -1013,7 +1013,12 @@ lm(
   y ~ M + So + Ed + Po1 + LF + M.F + Pop + U1 + U2 + GDP + Prob + Time,
   data = Datos
 ) %>% 
-  mixlm::forward() %>%  
+  mixlm::stepWise() %T>% 
+  assign(
+    "ModeloRed",
+    .,
+    envir = .GlobalEnv
+  ) %>% 
   tidy() %>% 
     mutate(
     Variable = c(
