@@ -82,7 +82,7 @@ read.table(
   dec = ","
 ) %>% 
   mutate(
-    Prob = Prob*1000
+    Prob = Prob*100
   ) %>% 
   assign(
     "Datos",
@@ -935,7 +935,7 @@ haciendo que las estimaciones varien ante pequeñas variaciones en nuestras obse
 \\
 
 Estamos en frente a un problema de multicolinealidad aproximada cuando es posible afirmar que existe una relación lineal entre las variables explicativas. 
-El término aproximado refiere al hecho que se cumpla el fenomeno de forma exacta, la matriz no sería invertible y no existirian estimaciones únicas de los regresores únicas 
+El término aproximado refiere al hecho que en el caso que se cumpla el fenomeno de forma exacta, la matriz no sería invertible y no existirian estimaciones únicas de los regresores únicas 
 (Teorema de Gauss Markov) y no estaríamos frente a estimadores eficientes (insesgados y de minima varianza)
 
 Recordando que  :
@@ -945,7 +945,7 @@ Recordando que  :
 
 Como se menciono anteriormente, ante una posible relación lineal el determinante de la matriz $X^{T}X$ sería proximo a cero, obteniendo un determinante de la matriz inversa
 demasiado grande. Es decir para un $sigma$ fijo la incertidumbre sería demasiado alta, considerando el hecho que en nuestra primera aproximación a un modelo de regresión es
-globalmente significativo pero salvo en una cantidad demasiado pequeña se puede afirmar que, de forma independiente que existe una relación lineal con la tasa de criminalidad, 
+globalmente significativo pero salvo en una cantidad demasiado pequeña se puede afirmar que, de forma independiente existe una relación lineal con la tasa de criminalidad, 
 es por esto que se cuantificara la intensidad de la multicolinealidad con el \textbf{Factor de inflación de varianza}.
 
 El \textbf{VIF} nos indica en cuantas unidades se incrementa la varianza del estimador ante presencia de colinealidad y se define como : 

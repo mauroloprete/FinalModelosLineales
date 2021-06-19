@@ -11,6 +11,7 @@ pacman::p_load(
   GGally
 )
 
+
 read.table(
     "UScrime.txt",
     header = TRUE,
