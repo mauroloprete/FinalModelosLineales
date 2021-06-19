@@ -59,7 +59,8 @@
 <<include=FALSE>>=
 knitr::opts_chunk$set(
   echo = FALSE,
-  fig.pos = 'H'
+  fig.pos = 'H',
+  warning = FALSE
 )
 if(!require(pacman)) {
   install.packages("pacman")
@@ -71,14 +72,23 @@ pacman::p_load(
   tidymodels,
   kableExtra,
   magrittr,
-  GGally
+  GGally,
+  car
 )
 
-Datos <- read.table(
-    "UScrime.txt",
-    header = TRUE,
-    dec = ","
-)
+read.table(
+  "UScrime.txt",
+  header = TRUE,
+  dec = ","
+) %>% 
+  mutate(
+    Prob = Prob*1000
+  ) %>% 
+  assign(
+    "Datos",
+    .,
+    envir = .GlobalEnv
+  )
 
 @
 \section{Introducción}
@@ -790,8 +800,6 @@ Quedan entonces determinadas las variables a conformar el modelo inicial, que se
 
 \newpage
 
-\subsection{Análisis de multicolinealidad}
-
 \subsection{Modelo Inicial}
 
 Como una primera aproximación, se construye un modelo donde se incluyen todas las variables de la tabla de datos, en concreto el siguiente modelo de regresión:
@@ -802,9 +810,14 @@ Como una primera aproximación, se construye un modelo donde se incluyen todas l
 
 <<>>=
 lm(
-    y ~ . ,
+    y ~ . -Ineq -Po2 - NW,
     data = Datos
-) %>% 
+) %T>% 
+  assign(
+    "ModeloCompleto",
+    .,
+    envir = .GlobalEnv
+  ) %>% 
   glance() %>% 
   mutate(
     "$R^{2}.adj$" = adj.r.squared*100,
@@ -853,17 +866,29 @@ de esta manera se obtiene el $F_{obs}$ que permite rechazar $H_{0}$ y así afirm
 A continuación se testea la siginificación de cada variable en forma independiente, los resultados se muestran en el siguiente cuadro : 
 
 <<>>=
-lm(
-    y ~ . ,
-    data = Datos
-) %>% 
+
+ModeloCompleto %>% 
   tidy() %>% 
   summarise_if(
     is.numeric,
     ~round(.x,3)
   ) %>% 
   mutate(
-    Variable = c("Intercepto",names(DatosTab)[-length(DatosTab)]),
+    Variable = c(
+      "Intercepto",
+      "Número de hombres entre 14 y 24 / 1000",
+      "Variable indicadora de loes estados del sur",
+      "Indice que refleja la escolaridad del estado",
+      "Gasto per cápita en policía en 1960",
+      "Tasa de participación masculina 14 y 24 / 1000",
+      "Número de hombres por cada 1000 mujeres",
+      "Tamaño de la población por 1.000.000 habitantes",
+      "Tasa de desmempleo urbana hombres 14 y 24 por 1000",
+      "Tasa de desmempleo urbana hombres 35 y 39 por 1000",
+      "Producto bruto interno per cápita",
+      "Probabilidad de encarcelamiento",
+      "Tiempo promedio de estadía en cárceles estatales"
+    ),
     "Estimación" = estimate,
     "Error estandar" = std.error,
     "Estadístico F" = statistic,
@@ -889,7 +914,8 @@ lm(
 A partir del cuadro presentado y conforme a los tests realizados, se ve claramente que son tan solo 3 las variables que de manera independiente (\textbf{y muy importantemente, en presencia de todas las demás}) logran un aporte significativo al momento de explicar el comportamiento de la tasa de criminalidad.
 \\
 
-Ellas son \textit{U1,Ineq y Prob}.
+Ellas son \textit{PO1}: Gasto pér capita en policía en 1960, \textit{U2}: Tasa de desempleo Urbana de hombres
+entre 35 y 39 años por 1000 habitantes y por último \textit{Prob*1000} Probabilidad de encarcelamiento cada 1000 habitantes.
 \\
 
 ¿Significa esto que se debe descartar el resto de las varibles y plantear un modelo caracterízado por tan solo las 3?, la respuesta es \textbf{no}. 
@@ -901,7 +927,90 @@ Como bien se menciona anteriormente, los tests analizan el aporte dada las demá
 Con base en esta última afirmación es que se promueve el uso de distintas técnicas que nos permitirán elegír las variables de manera más acertada (y teniendo en cuenta este panorama).
 
 
-\subsection{Aca iría la selección de modelos}
+\subsection{Analisis de multicolinealidad}
+
+Consierando el problema anteriormente mencionado, se analizara la multicolinealidad (aproximada) de las variables independientes del modelo planteado, 
+esto es relevante ya que si existe una posible relación lineal en la matriz de diseño, esto impactaría directamente en la varianza de los regresores $\beta_{k} = \left(X^{T}X\right)^{-1}X^{T}$, 
+haciendo que las estimaciones varien ante pequeñas variaciones en nuestras observaciones y predicciones menos confiables. 
+\\
+
+Estamos en frente a un problema de multicolinealidad aproximada cuando es posible afirmar que existe una relación lineal entre las variables explicativas. 
+El término aproximado refiere al hecho que se cumpla el fenomeno de forma exacta, la matriz no sería invertible y no existirian estimaciones únicas de los regresores únicas 
+(Teorema de Gauss Markov) y no estaríamos frente a estimadores eficientes (insesgados y de minima varianza)
+
+Recordando que  :
+\begin{equation*}
+  \hat{\beta_{k}} \sim N\left(\beta,\sigma^{2}\left(X^{T}X\right)^{-1}\right)
+\end{equation*}  
+
+Como se menciono anteriormente, ante una posible relación lineal el determinante de la matriz $X^{T}X$ sería proximo a cero, obteniendo un determinante de la matriz inversa
+demasiado grande. Es decir para un $sigma$ fijo la incertidumbre sería demasiado alta, considerando el hecho que en nuestra primera aproximación a un modelo de regresión es
+globalmente significativo pero salvo en una cantidad demasiado pequeña se puede afirmar que, de forma independiente que existe una relación lineal con la tasa de criminalidad, 
+es por esto que se cuantificara la intensidad de la multicolinealidad con el \textbf{Factor de inflación de varianza}.
+
+El \textbf{VIF} nos indica en cuantas unidades se incrementa la varianza del estimador ante presencia de colinealidad y se define como : 
+
+\begin{equation*}
+  VIF_{j} = \frac{1}{1-R^{2}_{j}}
+\end{equation*}
+
+Donde $R^{2}_{j}$ hace referecia al coeficiente de determinación de una regresión que intenta establecer una relación lineal de $X_{j}$ con las demás variables explicativas.
+
+\newpage
+
+Pondremos a prueba las variables explicativas del modelo anteriormente mencionado y diremos que estamos frente a 
+problemas de colinealidad con un $VIF \geq 10$, los resultados se muestran en el cuadro a continuación.
+<<>>=
+vif(ModeloCompleto) %>% 
+  tidy() %>% 
+  mutate(
+      Variable = c(
+        "Número de hombres entre 14 y 24 / 1000",
+        "Variable indicadora de loes estados del sur",
+        "Indice que refleja la escolaridad del estado",
+        "Gasto per cápita en policía en 1960",
+        "Tasa de participación masculina 14 y 24 / 1000",
+        "Número de hombres por cada 1000 mujeres",
+        "Tamaño de la población por 1.000.000 habitantes",
+        "Tasa de desmempleo urbana hombres 14 y 24 por 1000",
+        "Tasa de desmempleo urbana hombres 35 y 39 por 1000",
+        "Producto bruto interno per cápita",
+        "Probabilidad de encarcelamiento",
+        "Tiempo promedio de estadía en cárceles estatales"
+    ),
+    VIF = x,
+    "Prueba" = case_when(
+      x >= 10 ~ "Problema de colinealidad",
+      x < 10 ~ "No hay problema de colinealidad"
+    )
+  ) %>%  
+  mutate_if(
+    is.numeric,
+    round,
+    3
+  ) %>% 
+  select(
+    Variable,
+    VIF,
+    Prueba
+  ) %>% 
+  kbl(
+    booktabs = T, 
+    caption = "Prueba de multicolinealidad : Factor de incremento de Varianza \\textbf{VIF} ",
+    escape = FALSE
+  ) %>% 
+  kable_styling(
+    latex_options = c("striped", "hold_position"),
+    font_size = 7.5
+  )
+@
+
+En base a esto, podemos afirmar que nuestro modelo no presenta problemas con la colinealidad y es por esto
+que continuaremos con la selección a pasos por el método Forward.
+
+\subsection{Método Forward}
+
+Poner aca el script del Forward, el objeto "ModeloCompleto" tiene el modelo que estamos especificando.
 
 \section{Diagnostico}
 

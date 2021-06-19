@@ -11,16 +11,27 @@ pacman::p_load(
   GGally
 )
 
-Datos <- read.table(
+read.table(
     "UScrime.txt",
     header = TRUE,
     dec = ","
+) %>% 
+mutate(
+    So = factor(So)
+) %>% 
+assign(
+    "Datos",
+    .,
+    envir = .GlobalEnv
 )
 
 LPlot <- function(data,mapping) {
     gf <- ggplot(
         data = data,
-        mapping = mapping
+        mapping = mapping,
+        aes(
+            colour = colour
+        )
     ) +
     geom_point(
         color = "#C39BD3"
@@ -37,7 +48,8 @@ Datos %>%
         M,
         NW,
         U1,
-        y
+        y,
+        So
     ) %>% 
 ggpairs(
     lower = list(
@@ -46,10 +58,8 @@ ggpairs(
 )
 
 Datos  %>% 
- select(
-     -So
- ) %>% 
  ggpairs(
+     aes(color = So),
      lower = list(
          continuous = LPlot
      ),
