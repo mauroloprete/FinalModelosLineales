@@ -27,7 +27,7 @@
 \usepackage{amsmath}
 \spanishdecimal{.}
 \usepackage[backend=bibtex]{biblatex}
-\bibliography{packages.bib}
+\bibliography{packages}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1086,10 +1086,7 @@ Tomando como regla empírica el valor de $\frac{4}{n-k-1} = 4/40$ puede verse qu
 
 Por ende, se decide retirarlas del modelo reducido ya que las mismas tienen una influencia preponderante en la estimación. Como se vió en clase, observaciones de este tipo pueden llevar a un modelo alejado de la realidad.
 
-\subsection{Heterosedasticidad}
-
-\subsubsection{Test de Breusch-Pagan}
-<<>>=
+<<results = 'hide'>>=
 Datos %<>%
   slice(
     -c(
@@ -1107,11 +1104,20 @@ ModeloRed %>%
     "ModeloRedInter",
     .,
     envir = .GlobalEnv
-  ) %>% 
-  bptest()
-  
+  )
 @
+
+\newpage
+
 \subsection{Normalidad}
+
+Uno de los supuestos que dimos acerca de nuestro modelo lineal, refiere a la distribución que le dimos a los errores, en este caso siguen una distribución normal,
+esto nos permite realizar las pruebas anteriormente presentadas a lo largo de este trabajo, en el caso que este supuesto no se cumpla los estdaísticos no reflejaran 
+lo que nosotros realmente necesitamos,es por esto que es de crucial importancia chequear la distribución de los errores. En primer lugar haremos un primer acercamiento
+con un gráfico de QQ-Plot que muestra la similitud de los percentiles de la distribución normal téorica y la observada en nuestros errores, por último 
+un gráfico de residudos contra los valores predichos para ver si existe algun patrón en su recorrido. 
+
+\vspace{-3cm}
 
 <<>>=
 ModeloRedInter %>% 
@@ -1133,30 +1139,39 @@ ModeloRedInter %>%
   )
 @
 
-Considerando los gráficos anteriormente mencionados podemos ver que la esperanza de los errores se mantiene
-cercana a cero, a diferencia de algunas observaciones, a su vez , no encontramos un patrón en la dispersión de los errores,
-en cambio en la gráfica QQ-plot podemos ver que en valores centrales de la distribución se asemeja a una distribución normal
-a exepción de la observación 40,11 y 6.
+\vspace{-2.5cm}
+
+En base a los gráficos podemos ver que la esperanza de los errores se mantiene cercana a cero, a diferencia de algunas observaciones.
+También hay que mencionar que no encontramos un patrón en la dispersión de los errores, en cambio en la gráfica QQ-plot podemos ver que en valores centrales
+la distribución se asemeja a una distribución normal a exepción de la observación 17, 20 y 21.
+
+Para poder afirmar que se cumple el supuesto de normalidad de los errores relizaremos,
+tres pruebas
+
+\begin{itemize}
+  \item {\textbf{Test Kolmogrov-Smirnov Lillie:} Compara la distribución teórica $F^{*}$ y la distribución empírica de los errores $S(x)$ $T = sup_{x}|F^{*}(x) - S(X)|$}
+  \item {\textbf{Shapiro-Wilks:} Que plantea un estadísitco que es una función de las estadísticas de órden de la distribución de los errores y se compara con un valor de tabla}
+  \item {\textbf{Jarque Bera:} Se basa en los coeficientes de simetría y curtosis de la muestra, que para una nomral son 0 y 3 respectivamente y con estadístico $\chi^{2}_{2}$}
+\end{itemize}
 
 <<>>=
-
 TestNormalidad <- function(lm) {
   x = rstudent(lm) 
   Esta = c(
-    shapiro.test(x)$statistic,
     lillie.test(x)$statistic,
+    shapiro.test(x)$statistic,
     jarque.bera.test(x)$statistic
   )
   Pvalue = c(
-    shapiro.test(x)$p.value,
     lillie.test(x)$p.value,
+    shapiro.test(x)$p.value,
     jarque.bera.test(x)$p.value
   )
   return(
     data.frame(
       "Test" = c(
-        "Shapiro",
         "Lillie",
+        "Shapiro",
         "Jarque Bera"
       ),
       "Pvalor" = Pvalue,
@@ -1166,15 +1181,41 @@ TestNormalidad <- function(lm) {
 }
 
 ModeloRedInter %>% 
-
-
-
-
+  TestNormalidad() %>% 
+  mutate_if(
+    is.numeric,
+    round,
+    3
+  ) %>% 
+  mutate(
+    Resultado = case_when(
+      Pvalor > 0.05 ~ "No rechazo normalidad",
+      NA ~ "Rechazo H0"
+    )
+  ) %>% 
+  kbl(
+    booktabs = T, 
+    caption = "Test de Normalidad ",
+    escape = FALSE,
+    row.names = FALSE
+  ) %>% 
+  kable_styling(
+    latex_options = c("striped", "hold_position"),
+    font_size = 7.5
+  )
 @
 
-En base a los test puedo afirtmar que la distribución de los errores es normal.
+En base a los test puedo afirtmar que la distribución de los errores sigue una distribución Normal
 
-Me tranque en como presentar una tabla , lo miro luego
+\subsection{Heterosedasticidad}
+
+\subsubsection{Test de Breusch-Pagan}
+<<>>=
+ModeloRedInter %>% 
+  bptest()
+  
+@
+ 
 
 \section{Anexo}
 

@@ -767,7 +767,7 @@ geom_text( label="Regla empírica",
 
 
 
-## -----------------------------------------------------------------------------
+## ----results = 'hide'---------------------------------------------------------
 Datos %<>%
   slice(
     -c(
@@ -785,9 +785,7 @@ ModeloRed %>%
     "ModeloRedInter",
     .,
     envir = .GlobalEnv
-  ) %>% 
-  bptest()
-  
+  )
 
 
 ## -----------------------------------------------------------------------------
@@ -811,24 +809,23 @@ ModeloRedInter %>%
 
 
 ## -----------------------------------------------------------------------------
-
 TestNormalidad <- function(lm) {
   x = rstudent(lm) 
   Esta = c(
-    shapiro.test(x)$statistic,
     lillie.test(x)$statistic,
+    shapiro.test(x)$statistic,
     jarque.bera.test(x)$statistic
   )
   Pvalue = c(
-    shapiro.test(x)$p.value,
     lillie.test(x)$p.value,
+    shapiro.test(x)$p.value,
     jarque.bera.test(x)$p.value
   )
   return(
     data.frame(
       "Test" = c(
-        "Shapiro",
         "Lillie",
+        "Shapiro",
         "Jarque Bera"
       ),
       "Pvalor" = Pvalue,
@@ -838,10 +835,34 @@ TestNormalidad <- function(lm) {
 }
 
 ModeloRedInter %>% 
+  TestNormalidad() %>% 
+  mutate_if(
+    is.numeric,
+    round,
+    3
+  ) %>% 
+  mutate(
+    Resultado = case_when(
+      Pvalor > 0.05 ~ "No rechazo normalidad",
+      NA ~ "Rechazo H0"
+    )
+  ) %>% 
+  kbl(
+    booktabs = T, 
+    caption = "Test de Normalidad ",
+    escape = FALSE,
+    row.names = FALSE
+  ) %>% 
+  kable_styling(
+    latex_options = c("striped", "hold_position"),
+    font_size = 7.5
+  )
 
 
-
-
+## -----------------------------------------------------------------------------
+ModeloRedInter %>% 
+  bptest()
+  
 
 
 ## -----------------------------------------------------------------------------
