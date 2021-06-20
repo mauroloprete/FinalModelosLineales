@@ -68,7 +68,6 @@ if(!require(pacman)) {
   install.packages("pacman")
 }
 pacman::p_load(
-   tidyverse,
    reshape2,
    knitr,
    tidymodels,
@@ -76,11 +75,11 @@ pacman::p_load(
    magrittr,
    GGally,
    car,
-   ggfortify,
    nortest,
    tseries,
    lmtest,
-   MASS
+   tidyverse,
+   ggfortify
  )
 
  knitr::write_bib(c(.packages(), "kntir"), "packages.bib")
@@ -1129,31 +1128,23 @@ Datos %<>%
       31
     )
   )
-
-lm(
-  y ~ So + Po1 + M.F + Pop + Prob ,
-  data = Datos
-  )%>%
+ModeloRed %>%
+  update(
+    .,
+    data = Datos
+  ) %T>% 
+  assign(
+    "ModeloRedInter",
+    .,
+    envir = .GlobalEnv
+  ) %>% 
   bptest()
   
 @
 \subsection{Normalidad}
 
 <<>>=
-Datos %<>%
-  slice(
-    -c(
-      19,
-      29,
-      31
-    )
-  )
-
-ModeloRed %>%
-  update(
-    .,
-    data = Datos
-  ) %>% 
+ModeloRedInter %>% 
   autoplot(
     which = c(1,2)
   ) + 
@@ -1178,9 +1169,35 @@ en cambio en la gráfica QQ-plot podemos ver que en valores centrales de la dist
 a exepción de la observación 40,11 y 6.
 
 <<>>=
-ModeloRed %>% 
-  rstudent() %>% 
-  data.frame() %>% 
+
+TestNormalidad <- function(lm) {
+  x = rstudent(lm) 
+  Esta = c(
+    shapiro.test(x)$statistic,
+    lillie.test(x)$statistic,
+    jarque.bera.test(x)$statistic
+  )
+  Pvalue = c(
+    shapiro.test(x)$p.value,
+    lillie.test(x)$p.value,
+    jarque.bera.test(x)$p.value
+  )
+
+  return(
+    data.frame(
+      "Test" = c(
+        "Shapiro",
+        "Lillie",
+        "Jarque Bera"
+      ),
+      "Pvalor" = Pvalue,
+      "Estadistico" = Esta
+    )
+  )
+}
+
+
+  names()
   summarise(
     Shapiro = shapiro.test(as.numeric(.)),
     lillie = lillie.test(as.numeric(.)),

@@ -8,7 +8,6 @@ if(!require(pacman)) {
   install.packages("pacman")
 }
 pacman::p_load(
-   tidyverse,
    reshape2,
    knitr,
    tidymodels,
@@ -16,11 +15,11 @@ pacman::p_load(
    magrittr,
    GGally,
    car,
-   ggfortify,
    nortest,
    tseries,
    lmtest,
-   MASS
+   tidyverse,
+   ggfortify
  )
 
  knitr::write_bib(c(.packages(), "kntir"), "packages.bib")
