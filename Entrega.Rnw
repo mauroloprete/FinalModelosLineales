@@ -112,8 +112,14 @@ También se trabajará con las observaciones y la existencia de algunas que apor
 \\
 
 El herramental gráfico juega un rol fundamental al momento de transmitir la información de manera concisa y entendible. El mismo se encuentra respaldado por tablas que resumen la información de manera más detallada.
+\\
 
-<<fig.cap = "Histograma de la Tasa de Criminalidad",out.width = "0.8\\textwidth",fig.align = "center">>=
+Cabe destacar que las observaciones se corresponden con los distintos estados de Estado Unidos.
+\\
+
+De manera general se muestra el comportamiento de \textbf{y} de manera resumida:
+
+<<fig.cap = "Histograma de la Tasa de Criminalidad",out.width = "0.4\\textwidth",fig.align = "center">>=
 Sturges<-log2(47)+1
 ggplot(Datos,aes(x=y))+
   geom_histogram(bins = Sturges,
@@ -140,9 +146,7 @@ ggplot(Datos,aes(x=y))+
        y="Cantidad de Estados")
 @
 
-Por último, el histograma de la variable Y. Cuenta con una distribución asimétrica, tiene un intervalo modal entre los valores de 500 y 800 ofensas reportadas en casi 13 Estados.
-Podemos afirmar que la mayoría de las observaciones están concentradas entre 342 que es su valor mínimo y 831 que es la mediana. Dado que su valor máximo es el 1993, el histograma cuenta
-con una cola hacia la derecha.
+Es claro que \textbf{y} cuenta con una distribución medianamente asimétrica, tiene un intervalo modal entre los valores de 500 y 800 ofensas (13 estados presentan una tasa de criminalidad comprendida entre esos valores).
 
 \newpage
 \section{Análisis Exploratorio de datos}
@@ -706,12 +710,10 @@ DatosTab %>%
 @
 
 
-\newpage
-
 \subsubsection{Correlación entre variables}
 
 
-<<out.width = "1\\textwidth",fig.align = "center",fig.cap = "Mapa de correlación de variables incluidas">>=
+<<out.width = "1\\textwidth",fig.align = "center",fig.cap = "Mapa de correlación de variables incluidas",out.width = "0.5\\textwidth",fig.align = "center">>=
 qplot(x=Var1,
       y=Var2,
       data = melt(cor(Datos, use = "p")),
@@ -742,15 +744,12 @@ qplot(x=Var1,
        fill="Coef Corr.")
 @
 
-\begin{figure}
-  \includegraphics[width = 1.05\textwidth]{Grafico.png}
-\end{figure}
 
 
 
 \newpage
 
-\section{Especificación y selección de modelos}
+\section{Especificación y selección de modelos inicial}
 
 
 El objetivo de esta sección es la aplicación de las distintas técnicas estadísticas impartidas en el curso para así llegar a un modelo final que no solo sea significativo al momento de estimar a \textbf{y}, sino que también se adecúe a los supuestos y propiedades deseadas (ganando de esta manera fidelidad).
@@ -947,6 +946,7 @@ Como bien se menciona anteriormente, los tests analizan el aporte dada las demá
 
 Con base en esta última afirmación es que se promueve el uso de distintas técnicas que nos permitirán elegír las variables de manera más acertada (y teniendo en cuenta este panorama).
 
+\section{Diagnóstico}
 
 \subsection{Análisis de multicolinealidad}
 
@@ -1119,12 +1119,7 @@ Tomando como regla empírica el valor de $\frac{4}{n-k-1}$ puede verse que las o
 Por ende, se decide retirarlas del modelo reducido ya que las mismas tienen una influencia preponderante en la estimación. Como se vió en clase, observaciones de este tipo pueden llevar a un modelo alejado de la realidad.
 
 
-
-\section{Diagnostico}
-
-\section{Conclusiones}
-
-\section{Normalidad}
+\subsection{Normalidad}
 
 <<>>=
 Datos %<>%
@@ -1188,5 +1183,10 @@ En base a los test puedo afirtmar que la distribución de los errores es normal.
 
 Me tranque en como presentar una tabla , lo miro luego
 
+\section{Anexo}
+
+\begin{figure}
+  \includegraphics[width = 1.05\textwidth]{Grafico.png}
+\end{figure}
 
 \end{document}
