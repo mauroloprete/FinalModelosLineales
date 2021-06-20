@@ -74,7 +74,9 @@ pacman::p_load(
    magrittr,
    GGally,
    car,
-   ggfortify
+   ggfortify,
+   nortest,
+   tseries
  )
 
 read.table(
@@ -949,8 +951,8 @@ Con base en esta última afirmación es que se promueve el uso de distintas téc
 \subsection{Análisis de multicolinealidad}
 
 Consierando el problema oreviamente mencionado, se analizara la multicolinealidad (aproximada) de las variables independientes del modelo planteado, 
-esto es relevante ya que si existe una relación lineal en la matriz de diseño, estoimpactaría directamente en la varianza de los regresores $\beta_{k} = \left(X^{T}X\right)^{-1}X^{T}$, 
-haciendo que las estimaciones varien ante pequeñas variaciones en nuestras observaciones y predicciones menos confiables. 
+esto es relevante ya que si existe una relación lineal en la matriz de diseño, esto impactaría directamente en la varianza de los regresores $\beta_{k} = \left(X^{T}X\right)^{-1}X^{T}$, 
+haciendo que las estimaciones varien ante pequeñas variaciones en nuestras observaciones y las predicciones serian menos confiables. 
 \\
 
 Estamos en frente a un problema de multicolinealidad aproximada cuando es posible afirmar que existe una relación lineal entre las variables explicativas. 
@@ -963,7 +965,7 @@ Recordando que  :
 \end{equation*}  
 
 Como se menciono anteriormente, ante una posible relación lineal el determinante de la matriz $X^{T}X$ sería proximo a cero, obteniendo un determinante de la matriz inversa
-demasiado grande. Es decir para un $sigma$ fijo la incertidumbre sería demasiado alta, considerando el hecho que en nuestra primera aproximación a un modelo de regresión es
+demasiado grande. Es decir para un $\sigma^{2}$ fijo la incertidumbre sería demasiado alta, considerando el hecho que en nuestra primera aproximación a un modelo de regresión es
 globalmente significativo pero salvo en una cantidad demasiado pequeña se puede afirmar que, de forma independiente existe una relación lineal con la tasa de criminalidad, 
 es por esto que se cuantificara la intensidad de la multicolinealidad con el \textbf{Factor de inflación de varianza}.
 
@@ -1021,7 +1023,7 @@ vif(ModeloInicial) %>%
 @
 
 En base a esto, podemos afirmar que nuestro modelo no presenta problemas con la colinealidad y es por esto
-que continuaremos con la selección a pasos por el método Forward.
+que continuaremos con la selección a pasos por el método Stepwise.
 
 \subsection{Método Stepwise}
 
@@ -1058,7 +1060,7 @@ lm(
   ) %>% 
   kbl(
     booktabs = T, 
-    caption = "Estimación,error estandar y test individual tras aplicar el método Forward ",
+    caption = "Estimación,error estandar y test individual tras aplicar el método Stepwise ",
     escape = FALSE
   ) %>% 
   kable_styling(
@@ -1138,20 +1140,53 @@ lm(
   y ~ M + So + Ed + Po1 + LF + M.F + Pop + U1 + U2 + GDP + Prob + Time,
   data = Datos
   ) %>% 
-  mixlm::stepWise() %>% 
+  mixlm::stepWise() %T>% 
   assign(
     "ModeloRed",
     .,
     envir = .GlobalEnv
   ) %>% 
-  autoplot()
+  autoplot(
+    which = c(1,2)
+  ) + 
+  theme(
+    aspect.ratio = 1,
+    plot.title = element_text(
+      colour = "#280434FF",
+      face="bold"
+    ),
+    axis.text.x = element_text(
+    color = "#8C04C2"
+    ),
+    axis.text.y = element_text(
+      color="#8C04C2"
+    )
+  )
 @
 
 Considerando los gráficos anteriormente mencionados podemos ver que la esperanza de los errores se mantiene
-cercana a cero, a diferencia de algunas observaciones y encontramos un patrón en la dispersión de los errores,
+cercana a cero, a diferencia de algunas observaciones, a su vez , no encontramos un patrón en la dispersión de los errores,
 en cambio en la gráfica QQ-plot podemos ver que en valores centrales de la distribución se asemeja a una distribución normal
-a exepción de la observación 46 y 11.
+a exepción de la observación 46,11 y 6.
 
+<<>>=
+ModeloRed %>% 
+  rstudent() %>% 
+  data.frame() %>% 
+  summarise(
+    Shapiro = shapiro.test(as.numeric(.)),
+    lillie = lillie.test(as.numeric(.)),
+    jarquebera = jarque.bera.test(as.numeric(.))
+  )
+  shapiro.test() %T>%  
+  lillie.test() %>% 
+  jarque.bera.test()
+
+@
+
+En base a los test puedo afirtmar que la distribución de los errores es normal.
+
+Me tranque en como presentar una tabla , lo miro luego
 
 
 \end{document}
