@@ -770,35 +770,27 @@ geom_text( label="Regla empírica",
 Datos %<>%
   slice(
     -c(
-      19,
+      11,
       29,
-      31
+      17
     )
   )
-
-lm(
-  y ~ So + Po1 + M.F + Pop + Prob ,
-  data = Datos
-  )%>%
+ModeloRed %>%
+  update(
+    .,
+    data = Datos
+  ) %T>% 
+  assign(
+    "ModeloRedInter",
+    .,
+    envir = .GlobalEnv
+  ) %>% 
   bptest()
   
 
 
 ## -----------------------------------------------------------------------------
-Datos %<>%
-  slice(
-    -c(
-      19,
-      29,
-      31
-    )
-  )
-
-ModeloRed %>%
-  update(
-    .,
-    data = Datos
-  ) %>% 
+ModeloRedInter %>% 
   autoplot(
     which = c(1,2)
   ) + 
@@ -818,17 +810,36 @@ ModeloRed %>%
 
 
 ## -----------------------------------------------------------------------------
-ModeloRed %>% 
-  rstudent() %>% 
-  data.frame() %>% 
-  summarise(
-    Shapiro = shapiro.test(as.numeric(.)),
-    lillie = lillie.test(as.numeric(.)),
-    jarquebera = jarque.bera.test(as.numeric(.))
+
+TestNormalidad <- function(lm) {
+  x = rstudent(lm) 
+  Esta = c(
+    shapiro.test(x)$statistic,
+    lillie.test(x)$statistic,
+    jarque.bera.test(x)$statistic
   )
-  shapiro.test() %T>%  
-  lillie.test() %>% 
-  jarque.bera.test()
+  Pvalue = c(
+    shapiro.test(x)$p.value,
+    lillie.test(x)$p.value,
+    jarque.bera.test(x)$p.value
+  )
+  return(
+    data.frame(
+      "Test" = c(
+        "Shapiro",
+        "Lillie",
+        "Jarque Bera"
+      ),
+      "Pvalor" = Pvalue,
+      "Estadistico" = Esta
+    )
+  )
+}
+
+ModeloRedInter %>% 
+
+
+
 
 
 

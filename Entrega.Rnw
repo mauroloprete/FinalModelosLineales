@@ -1123,9 +1123,9 @@ Por ende, se decide retirarlas del modelo reducido ya que las mismas tienen una 
 Datos %<>%
   slice(
     -c(
-      19,
+      11,
       29,
-      31
+      17
     )
   )
 ModeloRed %>%
@@ -1182,7 +1182,6 @@ TestNormalidad <- function(lm) {
     lillie.test(x)$p.value,
     jarque.bera.test(x)$p.value
   )
-
   return(
     data.frame(
       "Test" = c(
@@ -1196,16 +1195,10 @@ TestNormalidad <- function(lm) {
   )
 }
 
+ModeloRedInter %>% 
 
-  names()
-  summarise(
-    Shapiro = shapiro.test(as.numeric(.)),
-    lillie = lillie.test(as.numeric(.)),
-    jarquebera = jarque.bera.test(as.numeric(.))
-  )
-  shapiro.test() %T>%  
-  lillie.test() %>% 
-  jarque.bera.test()
+
+
 
 @
 
