@@ -26,8 +26,8 @@
 \usepackage{multicol}
 \usepackage{amsmath}
 \spanishdecimal{.}
-\usepackage[backend=bibtex]{biblatex}
-\bibliography{packages}
+\usepackage{natbib}
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -48,6 +48,8 @@
   \vfill
   {\scshape\LARGE Modelos Líneales \par}
   {\scshape\Large Trabajo final \par}
+  \vspace{0.5cm}
+  {\scshape\Large Docentes : Laura Nalbarte y Fernando Massa \par}
   \vspace{3cm}
   {\Large Ignacio Acosta - Sofía Itté - Mauro Loprete \par}
   {\Large 1er semestre 2021 \par}
@@ -1139,14 +1141,52 @@ ModeloRedInter %>%
   )
 @
 
-\vspace{-2.5cm}
+<<>>=
+ModeloRedInter  %>% 
+  rstandard() %>% 
+  as.data.frame() %>% 
+  ggplot(
+    aes(
+      x = .
+    )
+  ) + 
+  geom_density(
+    size = 1.7,
+    colour = "#8F3A84FF"
+  ) + 
+  geom_line(
+    aes(
+      x = seq(-4,4,length.out = 44),
+      y = dnorm(seq(-4,4,length.out = 44))
+    ),
+    colour = "#280434FF",
+    size = 1.7
+  ) + 
+  labs(
+    title = "Valores téoricos y errores " 
+  ) +
+  theme(
+    aspect.ratio = 1,
+    plot.title = element_text(
+      colour = "#280434FF",
+      face="bold"
+    ),
+    axis.text.x = element_text(
+      color = "#8C04C2"
+    ),
+    axis.text.y = element_text(
+      color="#8C04C2"
+    )
+  )
+@
+
 
 En base a los gráficos podemos ver que la esperanza de los errores se mantiene cercana a cero, a diferencia de algunas observaciones.
 También hay que mencionar que no encontramos un patrón en la dispersión de los errores, en cambio en la gráfica QQ-plot podemos ver que en valores centrales
 la distribución se asemeja a una distribución normal a exepción de la observación 17, 20 y 21.
+\\
 
-Para poder afirmar que se cumple el supuesto de normalidad de los errores relizaremos,
-tres pruebas
+Para poder afirmar que se cumple el supuesto de normalidad de los errores relizaremos, tres pruebas:
 
 \begin{itemize}
   \item {\textbf{Test Kolmogrov-Smirnov Lillie:} Compara la distribución teórica $F^{*}$ y la distribución empírica de los errores $S(x)$ $T = sup_{x}|F^{*}(x) - S(X)|$}
@@ -1205,7 +1245,7 @@ ModeloRedInter %>%
   )
 @
 
-En base a los test puedo afirtmar que la distribución de los errores sigue una distribución Normal
+En base a los test se puede afirmar que la distribución de los errores sigue una distribución Normal, a continuación haremos el analisis de la homocedasticidad.
 
 \subsection{Heterosedasticidad}
 
@@ -1213,7 +1253,6 @@ En base a los test puedo afirtmar que la distribución de los errores sigue una 
 <<>>=
 ModeloRedInter %>% 
   bptest()
-  
 @
  
 
@@ -1237,6 +1276,5 @@ lm(
 lili
 \section{Bibliografía}
 
-\printbibliography
 
 \end{document}

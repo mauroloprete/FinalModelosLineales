@@ -809,6 +809,45 @@ ModeloRedInter %>%
 
 
 ## -----------------------------------------------------------------------------
+ModeloRedInter  %>% 
+  rstandard() %>% 
+  as.data.frame() %>% 
+  ggplot(
+    aes(
+      x = .
+    )
+  ) + 
+  geom_density(
+    size = 1.7,
+    colour = "#8F3A84FF"
+  ) + 
+  geom_line(
+    aes(
+      x = seq(-4,4,length.out = 44),
+      y = dnorm(seq(-4,4,length.out = 44))
+    ),
+    colour = "#280434FF",
+    size = 1.7
+  ) + 
+  labs(
+    title = "Valores téoricos y errores " 
+  ) +
+  theme(
+    aspect.ratio = 1,
+    plot.title = element_text(
+      colour = "#280434FF",
+      face="bold"
+    ),
+    axis.text.x = element_text(
+      color = "#8C04C2"
+    ),
+    axis.text.y = element_text(
+      color="#8C04C2"
+    )
+  )
+
+
+## -----------------------------------------------------------------------------
 TestNormalidad <- function(lm) {
   x = rstudent(lm) 
   Esta = c(
@@ -862,7 +901,6 @@ ModeloRedInter %>%
 ## -----------------------------------------------------------------------------
 ModeloRedInter %>% 
   bptest()
-  
 
 
 ## -----------------------------------------------------------------------------
