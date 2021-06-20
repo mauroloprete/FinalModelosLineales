@@ -108,7 +108,7 @@ Haciendo uso de las distintas técnicas estadíticas aprendidas en el curso se b
 En el transcurso del texto se pondrán a prueba las distintas hipótesis centrales del modelo, tales como la normalidad de los errores y la heterosedasticidad.
 \\
 
-También se trabajará con las observaciones y la existencia de algunas que aporten el mismo nivel de información (análisis de multicolinealidad).
+También se trabajará con las observaciones y la existencia de algunas que aporten el mismo nivel de información.
 \\
 
 El herramental gráfico juega un rol fundamental al momento de transmitir la información de manera concisa y entendible. El mismo se encuentra respaldado por tablas que resumen la información de manera más detallada.
