@@ -1234,7 +1234,7 @@ lm(
 @
 
 \subsection{Script de R}
-
+lili
 \section{Bibliografía}
 
 \printbibliography
