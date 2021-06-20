@@ -808,7 +808,7 @@ ModeloRedInter %>%
   )
 
 
-## -----------------------------------------------------------------------------
+## ----out.width = "0.6\\textwidth",fig.align = "center"------------------------
 ModeloRedInter  %>% 
   rstandard() %>% 
   as.data.frame() %>% 
