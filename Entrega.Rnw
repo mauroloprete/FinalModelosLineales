@@ -66,15 +66,16 @@ if(!require(pacman)) {
   install.packages("pacman")
 }
 pacman::p_load(
-  tidyverse,
-  reshape2,
-  knitr,
-  tidymodels,
-  kableExtra,
-  magrittr,
-  GGally,
-  car
-)
+   tidyverse,
+   reshape2,
+   knitr,
+   tidymodels,
+   kableExtra,
+   magrittr,
+   GGally,
+   car,
+   ggfortify
+ )
 
 read.table(
   "UScrime.txt",
@@ -1100,6 +1101,36 @@ Por ende, se decide retirarlas del modelo reducido ya que las mismas tienen una 
 \section{Diagnostico}
 
 \section{Conclusiones}
+
+\section{Normalidad}
+
+<<>>=
+Datos %<>%
+  slice(
+    -c(
+      19,
+      29,
+      31
+    )
+  )
+
+lm(
+  y ~ M + So + Ed + Po1 + LF + M.F + Pop + U1 + U2 + GDP + Prob + Time,
+  data = Datos
+  ) %>% 
+  mixlm::stepWise() %>% 
+  assign(
+    "ModeloRed",
+    .,
+    envir = .GlobalEnv
+  ) %>% 
+  autoplot()
+@
+
+Considerando los gráficos anteriormente mencionados podemos ver que la esperanza de los errores se mantiene
+cercana a cero, a diferencia de algunas observaciones y encontramos un patrón en la dispersión de los errores,
+en cambio en la gráfica QQ-plot podemos ver que en valores centrales de la distribución se asemeja a una distribución normal
+a exepción de la observación 46 y 11.
 
 
 
