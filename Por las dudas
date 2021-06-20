@@ -1,0 +1,41 @@
+\section{Introducción al Modelo Completo}
+
+El objetivo de esta sección es la aplicación de las distintas técnicas estadísticas impartidas en el curso para así llegar a un modelo final que no solo sea significativo al momento de estimar a \textbf{y}, sino que también se adecúe a los supuestos y propiedades deseadas (ganando de esta manera fidelidad).
+\\
+
+De manera resumida podría decirse que este informe seguirá fielmente el principio de \textit{parsimonia}\footnote{Frugalidad y moderación en los gastos.}. Respetando en todo momento el objetivo principal, la creación de un modelo lo más certero posible.
+\\
+
+En una primer instancia se planteará el \textbf{Modelo completo} constituído por la totalidad de las variables de las cuales se poseen datos.
+\\
+
+Claro está, se podría haber planteado en primera instancia un \textit{modelo inicial} (es decír, que contenga parte de las variables). No es esto errado, sin embargo es este un procedimiento que requiere de cierta experiencia en el tema de criminología.
+\\
+
+Como ya es sabido, variables que presentan una correlación muy alta no son (en general) marginalmente significativas al momento de definir la variable de respuesta.
+\\
+
+Esto se evidencia en los tests de hipótesis en donde se analiza el aporte de cada variable dada las demás variables. Una correlación alta entre variables, podría indicar que parte de la información que aportan una de ellas está también presente en otra y esa cantidad de información se vió cuantificada de manera previa. Lo que tarde o temprano llevaría a descartar alguna de ellas.
+\\
+
+Al comienzo de este trabajo jugó este principio de la correlación un rol monumental. Basándose en la alta correlación de variables 2 a 2, se procedió a retirar de la dupla a aquella que menor correlación mantenía con \textbf{y}.
+
+Esto es en principio coherente, a pesar de ello y trás el análisis de disntitos panoramas, el caso partícular de \textbf{Ineq} y \textbf{GDP} dejó en claro que esta técnica fue en un principio apresurada. Si bien las variables comparten gran nivel de información, trás la aplicación de las técnicas de \textbf{Forward,Backwards,Stepwise} ambas varibles eran incluídas en el modelo en todo escenario.
+\\
+
+Esta situación subyace de que incluso cuando ambas comparten un nivel elevado de información, el aporte único de las mismas es alto en comparación con el resto de las variables presentadas.
+\\
+
+Lo último se vió claramente en el $R^{2}_{a}$ de los modelos finales.
+\\
+
+En principio, a partir del ``arsenal`` descriptivo es claro que:
+\begin{itemize}
+\item {\textbf{Ineq} y \textbf{GDP} tienen una correlación negativa altísima (-0.884).}
+\item {\textbf{P01} y \textbf{P02} poseen una correlación negativa casi perfecta (0.994)}
+\item {\textbf{Ineq} y \textbf{Ed} tienen también una correlación negativa bastante alta (-0,794)}
+\item {\textbf{SO} y \textbf{NW} mantienen una correlación positiva y de nivel alto (0,767)}
+\end{itemize}
+
+Como veremos en las siguientes secciones del documento, el caso de \textbf{Ineq} y \textbf{GDP} es partícular. Como se pensó en un principio, en el resto de las duplas muy probablemente sobreviva una sola de las varibles (si no es que ambas son descartadas).
+

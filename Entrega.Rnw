@@ -26,6 +26,8 @@
 \usepackage{multicol}
 \usepackage{amsmath}
 \spanishdecimal{.}
+\usepackage[backend=bibtex]{biblatex}
+\bibliography{packages.bib}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -66,7 +68,6 @@ if(!require(pacman)) {
   install.packages("pacman")
 }
 pacman::p_load(
-   tidyverse,
    reshape2,
    knitr,
    tidymodels,
@@ -74,10 +75,14 @@ pacman::p_load(
    magrittr,
    GGally,
    car,
-   ggfortify,
    nortest,
-   tseries
+   tseries,
+   lmtest,
+   tidyverse,
+   ggfortify
  )
+
+ knitr::write_bib(c(.packages(), "kntir"), "packages.bib")
 
 read.table(
   "UScrime.txt",
@@ -92,6 +97,8 @@ read.table(
     .,
     envir = .GlobalEnv
   )
+
+knitr::purl("Entrega.Rnw")
 
 @
 \section{Introducción}
@@ -713,7 +720,7 @@ DatosTab %>%
 \subsubsection{Correlación entre variables}
 
 
-<<out.width = "1\\textwidth",fig.align = "center",fig.cap = "Mapa de correlación de variables incluidas",out.width = "0.5\\textwidth",fig.align = "center">>=
+<<fig.cap = "Mapa de correlación de variables incluidas",out.width = "0.5\\textwidth",fig.align = "center">>=
 qplot(x=Var1,
       y=Var2,
       data = melt(cor(Datos, use = "p")),
@@ -853,14 +860,13 @@ se considera al mismo como \textit{aceptable}. Por otro lado, haciendo referecia
 \end{align*}
 
 
-Siendo $SCE$ la suma de cuadrados explicados por la regresión y $RSE^{2}$ el cuadrado del error estandar de los residuos, resulta para este caso partícular $SCE = 5.525.982$ y $RSE^{2} = 43707,93$,
+Siendo $SCE$ la suma de cuadrados explicados por la regresión y $RSE^{2}$ el cuadrado del error estandar de los residuos, resulta para este caso partícular $SCE = 5.525.982$ y $RSE^{2} = 43707,766$,
 de esta manera se obtiene el $F_{obs}$ que permite rechazar $H_{0}$ y así afirmar que el modelo es estadísticamente significativo para explicar a \textbf{y}.
 \\
 
 A continuación se testea la siginificación de cada variable en forma independiente, los resultados se muestran en el siguiente cuadro : 
 
 <<>>=
-
 ModeloCompleto %>% 
   tidy() %>% 
   summarise_if(
@@ -870,21 +876,7 @@ ModeloCompleto %>%
   mutate(
     Variable = c(
       "Intercepto",
-      "Número de hombres entre 14 y 24 / 1000",
-      "Variable indicadora estado sureño",
-      "Indice que refleja la escolaridad del estado",
-      "Gasto per cápita en policía en 1960",
-      "Gasto per cápita en policía en 1960",
-      "Tasa de participación masculina 14 y 24 / 1000",
-      "Número de hombres por cada 1000 mujeres",
-      "Tamaño de la población por 1.000.000 habitantes",
-      "Número de no caucásicos por cada 1000 habitantes",
-      "Tasa de desmempleo urbana hombres 14 y 24 por 1000",
-      "Tasa de desmempleo urbana hombres 35 y 39 por 1000",
-      "Producto bruto interno per cápita",
-      "Desigualdad de ingreso",
-      "Probabilidad de encarcelamiento",
-      "Tiempo promedio de estadía en cárceles estatales"
+      names(DatosTab)[-length(DatosTab)]
     ),
     "Estimación" = estimate,
     "Error estandar" = std.error,
@@ -961,20 +953,9 @@ problemas de colinealidad con un $VIF \geq 10$, los resultados se muestran en el
 vif(ModeloCompleto) %>% 
   tidy() %>% 
   mutate(
-      Variable = c(
-        "Número de hombres entre 14 y 24 / 1000",
-        "Variable indicadora de loes estados del sur",
-        "Indice que refleja la escolaridad del estado",
-        "Gasto per cápita en policía en 1960",
-        "Tasa de participación masculina 14 y 24 / 1000",
-        "Número de hombres por cada 1000 mujeres",
-        "Tamaño de la población por 1.000.000 habitantes",
-        "Tasa de desmempleo urbana hombres 14 y 24 por 1000",
-        "Tasa de desmempleo urbana hombres 35 y 39 por 1000",
-        "Producto bruto interno per cápita",
-        "Probabilidad de encarcelamiento",
-        "Tiempo promedio de estadía en cárceles estatales"
-    ),
+  Variable = c(
+    names(DatosTab)[-length(DatosTab)]
+  ),
     VIF = x,
     "Prueba" = case_when(
       x >= 10 ~ "Problema de colinealidad",
@@ -998,31 +979,42 @@ vif(ModeloCompleto) %>%
   )
 @
 
-En base a esto, podemos afirmar que nuestro modelo no presenta problemas con la colinealidad y es por esto
-que continuaremos con la selección a pasos por el método Stepwise.
-
+En base a esto, podemos afirmar que este modelo presenta problemas con la colinealidad y es por esto
+que se continuará con la selección a pasos por el método Stepwise.
 \subsection{Método Stepwise}
 
-<<>>=
+El método de Stepwise (basado en el \textit{F-Test}) inicia seleccionado aquella variable que tiene una mayor correlación con la variable \textbf{y},
+la segunda en ingresar al modelo es aquella que mayor $\text{SCE}(X|\text{demás variables})$.
+
+<<results='hide'>>=
 lm(
-  y ~ M + So + Ed + Po1 + LF + M.F + Pop + U1 + U2 + GDP + Prob + Time,
+  reformulate(names(Datos)[-16], names(Datos[16])),
   data = Datos
 ) %>% 
-  mixlm::stepWise() %T>% 
+  mixlm::stepWise() %>% 
   assign(
     "ModeloRed",
     .,
     envir = .GlobalEnv
-  ) %>% 
+  )
+@
+
+<<>>=
+ModeloRed %>%  
   tidy() %>% 
-    mutate(
+  summarise_if(
+    is.numeric,
+    ~round(.x,3)
+  ) %>% 
+  mutate(
     Variable = c(
       "Intercepto",
-      "Gasto per cápita en policía en 1960",
+      "Gasto per capita en policía 1960",
+      "Desigualdad del ingreso",
+      "Indice que refleja la escolaridad del estado",
       "Número de hombres entre 14 y 24 / 1000",
-      "Número de hombres por cada 1000 mujeres",
       "Probabilidad de encarcelamiento",
-      "Variable indicadora de loes estados del sur"
+      "Tasa de desempleo urbana hombres 35-39 años x 1000"
     ),
     "Estimación" = estimate,
     "Error estandar" = std.error,
@@ -1060,7 +1052,7 @@ Una distancia de Cook elevada significa que una observación tiene mayor influen
 D_{i}=\frac{(\widehat{\beta}-\widehat{\beta}{(-i)})^{{}'}X{}'X(\widehat{\beta}-\widehat{\beta}{(-i)})}{(k+1)\widehat{\sigma^{2}}}
 \end{equation*}
 
-<<fig.align= "center">>=
+<<fig.align= "center",out.width = "0.8\\textwidth">>=
 Dcook<-as.data.frame(cooks.distance(ModeloRed))
 Dcook%>%
   ggplot(aes(x=seq(1,47,1),y=`cooks.distance(ModeloRed)`))+
@@ -1068,7 +1060,7 @@ Dcook%>%
   labs(title="Distancias de Cook",
        x="Observación",
        y="Valor de la distancia de cook")+
-  geom_hline(yintercept = (4/41),
+  geom_hline(yintercept = (4/40),
              colour="#280434FF",
           size=1)+
   theme(aspect.ratio = 1,
@@ -1090,7 +1082,7 @@ geom_text( label="Regla empírica",
 
 @
 
-Tomando como regla empírica el valor de $\frac{4}{n-k-1}$ puede verse que las observaciones \textbf{19}, \textbf{29} (de manera excesiva) y \textbf{31} sobrepasan la regla estipulada.
+Tomando como regla empírica el valor de $\frac{4}{n-k-1} = 4/40$ puede verse que las observaciones \textbf{11}, \textbf{29} (de manera excesiva) y \textbf{18} sobrepasan la regla estipulada.
 
 Por ende, se decide retirarlas del modelo reducido ya que las mismas tienen una influencia preponderante en la estimación. Como se vió en clase, observaciones de este tipo pueden llevar a un modelo alejado de la realidad.
 
@@ -1101,41 +1093,28 @@ Por ende, se decide retirarlas del modelo reducido ya que las mismas tienen una 
 Datos %<>%
   slice(
     -c(
-      19,
+      11,
       29,
-      31
+      18
     )
   )
-
-lm(
-  y ~ So + Po1 + M.F + Pop + Prob ,
-  data = Datos
-  )%>%
+ModeloRed %>%
+  update(
+    .,
+    data = Datos
+  ) %T>% 
+  assign(
+    "ModeloRedInter",
+    .,
+    envir = .GlobalEnv
+  ) %>% 
   bptest()
   
 @
 \subsection{Normalidad}
 
 <<>>=
-Datos %<>%
-  slice(
-    -c(
-      19,
-      29,
-      31
-    )
-  )
-
-lm(
-  y ~ M + So + Ed + Po1 + LF + M.F + Pop + U1 + U2 + GDP + Prob + Time,
-  data = Datos
-  ) %>% 
-  mixlm::stepWise() %T>% 
-  assign(
-    "ModeloRed",
-    .,
-    envir = .GlobalEnv
-  ) %>% 
+ModeloRedInter %>% 
   autoplot(
     which = c(1,2)
   ) + 
@@ -1157,20 +1136,39 @@ lm(
 Considerando los gráficos anteriormente mencionados podemos ver que la esperanza de los errores se mantiene
 cercana a cero, a diferencia de algunas observaciones, a su vez , no encontramos un patrón en la dispersión de los errores,
 en cambio en la gráfica QQ-plot podemos ver que en valores centrales de la distribución se asemeja a una distribución normal
-a exepción de la observación 46,11 y 6.
+a exepción de la observación 40,11 y 6.
 
 <<>>=
-ModeloRed %>% 
-  rstudent() %>% 
-  data.frame() %>% 
-  summarise(
-    Shapiro = shapiro.test(as.numeric(.)),
-    lillie = lillie.test(as.numeric(.)),
-    jarquebera = jarque.bera.test(as.numeric(.))
+
+TestNormalidad <- function(lm) {
+  x = rstudent(lm) 
+  Esta = c(
+    shapiro.test(x)$statistic,
+    lillie.test(x)$statistic,
+    jarque.bera.test(x)$statistic
   )
-  shapiro.test() %T>%  
-  lillie.test() %>% 
-  jarque.bera.test()
+  Pvalue = c(
+    shapiro.test(x)$p.value,
+    lillie.test(x)$p.value,
+    jarque.bera.test(x)$p.value
+  )
+  return(
+    data.frame(
+      "Test" = c(
+        "Shapiro",
+        "Lillie",
+        "Jarque Bera"
+      ),
+      "Pvalor" = Pvalue,
+      "Estadistico" = Esta
+    )
+  )
+}
+
+ModeloRedInter %>% 
+
+
+
 
 @
 
@@ -1180,8 +1178,24 @@ Me tranque en como presentar una tabla , lo miro luego
 
 \section{Anexo}
 
-\begin{figure}
+\begin{figure}[h]
   \includegraphics[width = 1.05\textwidth]{Grafico.png}
 \end{figure}
+
+\subsection{Selección de Modelos : StepWise}
+
+<<>>=
+lm(
+  reformulate(names(Datos)[-16], names(Datos[16])),
+  data = Datos
+) %>% 
+  mixlm::stepWise(full = TRUE)
+@
+
+\subsection{Script de R}
+
+\section{Bibliografía}
+
+\printbibliography
 
 \end{document}
