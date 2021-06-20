@@ -749,22 +749,36 @@ qplot(x=Var1,
 
 \newpage
 
-\section{Especificación y selección de modelos inicial}
-
+\section{Introducción al Modelo Completo}
 
 El objetivo de esta sección es la aplicación de las distintas técnicas estadísticas impartidas en el curso para así llegar a un modelo final que no solo sea significativo al momento de estimar a \textbf{y}, sino que también se adecúe a los supuestos y propiedades deseadas (ganando de esta manera fidelidad).
 \\
 
-En una primer instancia se planteará un \textit{modelo inicial} constituído por parte de las variables de las cuales se poseen datos.
+De manera resumida podría decirse que este informe seguirá fielmente el principio de \textit{parsimonia}\footnote{Frugalidad y moderación en los gastos.}. Respetando en todo momento el objetivo principal, la creación de un modelo lo más certero posible.
 \\
 
-Claro está, se podría haber planteado en primera instancia un \textit{modelo completo} (es decír, que contenga absolutamente a todas las variables). No es esto errado, pero si desconsiderado con el extenso análisis descriptivo planteado con anterioridad.
+En una primer instancia se planteará el \textbf{Modelo completo} constituído por la totalidad de las variables de las cuales se poseen datos.
 \\
 
-Como ya es sabido, variables que presentan una correlación muy alta no son marginalmente significativas al momento de definir la variable de respuesta.
+Claro está, se podría haber planteado en primera instancia un \textit{modelo inicial} (es decír, que contenga parte de las variables). No es esto errado, sin embargo es este un procedimiento que requiere de cierta experiencia en el tema de criminología.
+\\
+
+Como ya es sabido, variables que presentan una correlación muy alta no son (en general) marginalmente significativas al momento de definir la variable de respuesta.
 \\
 
 Esto se evidencia en los tests de hipótesis en donde se analiza el aporte de cada variable dada las demás variables. Una correlación alta entre variables, podría indicar que parte de la información que aportan una de ellas está también presente en otra y esa cantidad de información se vió cuantificada de manera previa. Lo que tarde o temprano llevaría a descartar alguna de ellas.
+\\
+
+Al comienzo de este trabajo jugó este principio de la correlación un rol monumental. Basándose en la alta correlación de variables 2 a 2, se procedió a retirar de la dupla a aquella que menor correlación mantenía con \textbf{y}.
+
+Esto es en principio coherente, a pesar de ello y trás el análisis de disntitos panoramas, el caso partícular de \textbf{Ineq} y \textbf{GDP} dejó en claro que esta técnica fue en un principio apresurada. Si bien las variables comparten gran nivel de información, trás la aplicación de las técnicas de \textbf{Forward,Backwards,Stepwise} ambas varibles eran incluídas en el modelo en todo escenario.
+\\
+
+Esta situación subyace de que incluso cuando ambas comparten un nivel elevado de información, el aporte único de las mismas es alto en comparación con el resto de las variables presentadas.
+\\
+
+Lo último se vió claramente en el $R^{2}_{a}$ de los modelos finales.
+\\
 
 En principio, a partir del ``arsenal`` descriptivo es claro que:
 \begin{itemize}
@@ -774,53 +788,13 @@ En principio, a partir del ``arsenal`` descriptivo es claro que:
 \item {\textbf{SO} y \textbf{NW} mantienen una correlación positiva y de nivel alto (0,767)}
 \end{itemize}
 
-A partir de lo afirmado, se procederá a "descartar" a alguna de las variables que constituye cada dupla respaldándose en el valor del coeficiente de correlación existente entre las variables explicativas y \textbf{y}.
+Como veremos en las siguientes secciones del documento, el caso de \textbf{Ineq} y \textbf{GDP} es partícular. Como se pensó en un principio, en el resto de las duplas muy probablemente sobreviva una sola de las varibles (si no es que ambas son descartadas).
 
 
-\begin{multicols}{4}
-  \begin{equation*}
-    \rho _{y,Ineq}=-0,179
-  \end{equation*}
-
-  \begin{equation*}
-    \rho _{y,GDP}=0,441
-  \end{equation*}
-
-  \begin{equation*}
-    \rho _{y,P01}=0,688
-  \end{equation*}
-
-  \begin{equation*}
-    \rho _{y,P02}=0,667
-  \end{equation*}
-
-  \begin{equation*}
-    \rho _{y,Ed}=0,323
-  \end{equation*}
-
-  \begin{equation*}
-    \rho _{y,S0}=-0,09
-  \end{equation*}
-
-  \begin{equation*}
-    \rho _{y,NW}=0,03
-  \end{equation*}
-\end{multicols}
-
-Se elige aquella variable cuyo coeficiente de correlación con \textbf{y} en valor absoluto sea mayor.
-\\
-
-Trás esto, se decide que \textbf{Ineq} , \textbf{P02} y \textbf{NW} no sean incluídos en el modelo inicial ya que se entiende que las mismas no tendrán un aporte significativo en presencia de sus pares.
-\\
-
-A manera de resumen podría decirse que este primer acercamiento al modelo sigue fielmente el principio de \textit{parsimonia}\footnote{Frugalidad y moderación en los gastos.}.
-\\
-
-Quedan entonces determinadas las variables a conformar el modelo inicial, que será analizado con detenimiento en la sección siguiente.
 
 \newpage
 
-\subsection{Modelo Inicial}
+\subsection{Modelo Completo}
 
 Como una primera aproximación, se construye un modelo donde se incluyen todas las variables de la tabla de datos, en concreto el siguiente modelo de regresión:
 
@@ -830,11 +804,11 @@ Como una primera aproximación, se construye un modelo donde se incluyen todas l
 
 <<>>=
 lm(
-    y ~ . -Ineq -Po2 - NW,
+    y ~ .,
     data = Datos
 ) %T>% 
   assign(
-    "ModeloInicial",
+    "ModeloCompleto",
     .,
     envir = .GlobalEnv
   ) %>% 
@@ -887,7 +861,7 @@ A continuación se testea la siginificación de cada variable en forma independi
 
 <<>>=
 
-ModeloInicial %>% 
+ModeloCompleto %>% 
   tidy() %>% 
   summarise_if(
     is.numeric,
@@ -897,15 +871,18 @@ ModeloInicial %>%
     Variable = c(
       "Intercepto",
       "Número de hombres entre 14 y 24 / 1000",
-      "Variable indicadora de loes estados del sur",
+      "Variable indicadora estado sureño",
       "Indice que refleja la escolaridad del estado",
+      "Gasto per cápita en policía en 1960",
       "Gasto per cápita en policía en 1960",
       "Tasa de participación masculina 14 y 24 / 1000",
       "Número de hombres por cada 1000 mujeres",
       "Tamaño de la población por 1.000.000 habitantes",
+      "Número de no caucásicos por cada 1000 habitantes",
       "Tasa de desmempleo urbana hombres 14 y 24 por 1000",
       "Tasa de desmempleo urbana hombres 35 y 39 por 1000",
       "Producto bruto interno per cápita",
+      "Desigualdad de ingreso",
       "Probabilidad de encarcelamiento",
       "Tiempo promedio de estadía en cárceles estatales"
     ),
@@ -931,14 +908,13 @@ ModeloInicial %>%
 @
 
 \newpage
-A partir del cuadro presentado y conforme a los tests realizados, se ve claramente que son tan solo 3 son las variables que de manera independiente (\textbf{y muy importantemente, en presencia de todas las demás}) logran un aporte significativo al momento de explicar el comportamiento de la tasa de criminalidad.
+A partir del cuadro presentado y conforme a los tests realizados, se ve claramente que son tan solo 4 son las variables que de manera independiente (\textbf{y muy importantemente, en presencia de todas las demás}) logran un aporte significativo al momento de explicar el comportamiento de la tasa de criminalidad.
 \\
 
-Ellas son \textbf{PO1}: Gasto pér capita en policía en 1960, \textbf{U2}: Tasa de desempleo Urbana de hombres
-entre 35 y 39 años por 1000 habitantes y por último \textbf{Prob*1000} Probabilidad de encarcelamiento cada 1000 habitantes.
+Ellas son \textbf{M},\textbf{PO1},\textbf{U2} y por último \textbf{Prob*1000}.
 \\
 
-¿Significa esto que se debe descartar el resto de las varibles y plantear un modelo caracterízado por tan solo las 3?, la respuesta es \textbf{no}. 
+¿Significa esto que se debe descartar el resto de las varibles y plantear un modelo caracterízado por tan solo las 4?, la respuesta es \textbf{no}. 
 \\
 
 Como bien se menciona anteriormente, los tests analizan el aporte dada las demás variables. Una correlación alta entre variables, podría indicar que parte de la información que aportan una de ellas está también presente en otra y esa cantidad de información se vió cuantificada de manera previa.
@@ -982,7 +958,7 @@ Donde $R^{2}_{j}$ hace referecia al coeficiente de determinación de una regresi
 Pondremos a prueba las variables explicativas del modelo anteriormente mencionado y diremos que estamos frente a 
 problemas de colinealidad con un $VIF \geq 10$, los resultados se muestran en el cuadro a continuación.
 <<>>=
-vif(ModeloInicial) %>% 
+vif(ModeloCompleto) %>% 
   tidy() %>% 
   mutate(
       Variable = c(
