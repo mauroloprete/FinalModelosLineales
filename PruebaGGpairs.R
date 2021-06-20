@@ -49,8 +49,7 @@ Datos %>%
         M,
         NW,
         U1,
-        y,
-        So
+        y
     ) %>% 
 ggpairs(
     lower = list(
@@ -59,8 +58,8 @@ ggpairs(
 )
 
 Datos  %>% 
+ select(-So) %>% 
  ggpairs(
-     aes(color = So),
      lower = list(
          continuous = LPlot
      ),
