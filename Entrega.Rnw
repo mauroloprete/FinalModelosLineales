@@ -746,7 +746,7 @@ Como ya es sabido, variables que presentan una correlación muy alta no son marg
 
 Esto se evidencia en los tests de hipótesis en donde se analiza el aporte de cada variable dada las demás variables. Una correlación alta entre variables, podría indicar que parte de la información que aportan una de ellas está también presente en otra y esa cantidad de información se vió cuantificada de manera previa. Lo que tarde o temprano llevaría a descartar alguna de ellas.
 
-En principio, a partir del "arsenal" descriptivo es claro que:
+En principio, a partir del ``arsenal`` descriptivo es claro que:
 \begin{itemize}
 \item {\textbf{Ineq} y \textbf{GDP} tienen una correlación negativa altísima (-0.884).}
 \item {\textbf{P01} y \textbf{P02} poseen una correlación negativa casi perfecta (0.994)}
@@ -814,7 +814,7 @@ lm(
     data = Datos
 ) %T>% 
   assign(
-    "ModeloCompleto",
+    "ModeloInicial",
     .,
     envir = .GlobalEnv
   ) %>% 
@@ -867,7 +867,7 @@ A continuación se testea la siginificación de cada variable en forma independi
 
 <<>>=
 
-ModeloCompleto %>% 
+ModeloInicial %>% 
   tidy() %>% 
   summarise_if(
     is.numeric,
@@ -911,11 +911,11 @@ ModeloCompleto %>%
 @
 
 \newpage
-A partir del cuadro presentado y conforme a los tests realizados, se ve claramente que son tan solo 3 las variables que de manera independiente (\textbf{y muy importantemente, en presencia de todas las demás}) logran un aporte significativo al momento de explicar el comportamiento de la tasa de criminalidad.
+A partir del cuadro presentado y conforme a los tests realizados, se ve claramente que son tan solo 3 son las variables que de manera independiente (\textbf{y muy importantemente, en presencia de todas las demás}) logran un aporte significativo al momento de explicar el comportamiento de la tasa de criminalidad.
 \\
 
-Ellas son \textit{PO1}: Gasto pér capita en policía en 1960, \textit{U2}: Tasa de desempleo Urbana de hombres
-entre 35 y 39 años por 1000 habitantes y por último \textit{Prob*1000} Probabilidad de encarcelamiento cada 1000 habitantes.
+Ellas son \textbf{PO1}: Gasto pér capita en policía en 1960, \textbf{U2}: Tasa de desempleo Urbana de hombres
+entre 35 y 39 años por 1000 habitantes y por último \textbf{Prob*1000} Probabilidad de encarcelamiento cada 1000 habitantes.
 \\
 
 ¿Significa esto que se debe descartar el resto de las varibles y plantear un modelo caracterízado por tan solo las 3?, la respuesta es \textbf{no}. 
@@ -927,10 +927,10 @@ Como bien se menciona anteriormente, los tests analizan el aporte dada las demá
 Con base en esta última afirmación es que se promueve el uso de distintas técnicas que nos permitirán elegír las variables de manera más acertada (y teniendo en cuenta este panorama).
 
 
-\subsection{Analisis de multicolinealidad}
+\subsection{Análisis de multicolinealidad}
 
-Consierando el problema anteriormente mencionado, se analizara la multicolinealidad (aproximada) de las variables independientes del modelo planteado, 
-esto es relevante ya que si existe una posible relación lineal en la matriz de diseño, esto impactaría directamente en la varianza de los regresores $\beta_{k} = \left(X^{T}X\right)^{-1}X^{T}$, 
+Consierando el problema oreviamente mencionado, se analizara la multicolinealidad (aproximada) de las variables independientes del modelo planteado, 
+esto es relevante ya que si existe una relación lineal en la matriz de diseño, estoimpactaría directamente en la varianza de los regresores $\beta_{k} = \left(X^{T}X\right)^{-1}X^{T}$, 
 haciendo que las estimaciones varien ante pequeñas variaciones en nuestras observaciones y predicciones menos confiables. 
 \\
 
@@ -961,7 +961,7 @@ Donde $R^{2}_{j}$ hace referecia al coeficiente de determinación de una regresi
 Pondremos a prueba las variables explicativas del modelo anteriormente mencionado y diremos que estamos frente a 
 problemas de colinealidad con un $VIF \geq 10$, los resultados se muestran en el cuadro a continuación.
 <<>>=
-vif(ModeloCompleto) %>% 
+vif(ModeloInicial) %>% 
   tidy() %>% 
   mutate(
       Variable = c(
@@ -1004,9 +1004,7 @@ vif(ModeloCompleto) %>%
 En base a esto, podemos afirmar que nuestro modelo no presenta problemas con la colinealidad y es por esto
 que continuaremos con la selección a pasos por el método Forward.
 
-\subsection{Método Forward}
-
-Poner aca el script del Forward, el objeto "ModeloCompleto" tiene el modelo que estamos especificando.
+\subsection{Método Stepwise}
 
 <<>>=
 lm(
@@ -1050,140 +1048,59 @@ lm(
   )
 @
 
+\newpage
+\subsection{Busqueda de observaciones influyentes}
+
+En esta sección se buscará estudiar cuales de las observaciones presentan valores influyentes,
+para ello se hará uso de la Distancia de Cook.
+\\
+
+Esta es una medida del nivel de influencia de la observación i-ésimas sobre la estimación de $\widehat{\beta }$, es decir se busca medir si su presencia o ausencia en el modelo hace que el mismo cambie. 
+
+Una distancia de Cook elevada significa que una observación tiene mayor influencia al momento de determinar los $\widehat{\beta }$.
+
+\begin{equation*}
+D_{i}=\frac{(\widehat{\beta}-\widehat{\beta}{(-i)})^{{}'}X{}'X(\widehat{\beta}-\widehat{\beta}{(-i)})}{(k+1)\widehat{\sigma^{2}}}
+\end{equation*}
+
+<<fig.align= "center">>=
+Dcook<-as.data.frame(cooks.distance(ModeloRed))
+Dcook%>%
+  ggplot(aes(x=seq(1,47,1),y=`cooks.distance(ModeloRed)`))+
+  geom_bar(stat="identity",fill="#8F3A84FF")+
+  labs(title="Distancias de Cook",
+       x="Observación",
+       y="Valor de la distancia de cook")+
+  geom_hline(yintercept = (4/41),
+             colour="#280434FF",
+          size=1)+
+  theme(aspect.ratio = 1,
+        plot.title = element_text(
+          colour = "#280434FF",
+          face="bold"
+        ),
+         axis.text.x = element_text(
+          color = "#8C04C2"
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        ))+
+geom_text( label="Regla empírica",
+           x=3,
+           y=0.105,
+           size=4,
+           colour="#6C246269")
+
+@
+
+Tomando como regla empírica el valor de $\frac{4}{n-k-1}$ puede verse que las observaciones \textbf{19}, \textbf{29} (de manera excesiva) y \textbf{31} sobrepasan la regla estipulada.
+
+Por ende, se decide retirarlas del modelo reducido ya que las mismas tienen una influencia preponderante en la estimación. Como se vió en clase, observaciones de este tipo pueden llevar a un modelo alejado de la realidad.
+
 \section{Diagnostico}
 
 \section{Conclusiones}
 
-\section{discutir}
-
-En este apartado se explicitará el procedimiento de especificación y selección de variables 
-para que dada la información disponible explicar la \textit{Tasa de Criminalidad en el 1960 para los Estados de USA}. 
-\\
-
-Considerando los ánalisis anteriores, antes de asignarle una forma a cada variable, utilizando diagramas de dispersión la para ver la relación que tienen con la variable Respuesta,
-haciendo enfasis en aquellas que en el mapa de correlación se presentan colores gris claro o blancos, en concreto: 
-
-\begin{itemize}
-  \item {\textbf{M} : \textit{Número de hombres entre 14 y 24 años por 1.000 habitantes}}
-  \item {\textbf{NW} : \textit{Número de no caucásicos por cada 1000 habitantes}}
-  \item {\textbf{U1} : \textit{Tasa de desempleo urbana por 1000 habitantes de hombres entre los 14 y 24 años}}
-\end{itemize}
-
-La justificación de esto se debe a que el coeficiente correlación toma en cuenta solo relaciones lineales por lo que deberíamos de indagar un poco mas la interacción, siendo crucial en la inclusión en el modelo.
-
-\vspace{-4.5cm}
-
-<<>>=
-Datos %>% 
-  ggplot(
-    aes(
-      x = M,
-      y = y
-    )
-  ) +
-  geom_point() + 
-  theme(
-    aspect.ratio = 1,
-    plot.subtitle = element_text(
-      size = 4.5
-    ),
-    plot.title = element_text(
-      face = "bold",
-      size = 6.5,
-      color = "#280434FF"
-    ),
-    axis.text.x = element_text(
-      color = "#8C04C2"
-    ),
-    axis.text.y = element_text(
-      color="#8C04C2"
-    )
-  ) + 
-  labs(  
-    title = "Número Hombres entre 14 y 24 años",
-    subtitle = "por 1000 habitantes vs Tasa Criminalidad"
-  ) -> PlotM
-
-Datos %>% 
-  ggplot(
-    aes(
-      x = NW,
-      y = y
-    )
-  ) +
-  geom_point() + 
-  theme(
-    aspect.ratio = 1,
-    plot.subtitle = element_text(
-      size = 4.5
-    ),
-    plot.title = element_text(
-      face="bold",
-      size = 6.5,
-      color = "#280434FF"
-    ),
-    axis.text.x = element_text(
-      color = "#8C04C2"
-    ),
-    axis.text.y = element_text(
-      color="#8C04C2"
-    )
-  ) + 
-  labs(
-    title = "Número de no caucásicos",
-    subtitle = "por cada 1000 habitantes vs Tasa Criminalidad"
-  ) -> PlotNW
-
-Datos %>% 
-  ggplot(
-    aes(
-      x = U1,
-      y = y
-    )
-  ) +
-  geom_point() + 
-  theme(
-    aspect.ratio = 1,
-    plot.subtitle = element_text(
-      size=4.5
-    ),
-    plot.title = element_text(
-      face="bold",
-      size = 6.5,
-      color = "#280434FF"
-    ),
-    axis.text.x = element_text(
-      color = "#8C04C2"
-    ),
-    axis.text.y = element_text(
-      color="#8C04C2"
-    )
-  ) + 
-  labs(
-    title = "Tasa de desempleo urbana ",
-    subtitle = "por 1000 habitantes de hombres entre los 14 y 24 años \n vs Tasa Criminalidad"
-  ) -> PlotU1
-
-multiplot(
-  PlotM,
-  PlotNW,
-  PlotU1,
-  cols = 3
-)
-@
-
-\vspace{-4.5cm}
-
-A la luz de los gráficos no podemos establecer una transformación para ninguna de las tres variables, aunque hay que considerar que para la variable \textbf{NW} podemos asegurar que no existe
-un patrón que indique relación entre las dos variables y a exepción de \textbf{Po1} \textit{El gasto per cápita en policía por el gobierno en 1960} y \textbf{Po2} \textit{El gasto per cápita en policía por el gobierno en 1960},
-la correlación es considerable, estando implicita en las demás variables por lo que no se incluirá en el modelo completo.
-\\
-
-Por otra parte, para \textbf{M} y \textbf{U1} no podemos establecer una forma "conocida" pero podemos afirmar una relación creciente por lo no que serán descartadas,
-de esta manera, el modelo completo tendrá todas las variables a exepción de \textit{Número de no caucásicos por cada 1.000 habitantes} \textbf{NW}.
-\\
-
-En la siguiente sección mostraremos el procedimiento que en primera instancia, un modelo completo sin transformaciones previas de las variables independientes.
 
 
 \end{document}
