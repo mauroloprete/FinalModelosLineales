@@ -1,13 +1,18 @@
 ## ----include=FALSE------------------------------------------------------------
+## Configuración 
 knitr::opts_chunk$set(
   echo = FALSE,
   fig.pos = 'H',
   warning = FALSE
 )
+
+## Paquetes
+
 if(!require(pacman)) {
   install.packages("pacman")
 }
 pacman::p_load(
+  here,
    reshape2,
    knitr,
    tidymodels,
@@ -20,10 +25,39 @@ pacman::p_load(
    lmtest,
    tidyverse,
    ggfortify,
-   skedastic
+   skedastic,
+   RefManageR,
+   bibtex
  )
 
+# Para citar los paquetes
+
  knitr::write_bib(c(.packages(), "kntir"), "packages.bib")
+
+
+ # Bibliografia :
+
+BibOptions(
+  check.entries = FALSE,
+  bib.style = "authortitle",
+  cite.style = "alphabetic",
+  style = "markdown",
+  hyperlink = FALSE,
+  max.names = 2,
+  dashed = FALSE
+)
+bib <- ReadBib(
+  here("packages.bib"),
+  check = FALSE,
+  .Encoding = "UTF-8"
+)
+rbib <- ReadBib(
+  here("packages.bib"),
+  check = FALSE,
+  .Encoding = "UTF-8"
+)
+
+# Cargar los datos
 
 read.table(
   "UScrime.txt",
@@ -39,11 +73,17 @@ read.table(
     envir = .GlobalEnv
   )
 
+# Para poder recuperar el script de los chunk
+
 knitr::purl("Entrega.Rnw")
 
 
 
 ## ----fig.cap = "Histograma de la Tasa de Criminalidad",out.width = "0.4\\textwidth",fig.align = "center"----
+# Histograma tasa de criminalidad
+
+# Regla de Struges
+
 Sturges<-log2(47)+1
 ggplot(Datos,aes(x=y))+
   geom_histogram(bins = Sturges,
@@ -71,21 +111,20 @@ ggplot(Datos,aes(x=y))+
 
 
 ## ----echo=FALSE,fig.cap = "Histogramas (1)"-----------------------------------
-# Multiple plot function, la hizo Dios.
+
+# Histogramas multiples 1
 
 multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
   library(grid)
 
-  # Make a list from the ... arguments and plotlist
+  
   plots <- c(list(...), plotlist)
 
   numPlots = length(plots)
 
-  # If layout is NULL, then use 'cols' to determine layout
+  
   if (is.null(layout)) {
-    # Make the panel
-    # ncol: Number of columns of plots
-    # nrow: Number of rows needed, calculated from # of cols
+  
     layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
                     ncol = cols, nrow = ceiling(numPlots/cols))
   }
@@ -94,13 +133,10 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
     print(plots[[1]])
 
   } else {
-    # Set up the page
     grid.newpage()
     pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
 
-    # Make each plot, in the correct location
     for (i in 1:numPlots) {
-      # Get the i,j matrix positions of the regions that contain this subplot
       matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
 
       print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
@@ -484,6 +520,8 @@ multiplot(HistU1,HistU2,HistGDP,HistIneq,HistProb,HistTime,cols=3)
 
 
 ## -----------------------------------------------------------------------------
+# Tabla descriptiva
+
 DatosTab <- Datos
 names(DatosTab) <- c(
   "Número de Hombres 14-24 / 1.000",
@@ -559,6 +597,8 @@ DatosTab %>%
 
 
 ## ----fig.cap = "Mapa de correlación de variables incluidas",out.width = "0.5\\textwidth",fig.align = "center"----
+# Mapa de correlación entre variables
+
 qplot(x=Var1,
       y=Var2,
       data = melt(cor(Datos, use = "p")),
@@ -590,6 +630,8 @@ qplot(x=Var1,
 
 
 ## -----------------------------------------------------------------------------
+# Se define el modelo completo
+
 lm(
     y ~ .,
     data = Datos
@@ -625,6 +667,8 @@ lm(
 
 
 ## -----------------------------------------------------------------------------
+# Test de forma independiente Modelo Completo
+
 ModeloCompleto %>% 
   tidy() %>% 
   summarise_if(
@@ -658,6 +702,9 @@ ModeloCompleto %>%
 
 
 ## -----------------------------------------------------------------------------
+
+# Multicolinealidad modelo completo
+
 vif(ModeloCompleto) %>% 
   tidy() %>% 
   mutate(
@@ -688,6 +735,9 @@ vif(ModeloCompleto) %>%
 
 
 ## ----results='hide'-----------------------------------------------------------
+
+# Stepwise
+
 lm(
   reformulate(names(Datos)[-16], names(Datos[16])),
   data = Datos
@@ -739,6 +789,9 @@ ModeloRed %>%
 
 
 ## ----fig.align= "center",out.width = "0.8\\textwidth"-------------------------
+
+# Distancia de Cook
+
 ModeloRed %>% 
   cooks.distance() %>% 
   as.data.frame() %>% 
@@ -780,6 +833,9 @@ geom_text( label="Regla empírica",
 
 
 ## ----fig.align= "center",out.width = "0.8\\textwidth"-------------------------
+
+# Observaciones atipicas
+
 ModeloRed  %>% 
   rstudent() %>% 
   as.data.frame() %>% 
@@ -849,6 +905,7 @@ ModeloRed  %>%
 
 
 ## ----results = 'hide'---------------------------------------------------------
+# Se interviene el modelo
 Datos %<>%
   slice(
     -c(
@@ -857,6 +914,7 @@ Datos %<>%
       18
     )
   )
+
 ModeloRed %>%
   update(
     .,
@@ -870,6 +928,8 @@ ModeloRed %>%
 
 
 ## ----out.width = "0.65\\textwidth",fig.align = "center"-----------------------
+
+# Gráfico de erorres y qq plot
 ModeloRedInter %>% 
   autoplot(
     which = c(1,2)
@@ -890,6 +950,9 @@ ModeloRedInter %>%
 
 
 ## ----out.width = "0.5\\textwidth",fig.align = "center"------------------------
+
+# Distribución teorica vs normal 
+
 ModeloRedInter  %>% 
   rstandard() %>% 
   as.data.frame() %>% 
@@ -930,6 +993,8 @@ ModeloRedInter  %>%
 
 
 ## -----------------------------------------------------------------------------
+# Test normalidad
+
 TestNormalidad <- function(lm) {
   x = rstudent(lm) 
   Esta = c(
@@ -981,6 +1046,9 @@ ModeloRedInter %>%
 
 
 ## -----------------------------------------------------------------------------
+
+# Test de heterocedasticidad
+
 Het<-function(lm) {
   Esta = c(
     bptest(lm)$statistic,
@@ -1031,4 +1099,10 @@ lm(
   data = Datos
 ) %>% 
   mixlm::stepWise(full = TRUE)
+
+
+## -----------------------------------------------------------------------------
+# No anda la biblio en mi pc
+# NoCite(bib)
+# PrintBibliography(bib, .opts = list(bib.style = "alphabetic"))
 

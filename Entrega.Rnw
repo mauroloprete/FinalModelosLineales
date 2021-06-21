@@ -26,7 +26,6 @@
 \usepackage{multicol}
 \usepackage{amsmath}
 \spanishdecimal{.}
-\usepackage{natbib}
 
 
 
@@ -61,15 +60,20 @@
 
 
 <<include=FALSE>>=
+## Configuración 
 knitr::opts_chunk$set(
   echo = FALSE,
   fig.pos = 'H',
   warning = FALSE
 )
+
+## Paquetes
+
 if(!require(pacman)) {
   install.packages("pacman")
 }
 pacman::p_load(
+  here,
    reshape2,
    knitr,
    tidymodels,
@@ -82,10 +86,39 @@ pacman::p_load(
    lmtest,
    tidyverse,
    ggfortify,
-   skedastic
+   skedastic,
+   RefManageR,
+   bibtex
  )
 
+# Para citar los paquetes
+
  knitr::write_bib(c(.packages(), "kntir"), "packages.bib")
+
+
+ # Bibliografia :
+
+BibOptions(
+  check.entries = FALSE,
+  bib.style = "authortitle",
+  cite.style = "alphabetic",
+  style = "markdown",
+  hyperlink = FALSE,
+  max.names = 2,
+  dashed = FALSE
+)
+bib <- ReadBib(
+  here("packages.bib"),
+  check = FALSE,
+  .Encoding = "UTF-8"
+)
+rbib <- ReadBib(
+  here("packages.bib"),
+  check = FALSE,
+  .Encoding = "UTF-8"
+)
+
+# Cargar los datos
 
 read.table(
   "UScrime.txt",
@@ -100,6 +133,8 @@ read.table(
     .,
     envir = .GlobalEnv
   )
+
+# Para poder recuperar el script de los chunk
 
 knitr::purl("Entrega.Rnw")
 
@@ -130,6 +165,10 @@ Cabe destacar que las observaciones se corresponden con los distintos estados de
 De manera general se muestra el comportamiento de \textbf{y} de manera resumida:
 
 <<fig.cap = "Histograma de la Tasa de Criminalidad",out.width = "0.4\\textwidth",fig.align = "center">>=
+# Histograma tasa de criminalidad
+
+# Regla de Struges
+
 Sturges<-log2(47)+1
 ggplot(Datos,aes(x=y))+
   geom_histogram(bins = Sturges,
@@ -206,21 +245,20 @@ Se estudiarán medidas de resumen y a partir de histogramas tendremos un primer 
 {
 \centering
 <<echo=FALSE,fig.cap = "Histogramas (1)">>=
-# Multiple plot function, la hizo Dios.
+
+# Histogramas multiples 1
 
 multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
   library(grid)
 
-  # Make a list from the ... arguments and plotlist
+  
   plots <- c(list(...), plotlist)
 
   numPlots = length(plots)
 
-  # If layout is NULL, then use 'cols' to determine layout
+  
   if (is.null(layout)) {
-    # Make the panel
-    # ncol: Number of columns of plots
-    # nrow: Number of rows needed, calculated from # of cols
+  
     layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
                     ncol = cols, nrow = ceiling(numPlots/cols))
   }
@@ -229,13 +267,10 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
     print(plots[[1]])
 
   } else {
-    # Set up the page
     grid.newpage()
     pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
 
-    # Make each plot, in the correct location
     for (i in 1:numPlots) {
-      # Get the i,j matrix positions of the regions that contain this subplot
       matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
 
       print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
@@ -645,6 +680,8 @@ Se presenta en forma de tabla el resumen de las variables númericas. En el mism
 A su vez, para estudiar la dispersión se incluye la media aritmética y una medida de variabilidad de la misma, el coeficiente de variación. 
 
 <<>>=
+# Tabla descriptiva
+
 DatosTab <- Datos
 names(DatosTab) <- c(
   "Número de Hombres 14-24 / 1.000",
@@ -724,6 +761,8 @@ DatosTab %>%
 
 
 <<fig.cap = "Mapa de correlación de variables incluidas",out.width = "0.5\\textwidth",fig.align = "center">>=
+# Mapa de correlación entre variables
+
 qplot(x=Var1,
       y=Var2,
       data = melt(cor(Datos, use = "p")),
@@ -813,6 +852,8 @@ Como una primera aproximación, se construye un modelo donde se incluyen todas l
 \end{equation*}
 
 <<>>=
+# Se define el modelo completo
+
 lm(
     y ~ .,
     data = Datos
@@ -870,6 +911,8 @@ de esta manera se obtiene el $F_{obs}$ que permite rechazar $H_{0}$ y así afirm
 A continuación se testea la siginificación de cada variable en forma independiente, los resultados se muestran en el siguiente cuadro : 
 
 <<>>=
+# Test de forma independiente Modelo Completo
+
 ModeloCompleto %>% 
   tidy() %>% 
   summarise_if(
@@ -954,6 +997,9 @@ Donde $R^{2}_{j}$ hace referecia al coeficiente de determinación de una regresi
 Pondremos a prueba las variables explicativas del modelo anteriormente mencionado y diremos que estamos frente a 
 problemas de colinealidad con un $VIF \geq 10$, los resultados se muestran en el cuadro a continuación.
 <<>>=
+
+# Multicolinealidad modelo completo
+
 vif(ModeloCompleto) %>% 
   tidy() %>% 
   mutate(
@@ -992,6 +1038,9 @@ El método de Stepwise (basado en el \textit{F-Test}) inicia seleccionado aquell
 la segunda en ingresar al modelo es aquella que mayor $\text{SCE}(X|\text{demás variables})$.
 
 <<results='hide'>>=
+
+# Stepwise
+
 lm(
   reformulate(names(Datos)[-16], names(Datos[16])),
   data = Datos
@@ -1042,13 +1091,20 @@ ModeloRed %>%
   )
 @
 
+Una vez realizado dicho método podemos encontrarnos con un modelo con 6 variables,
+todas de ellas significativas y sin problemas de multicolinealidad, además de tener un $R^{2}_{a}$ de 
+\Sexpr{ModeloRed %>% glance() %$% adj.r.squared %>% round(2)} mayor que el del modelo completo \Sexpr{ModeloCompleto %>% glance() %$% adj.r.squared %>% round(2)}.
+
+Para continuar con el diagnostico del modelo, en la siguiente sección se hará un estudio de 
+las observaciones atípicas y/o influyentes.
+
 \newpage
 \subsection{Busqueda de observaciones influyentes}
 
 En esta sección se buscará estudiar cuales de las observaciones presentan valores influyentes,
 para ello se hará uso de la Distancia de Cook.
 \\
-
+ %$% 
 Esta es una medida del nivel de influencia de la observación i-ésimas sobre la estimación de $\widehat{\beta }$, es decir se busca medir si su presencia o ausencia en el modelo hace que el mismo cambie. 
 
 Una distancia de Cook elevada significa que una observación tiene mayor influencia al momento de determinar los $\widehat{\beta }$.
@@ -1058,6 +1114,9 @@ D_{i}=\frac{(\widehat{\beta}-\widehat{\beta}{(-i)})^{{}'}X{}'X(\widehat{\beta}-\
 \end{equation*}
 
 <<fig.align= "center",out.width = "0.8\\textwidth">>=
+
+# Distancia de Cook
+
 ModeloRed %>% 
   cooks.distance() %>% 
   as.data.frame() %>% 
@@ -1105,9 +1164,26 @@ Tomando como regla empírica el valor de $\frac{4}{n-k-1} = 4/40$ puede verse qu
 \newpage
 
 \subsection{Observaciones atipicas}
-Una vez quitadas las variables mencionadas en la sección anterior 
+Analizaremos aquellas observaciones que son atipicas, es decir aquellas que tienen una dispersión mayor a las demás, pero no 
+hacen variar las estimaciones de los regresores.
+\\
+
+Para detectar observatios atípicas, construimos un vector con los residuos studentisados del modelo,lo comparamos con un umbral definido por
+una distribución t y en el caso que la superen, se consideran atípicos.
+
+Se definen los residudos studentisados como :
+
+\begin{equation*}
+  t_{i} = \frac{e}{\sqrt{\hat{\sigma^{2}_{i}}(1-h_{ii})}}
+\end{equation*}
+
+Una vez calculado los residuos de esta manera, podemos definir a los outliers como aquellas observaciones que sobrepasen el umbral de 
+una distribución $t^{df.res}_{1-0.01/2}$ (lineas continuas horizontales en el gráfico)
 
 <<fig.align= "center",out.width = "0.8\\textwidth">>=
+
+# Observaciones atipicas
+
 ModeloRed  %>% 
   rstudent() %>% 
   as.data.frame() %>% 
@@ -1176,7 +1252,15 @@ ModeloRed  %>%
     )
 @
 
+Recordando el analisis de la sección anterior, el estado número \textbf{11}, \textbf{29} y \textbf{18} presentan problemas con la distancia de Cook, con este gráfico podemos afirmar que las observaciones \textbf{29} y 
+\textbf{11} son influyentes y atipicas, mientras que para la número \textbf{18} podemos ver que es muy cercana a cero, la esperanza de los errores por lo que es solamente atipica.
+
+Por ende, se decide retirarlas del modelo reducido ya que las mismas tienen una influencia preponderante en la estimación. 
+Como se vió en clase, observaciones de este tipo pueden llevar a un modelo alejado de la realidad.
+
+
 <<results = 'hide'>>=
+# Se interviene el modelo
 Datos %<>%
   slice(
     -c(
@@ -1185,6 +1269,7 @@ Datos %<>%
       18
     )
   )
+
 ModeloRed %>%
   update(
     .,
@@ -1197,7 +1282,6 @@ ModeloRed %>%
   )
 @
 
-Por ende, se decide retirarlas del modelo reducido ya que las mismas tienen una influencia preponderante en la estimación. Como se vió en clase, observaciones de este tipo pueden llevar a un modelo alejado de la realidad.
 
 \newpage
 
@@ -1212,6 +1296,8 @@ En primer se hará un primer acercamiento con un gráfico de QQ-Plot, que muestr
 
 
 <<out.width = "0.65\\textwidth",fig.align = "center">>=
+
+# Gráfico de erorres y qq plot
 ModeloRedInter %>% 
   autoplot(
     which = c(1,2)
@@ -1232,6 +1318,9 @@ ModeloRedInter %>%
 @
 
 <<out.width = "0.5\\textwidth",fig.align = "center">>=
+
+# Distribución teorica vs normal 
+
 ModeloRedInter  %>% 
   rstandard() %>% 
   as.data.frame() %>% 
@@ -1274,7 +1363,8 @@ ModeloRedInter  %>%
 
 Con base en los gráficos se observa que la esperanza de los errores se mantiene cercana a cero, con excepción de algunas observaciones.
 También se debe mencionar que no es posible encontrar un patrón en la dispersión de los errores, en cambio en la gráfica QQ-plot muestra como los valores centrales de
-la distribución se asemeja a una distribución normal, a exepción de la observación 17, 20 y 21.
+la distribución se asemeja a una distribución normal, a exepción de la observación 17, 20 y 21, lo mismo se puede apreciar en gráfica que compara la distribución de los errores
+(que fue construida con la función \textit{geom density} de ggplot que calcula y dibuja la estimación de la densidad Kernel con valores por defecto) con una distribución normal.
 \\
 
 Para poder afirmar que se cumple el supuesto de normalidad de los errores se relizan, tres pruebas:
@@ -1286,6 +1376,8 @@ Para poder afirmar que se cumple el supuesto de normalidad de los errores se rel
 \end{itemize}
 
 <<>>=
+# Test normalidad
+
 TestNormalidad <- function(lm) {
   x = rstudent(lm) 
   Esta = c(
@@ -1336,9 +1428,9 @@ ModeloRedInter %>%
   )
 @
 
-En base a los test se puede afirmar que la distribución de los errores sigue una distribución Normal, a continuación haremos se hará el análisis de la homocedasticidad.
+En base a los test se puede afirmar que la distribución de los errores sigue una distribución Normal, a continuación se hará el análisis de la homocedasticidad.
 
-\subsection{Homosedasticidad}
+\subsection{Homocedasticidad}
 En esta sección se discutirá lo siguiente:
 \begin{equation*}
 \begin{matrix}
@@ -1363,6 +1455,9 @@ El test de \textbf{White} consiste en la siguiente serie de pasos:
 El test de \textbf{Breusch-Pagan} empleado se basa en:
 
 <<>>=
+
+# Test de heterocedasticidad
+
 Het<-function(lm) {
   Esta = c(
     bptest(lm)$statistic,
@@ -1407,6 +1502,7 @@ Het(ModeloRedInter)%>%
   )
 @
  
+\newpage
 
 \section{Anexo}
 
@@ -1428,5 +1524,9 @@ lm(
 lili
 \section{Bibliografía}
 
-
+<<>>=
+# No anda la biblio en mi pc
+# NoCite(bib)
+# PrintBibliography(bib, .opts = list(bib.style = "alphabetic"))
+@
 \end{document}
