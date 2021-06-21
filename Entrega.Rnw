@@ -1293,6 +1293,9 @@ El test de \textbf{White} consiste en la siguiente serie de pasos:
 \item{Se calcula el estadístico $nR^{2}$ que se distribuye $\chi _{k}$ con k cantidad de variables del modelo.}
 \item{Se realiza el test.}
 \end{itemize}
+\newpage
+
+El test de \textbf{Breusch-Pagan} empleado se basa en:
 
 <<>>=
 Het<-function(lm) {
