@@ -1069,9 +1069,72 @@ Het(ModeloRedInter)%>%
 
 
 ## -----------------------------------------------------------------------------
+ModeloRed %>%  
+  tidy() %>% 
+  summarise_if(
+    is.numeric,
+    ~round(.x,3)
+  ) %>% 
+  mutate(
+    Variable = c(
+      "Intercepto",
+      "Gasto per capita en policía 1960",
+      "Desigualdad del ingreso",
+      "Indice que refleja la escolaridad del estado",
+      "Número de hombres entre 14 y 24 / 1000",
+      "Probabilidad de encarcelamiento",
+      "Tasa de desempleo urbana hombres 35-39 años x 1000"
+    ),
+    "Estimación" = estimate,
+    "Error estandar" = std.error,
+    "$\\left(H_{0}^{\\alpha = 0.05}\\right)\\beta_{i} = 0$" = case_when(
+      p.value < 0.05 ~ "Se rechaza H0",
+      p.value >= 0.05 ~ "No se rechaza H0"
+    ),
+    .keep = "none"
+  ) %>% 
+  kbl(
+    booktabs = T, 
+    caption = "Estimación,error estandar y test individual tras aplicar el método Stepwise intervenido por observaciones influyentes",
+    escape = FALSE
+  ) %>% 
+  kable_styling(
+    latex_options = c("striped", "hold_position"),
+    font_size = 7.5
+  )
+
+
+## -----------------------------------------------------------------------------
+ModeloRedInter %>% 
+  glance() %>% 
+  mutate(
+    "$R^{2}.adj$" = adj.r.squared*100,
+    "RSE" = sigma,
+    "SCE" = sum((ModeloRedInter$fitted.values-mean(Datos$y))^(2)),
+    "F Obs." = statistic,
+    "P-valor*100" = p.value*100,
+    "Regresión.gl" = df,
+    "Residuos.gl" = df.residual,
+    .keep = "none"
+  ) %>% 
+  summarise_if(
+    is.numeric,
+    ~round(.x,3)
+  ) %>% 
+  kbl(
+    booktabs = T,
+    caption = "Test sobre el modelo completo",
+    escape = FALSE
+  ) %>% 
+    kable_styling(
+    latex_options = c("striped", "hold_position"),
+    font_size = 7.5
+  )
+
+
+## -----------------------------------------------------------------------------
 lm(
   reformulate(names(Datos)[-16], names(Datos[16])),
   data = Datos
 ) %>% 
   mixlm::stepWise(full = TRUE)
-
