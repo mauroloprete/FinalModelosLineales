@@ -19,7 +19,8 @@ pacman::p_load(
    tseries,
    lmtest,
    tidyverse,
-   ggfortify
+   ggfortify,
+   skedastic
  )
 
  knitr::write_bib(c(.packages(), "kntir"), "packages.bib")
@@ -788,7 +789,7 @@ ModeloRed %>%
   )
 
 
-## -----------------------------------------------------------------------------
+## ----out.width = "0.65\\textwidth",fig.align = "center"-----------------------
 ModeloRedInter %>% 
   autoplot(
     which = c(1,2)
@@ -808,7 +809,7 @@ ModeloRedInter %>%
   )
 
 
-## ----out.width = "0.6\\textwidth",fig.align = "center"------------------------
+## ----out.width = "0.5\\textwidth",fig.align = "center"------------------------
 ModeloRedInter  %>% 
   rstandard() %>% 
   as.data.frame() %>% 
@@ -830,7 +831,8 @@ ModeloRedInter  %>%
     size = 1.7
   ) + 
   labs(
-    title = "Valores téoricos y errores " 
+    title = "Valores téoricos y errores " ,
+    x="x"
   ) +
   theme(
     aspect.ratio = 1,
@@ -899,8 +901,48 @@ ModeloRedInter %>%
 
 
 ## -----------------------------------------------------------------------------
-ModeloRedInter %>% 
-  bptest()
+Het<-function(lm) {
+  Esta = c(
+    bptest(lm)$statistic,
+    white_lm(lm)$statistic
+  )
+  Pvalue = c(
+    bptest(lm)$p.value,
+    white_lm(lm)$p.value
+  )
+  return(
+    data.frame(
+      "Test" = c(
+        "Breusch-Pagan",
+        "White"),
+      "Pvalor" = Pvalue,
+      "Estadistico" = Esta
+    )
+  )
+}
+
+Het(ModeloRedInter)%>%
+  mutate_if(
+    is.numeric,
+    round,
+    3
+  ) %>% 
+  mutate(
+    Resultado = case_when(
+      Pvalor > 0.05 ~ "No rechazo Homocedasticidad",
+      NA ~ "Rechazo H0"
+    )
+  ) %>% 
+  kbl(
+    booktabs = T, 
+    caption = "Test de Homocedasticidad ",
+    escape = FALSE,
+    row.names = FALSE
+  ) %>% 
+  kable_styling(
+    latex_options = c("striped", "hold_position"),
+    font_size = 7.5
+  )
 
 
 ## -----------------------------------------------------------------------------
