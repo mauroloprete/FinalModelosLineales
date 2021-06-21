@@ -739,9 +739,20 @@ ModeloRed %>%
 
 
 ## ----fig.align= "center",out.width = "0.8\\textwidth"-------------------------
-Dcook<-as.data.frame(cooks.distance(ModeloRed))
-Dcook%>%
-  ggplot(aes(x=seq(1,47,1),y=`cooks.distance(ModeloRed)`))+
+ModeloRed %>% 
+  cooks.distance() %>% 
+  as.data.frame() %>% 
+  mutate(
+    .,
+    Valor = .,
+    .keep = "none"
+  ) %>% 
+  ggplot(
+    aes(
+      x = seq(1, 47, 1), 
+      y = Valor
+    )
+  ) +
   geom_bar(stat="identity",fill="#8F3A84FF")+
   labs(title="Distancias de Cook",
        x="Observación",
@@ -768,6 +779,75 @@ geom_text( label="Regla empírica",
 
 
 
+## ----fig.align= "center",out.width = "0.8\\textwidth"-------------------------
+ModeloRed  %>% 
+  rstudent() %>% 
+  as.data.frame() %>% 
+  mutate(
+    Ati = case_when(
+      abs(.) >= qt(1-0.01/2,ModeloRed %$% df.residual) ~ .,
+      NA ~ 0
+    )
+  ) %>% 
+  ggplot(
+    aes(
+      x = 1:nrow(Datos),
+      y = .
+    )
+  ) + 
+  geom_point() + 
+  geom_hline(
+    yintercept = 0,
+    linetype = "dashed",
+    color = "red",
+    size = 1.2
+  ) +
+  geom_hline(
+    yintercept = qt(
+      1-0.01/2,
+      ModeloRed %$% df.residual
+    ),
+    size = 1.2,
+    color = "blue"
+  ) +
+  geom_hline(
+      yintercept = - qt(
+        1-0.01/2,
+        ModeloRed %$% df.residual
+      ),
+      size = 1.2,
+      color = "blue"
+  ) + 
+  geom_point(
+    aes(
+      y = Ati
+    ),
+    shape = 18, 
+    color = "#FC4E07",
+    size = 3
+  ) + 
+  scale_x_continuous(
+    breaks = seq(1,nrow(Datos),2)
+  ) +
+  labs(
+    x = "Número de fila",
+    y = "Residudos studentisados"
+  ) +
+  theme(
+    aspect.ratio = 1,
+    plot.title = element_text(
+      colour = "#280434FF",
+      face="bold"
+      ),
+    axis.text.x = element_text(
+      color = "#8C04C2"
+      ),
+    axis.text.y = element_text(
+          color="#8C04C2"
+      )
+    )
+
+
 ## ----results = 'hide'---------------------------------------------------------
 Datos %<>%
   slice(
@@ -789,23 +869,6 @@ ModeloRed %>%
   )
 
 
-## -----------------------------------------------------------------------------
-si <- rstudent(ModeloRedInter)
-alfa <- 0.01
-n = nrow(Datos)
-k    <- 6
-vc   <- qt(1 - alfa/2, n - k - 1)
-
-plot(1:n, si, pch = 16, xlab='', ylab = 'residuos estudentizados', ylim = 2*c(-vc, vc))
-abline(h = 0,col = 'red', lwd = 2)
-abline(h = c(-vc,vc), col = 'red', lty = 2)
-
-# cuales estan por fuera de las bandas
-esos <- which(abs(s_i) > vc)
-text(esos, s_i[esos]*0.95,esos)
-
-
-## -----------------------------------------------------------------------------
 ## ----out.width = "0.65\\textwidth",fig.align = "center"-----------------------
 ModeloRedInter %>% 
   autoplot(
