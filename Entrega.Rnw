@@ -81,7 +81,8 @@ pacman::p_load(
    tseries,
    lmtest,
    tidyverse,
-   ggfortify
+   ggfortify,
+   skedastic
  )
 
  knitr::write_bib(c(.packages(), "kntir"), "packages.bib")
@@ -920,24 +921,25 @@ Con base en esta última afirmación es que se promueve el uso de distintas téc
 
 \subsection{Análisis de multicolinealidad}
 
-Consierando el problema oreviamente mencionado, se analizara la multicolinealidad (aproximada) de las variables independientes del modelo planteado, 
-esto es relevante ya que si existe una relación lineal en la matriz de diseño, esto impactaría directamente en la varianza de los regresores $\beta_{k} = \left(X^{T}X\right)^{-1}X^{T}$, 
-haciendo que las estimaciones varien ante pequeñas variaciones en nuestras observaciones y las predicciones serian menos confiables. 
+Consierando el problema previamente mencionado, se analizará la multicolinealidad (aproximada) de las variables independientes del modelo planteado. 
+Esto es relevante ya que si existe una relación lineal en la matriz de diseño, esto impactaría directamente en la varianza de los regresores $\beta_{k} = \left(X^{T}X\right)^{-1}X^{T}$, 
+haciendo que las estimaciones varíen ante pequeñas perturbaciones en las observaciones, logrando así que predicciones sean menos confiables. 
 \\
 
-Estamos en frente a un problema de multicolinealidad aproximada cuando es posible afirmar que existe una relación lineal entre las variables explicativas. 
-El término aproximado refiere al hecho que en el caso que se cumpla el fenomeno de forma exacta, la matriz no sería invertible y no existirian estimaciones únicas de los regresores únicas 
-(Teorema de Gauss Markov) y no estaríamos frente a estimadores eficientes (insesgados y de minima varianza)
+Estamos frente a un problema de multicolinealidad aproximada cuando es posible afirmar que existe una relación lineal entre las variables explicativas. 
+El término aproximado refiere al hecho de que en el caso de que se cumpla el fenómeno de forma exacta, la matriz no sería invertible y no existirían estimaciones únicas de los regresores
+(Teorema de Gauss Markov). A su vez no se obtendrían estimadores eficientes (insesgados y de mínima varianza).
 
 Recordando que  :
 \begin{equation*}
   \hat{\beta_{k}} \sim N\left(\beta,\sigma^{2}\left(X^{T}X\right)^{-1}\right)
 \end{equation*}  
 
-Como se menciono anteriormente, ante una posible relación lineal el determinante de la matriz $X^{T}X$ sería proximo a cero, obteniendo un determinante de la matriz inversa
-demasiado grande. Es decir para un $\sigma^{2}$ fijo la incertidumbre sería demasiado alta, considerando el hecho que en nuestra primera aproximación a un modelo de regresión es
-globalmente significativo pero salvo en una cantidad demasiado pequeña se puede afirmar que, de forma independiente existe una relación lineal con la tasa de criminalidad, 
-es por esto que se cuantificara la intensidad de la multicolinealidad con el \textbf{Factor de inflación de varianza}.
+Como se menciono anteriormente, ante una posible relación lineal el determinante de la matriz $X^{T}X$ sería proximo a cero, siendo el determinante de la matriz inversa
+demasiado grande. Es decir para un $\sigma^{2}$ fijo, la incertidumbre sería demasiado alta.
+\\
+
+Como se vió previamente, el modelo presentado hasta el momento es globalmente significativo, sin embargo tan solo 4 de las variables consideradas son significativas de manera independiente (presente todas las demás), es por esto que se cuantificaré la intensidad de la multicolinealidad con el \textbf{Factor de inflación de varianza}.
 
 El \textbf{VIF} nos indica en cuantas unidades se incrementa la varianza del estimador ante presencia de colinealidad y se define como : 
 
@@ -981,8 +983,9 @@ vif(ModeloCompleto) %>%
   )
 @
 
-En base a esto, podemos afirmar que este modelo presenta problemas con la colinealidad y es por esto
+Con base en base a esto, podemos afirmar que este modelo presenta problemas de multicolinealidad y es por esto
 que se continuará con la selección a pasos por el método Stepwise.
+
 \subsection{Método Stepwise}
 
 El método de Stepwise (basado en el \textit{F-Test}) inicia seleccionado aquella variable que tiene una mayor correlación con la variable \textbf{y},
@@ -1135,15 +1138,15 @@ text(esos, si[esos]*0.95,esos)
 
 \subsection{Normalidad}
 
-Uno de los supuestos que dimos acerca de nuestro modelo lineal, refiere a la distribución que le dimos a los errores, en este caso siguen una distribución normal,
-esto nos permite realizar las pruebas anteriormente presentadas a lo largo de este trabajo, en el caso que este supuesto no se cumpla los estdaísticos no reflejaran 
-lo que nosotros realmente necesitamos,es por esto que es de crucial importancia chequear la distribución de los errores. En primer lugar haremos un primer acercamiento
-con un gráfico de QQ-Plot que muestra la similitud de los percentiles de la distribución normal téorica y la observada en nuestros errores, por último 
-un gráfico de residudos contra los valores predichos para ver si existe algun patrón en su recorrido. 
+Uno de los supuestos fundamentales al momento de construír este modelo lineal, refiere a la distribución de los errores, en este caso siguen una distribución normal.
+Esto permite realizar las pruebas anteriormente presentadas a lo largo de este trabajo, en el caso que este supuesto no se cumpla los estadísticos no reflejarán 
+lo que se desea probar (su distribución no será la esperada), es por esto que es de crucial importancia chequear la distribución de los errores.
+\\
 
-\vspace{-3cm}
+En primer se hará un primer acercamiento con un gráfico de QQ-Plot, que muestra la similitud de los percentiles de la distribución normal téorica y la observada en nuestros errores, por último un gráfico de residudos contra los valores predichos para ver si existe algun patrón en su recorrido. 
 
-<<>>=
+
+<<out.width = "0.65\\textwidth",fig.align = "center">>=
 ModeloRedInter %>% 
   autoplot(
     which = c(1,2)
@@ -1163,7 +1166,7 @@ ModeloRedInter %>%
   )
 @
 
-<<out.width = "0.6\\textwidth",fig.align = "center">>=
+<<out.width = "0.5\\textwidth",fig.align = "center">>=
 ModeloRedInter  %>% 
   rstandard() %>% 
   as.data.frame() %>% 
@@ -1185,7 +1188,8 @@ ModeloRedInter  %>%
     size = 1.7
   ) + 
   labs(
-    title = "Valores téoricos y errores " 
+    title = "Valores téoricos y errores " ,
+    x="x"
   ) +
   theme(
     aspect.ratio = 1,
@@ -1203,12 +1207,12 @@ ModeloRedInter  %>%
 @
 
 
-En base a los gráficos podemos ver que la esperanza de los errores se mantiene cercana a cero, a diferencia de algunas observaciones.
-También hay que mencionar que no encontramos un patrón en la dispersión de los errores, en cambio en la gráfica QQ-plot podemos ver que en valores centrales
-la distribución se asemeja a una distribución normal a exepción de la observación 17, 20 y 21.
+Con base en los gráficos se observa que la esperanza de los errores se mantiene cercana a cero, con excepción de algunas observaciones.
+También se debe mencionar que no es posible encontrar un patrón en la dispersión de los errores, en cambio en la gráfica QQ-plot muestra como los valores centrales de
+la distribución se asemeja a una distribución normal, a exepción de la observación 17, 20 y 21.
 \\
 
-Para poder afirmar que se cumple el supuesto de normalidad de los errores relizaremos, tres pruebas:
+Para poder afirmar que se cumple el supuesto de normalidad de los errores se relizan, tres pruebas:
 
 \begin{itemize}
   \item {\textbf{Test Kolmogrov-Smirnov Lillie:} Compara la distribución teórica $F^{*}$ y la distribución empírica de los errores $S(x)$ $T = sup_{x}|F^{*}(x) - S(X)|$}
@@ -1267,14 +1271,72 @@ ModeloRedInter %>%
   )
 @
 
-En base a los test se puede afirmar que la distribución de los errores sigue una distribución Normal, a continuación haremos el analisis de la homocedasticidad.
+En base a los test se puede afirmar que la distribución de los errores sigue una distribución Normal, a continuación haremos se hará el análisis de la homocedasticidad.
 
-\subsection{Heterosedasticidad}
+\subsection{Homosedasticidad}
+En esta sección se discutirá lo siguiente:
+\begin{equation*}
+\begin{matrix}
+H_{0})\sigma_{i}^{2}=\sigma^{2},\: \forall i=1,...,6\\ 
+H_{1})\text{No}\,  H_{0}
+\end{matrix}
+\end{equation*}
 
-\subsubsection{Test de Breusch-Pagan}
+Para ello se hará uso de el test de Breusch-Pagan y el test de White.
+\\
+
+El test de \textbf{White} consiste en la siguiente serie de pasos:
+\begin{itemize}
+\item {Se estima el modelo y luego se genera el vector de errores estimados.}
+\item{Se ajusta el modelo $e^{2}=X\alpha+Z\beta+W\delta+\mu$, con Z matriz de productos cruzados se las variables originales, W contiene las variables originales al cuadrado. }
+\item{Se calcula $R^{2}$ del modelo.}
+\item{Se calcula el estadístico $nR^{2}$ que se distribuye $\chi _{k}$ con k cantidad de variables del modelo.}
+\item{Se realiza el test.}
+\end{itemize}
+
 <<>>=
-ModeloRedInter %>% 
-  bptest()
+Het<-function(lm) {
+  Esta = c(
+    bptest(lm)$statistic,
+    white_lm(lm)$statistic
+  )
+  Pvalue = c(
+    bptest(lm)$p.value,
+    white_lm(lm)$p.value
+  )
+  return(
+    data.frame(
+      "Test" = c(
+        "Breusch-Pagan",
+        "White"),
+      "Pvalor" = Pvalue,
+      "Estadistico" = Esta
+    )
+  )
+}
+
+Het(ModeloRedInter)%>%
+  mutate_if(
+    is.numeric,
+    round,
+    3
+  ) %>% 
+  mutate(
+    Resultado = case_when(
+      Pvalor > 0.05 ~ "No rechazo Homocedasticidad",
+      NA ~ "Rechazo H0"
+    )
+  ) %>% 
+  kbl(
+    booktabs = T, 
+    caption = "Test de Homocedasticidad ",
+    escape = FALSE,
+    row.names = FALSE
+  ) %>% 
+  kable_styling(
+    latex_options = c("striped", "hold_position"),
+    font_size = 7.5
+  )
 @
  
 
