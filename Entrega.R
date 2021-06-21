@@ -25,37 +25,8 @@ pacman::p_load(
    lmtest,
    tidyverse,
    ggfortify,
-   skedastic,
-   RefManageR,
-   bibtex
+   skedastic
  )
-
-# Para citar los paquetes
-
- knitr::write_bib(c(.packages(), "kntir"), "packages.bib")
-
-
- # Bibliografia :
-
-BibOptions(
-  check.entries = FALSE,
-  bib.style = "authortitle",
-  cite.style = "alphabetic",
-  style = "markdown",
-  hyperlink = FALSE,
-  max.names = 2,
-  dashed = FALSE
-)
-bib <- ReadBib(
-  here("packages.bib"),
-  check = FALSE,
-  .Encoding = "UTF-8"
-)
-rbib <- ReadBib(
-  here("packages.bib"),
-  check = FALSE,
-  .Encoding = "UTF-8"
-)
 
 # Cargar los datos
 
@@ -954,7 +925,7 @@ ModeloRedInter %>%
 # Distribución teorica vs normal 
 
 ModeloRedInter  %>% 
-  rstandard() %>% 
+  rstudent() %>% 
   as.data.frame() %>% 
   ggplot(
     aes(
@@ -974,8 +945,9 @@ ModeloRedInter  %>%
     size = 1.7
   ) + 
   labs(
-    title = "Valores téoricos y errores " ,
-    x="x"
+    title = "Valores téoricos y errores studentizados " ,
+    x="x",
+    y = "Densidad"
   ) +
   theme(
     aspect.ratio = 1,
@@ -1099,10 +1071,4 @@ lm(
   data = Datos
 ) %>% 
   mixlm::stepWise(full = TRUE)
-
-
-## -----------------------------------------------------------------------------
-# No anda la biblio en mi pc
-# NoCite(bib)
-# PrintBibliography(bib, .opts = list(bib.style = "alphabetic"))
 

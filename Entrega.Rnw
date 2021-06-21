@@ -26,7 +26,12 @@
 \usepackage{multicol}
 \usepackage{amsmath}
 \spanishdecimal{.}
+\usepackage[backend=biber]{biblatex}
+\defbibfilter{other}{
+  not type=book
+}
 
+\addbibresource{biblio.bib}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -86,37 +91,8 @@ pacman::p_load(
    lmtest,
    tidyverse,
    ggfortify,
-   skedastic,
-   RefManageR,
-   bibtex
+   skedastic
  )
-
-# Para citar los paquetes
-
- knitr::write_bib(c(.packages(), "kntir"), "packages.bib")
-
-
- # Bibliografia :
-
-BibOptions(
-  check.entries = FALSE,
-  bib.style = "authortitle",
-  cite.style = "alphabetic",
-  style = "markdown",
-  hyperlink = FALSE,
-  max.names = 2,
-  dashed = FALSE
-)
-bib <- ReadBib(
-  here("packages.bib"),
-  check = FALSE,
-  .Encoding = "UTF-8"
-)
-rbib <- ReadBib(
-  here("packages.bib"),
-  check = FALSE,
-  .Encoding = "UTF-8"
-)
 
 # Cargar los datos
 
@@ -1091,7 +1067,7 @@ ModeloRed %>%
   )
 @
 
-Una vez realizado dicho método podemos encontrarnos con un modelo con 6 variables,
+Una vez realizado dicho método\footnote{Se pueden encontrar las salidas en el anexo.} podemos encontrarnos con un modelo con 6 variables,
 todas de ellas significativas y sin problemas de multicolinealidad, además de tener un $R^{2}_{a}$ de 
 \Sexpr{ModeloRed %>% glance() %$% adj.r.squared %>% round(2)} mayor que el del modelo completo \Sexpr{ModeloCompleto %>% glance() %$% adj.r.squared %>% round(2)}.
 
@@ -1322,7 +1298,7 @@ ModeloRedInter %>%
 # Distribución teorica vs normal 
 
 ModeloRedInter  %>% 
-  rstandard() %>% 
+  rstudent() %>% 
   as.data.frame() %>% 
   ggplot(
     aes(
@@ -1342,8 +1318,9 @@ ModeloRedInter  %>%
     size = 1.7
   ) + 
   labs(
-    title = "Valores téoricos y errores " ,
-    x="x"
+    title = "Valores téoricos y errores studentizados " ,
+    x="x",
+    y = "Densidad"
   ) +
   theme(
     aspect.ratio = 1,
@@ -1512,6 +1489,9 @@ Het(ModeloRedInter)%>%
 
 \subsection{Selección de Modelos : StepWise}
 
+En este apartado se muestra la salida de la selección a pasos de Stepwise, se puede ver que el $\alpha$ de entrada y salida es igual a $0.15$, comienza
+solo incluyendo la constante en el modelo, luego agrega \textbf{Po1} hasta llegar al séptimo paso y terminar el algorítmo
+
 <<>>=
 lm(
   reformulate(names(Datos)[-16], names(Datos[16])),
@@ -1521,12 +1501,17 @@ lm(
 @
 
 \subsection{Script de R}
-lili
-\section{Bibliografía}
 
-<<>>=
-# No anda la biblio en mi pc
-# NoCite(bib)
-# PrintBibliography(bib, .opts = list(bib.style = "alphabetic"))
-@
+Aquí se mostrará el código R utilizado para el trabajo, para reproducirlo solo hace falta incluir en el mismo directorio de trabajo
+el archivo \textbf{USCrime.txt}, en el proceso se desplegaran las diferentes gráficas y tablas, así como el modelo completo \textit{ModeloCompleto}
+el modelo reducido \textit{ModeloRed} y el modelo reducido intervenido como \textit{ModeloRedInter} en ambiente de trabajo.
+
+\newpage
+
+\section{Referencias}
+\nocite{*}
+\printbibliography[title={Libros consultados},type=book]
+\printbibliography[title={Paquetes de R},filter=other]
+
+
 \end{document}
