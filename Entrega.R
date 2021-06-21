@@ -851,11 +851,11 @@ ModeloRed  %>%
       y = .
     )
   ) + 
-  geom_point() + 
+  geom_point(colour="#8C04C2") + 
   geom_hline(
     yintercept = 0,
     linetype = "dashed",
-    color = "red",
+    color = "#8F3A847A",
     size = 1.2
   ) +
   geom_hline(
@@ -864,7 +864,7 @@ ModeloRed  %>%
       ModeloRed %$% df.residual
     ),
     size = 1.2,
-    color = "blue"
+    color = "#280434FF"
   ) +
   geom_hline(
       yintercept = - qt(
@@ -872,7 +872,7 @@ ModeloRed  %>%
         ModeloRed %$% df.residual
       ),
       size = 1.2,
-      color = "blue"
+      color = "#280434FF"
   ) + 
   geom_point(
     aes(
@@ -886,7 +886,7 @@ ModeloRed  %>%
     breaks = seq(1,nrow(Datos),2)
   ) +
   labs(
-    x = "Número de fila",
+    x = "Observación",
     y = "Residudos studentisados"
   ) +
   theme(
@@ -1052,17 +1052,20 @@ ModeloRedInter %>%
 Het<-function(lm) {
   Esta = c(
     bptest(lm)$statistic,
-    white_lm(lm)$statistic
+    white_lm(lm)$statistic,
+    glejser(lm)$statistic
   )
   Pvalue = c(
     bptest(lm)$p.value,
-    white_lm(lm)$p.value
+    white_lm(lm)$p.value,
+    glejser(lm)$p.value
   )
   return(
     data.frame(
       "Test" = c(
         "Breusch-Pagan",
-        "White"),
+        "White",
+        "Glejser"),
       "Pvalor" = Pvalue,
       "Estadistico" = Esta
     )
