@@ -1531,7 +1531,9 @@ Het(ModeloRedInter)%>%
 
 Trás la realización de los 3 tests, se confirma con gran nivel de seguridad que el modelo actual no presenta problemas con respecto al supuesto de la homocedasticidad.
 \newpage
+\section{Modelo Final}
 
+\newpage
 \section{Anexo}
 
 \begin{figure}[h]
