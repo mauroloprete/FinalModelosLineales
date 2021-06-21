@@ -1416,7 +1416,7 @@ H_{1})\text{No}\,  H_{0}
 \end{matrix}
 \end{equation*}
 
-Para ello se hará uso de el test de Breusch-Pagan y el test de White.
+Para ello se hará uso de los test de Breusch-Pagan, White, y Glejser.
 \\
 
 El test de \textbf{White} consiste en la siguiente serie de pasos:
@@ -1508,7 +1508,9 @@ Het(ModeloRedInter)%>%
 
 Trás la realización de los 3 tests, se confirma con gran nivel de seguridad que el modelo actual no presenta problemas con respecto al supuesto de la homocedasticidad.
 \newpage
+\section{Modelo Final}
 
+\newpage
 \section{Anexo}
 
 \begin{figure}[h]
