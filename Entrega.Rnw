@@ -732,6 +732,7 @@ DatosTab %>%
   )
 @
 
+\subsection{Análisis bivariado}
 
 \subsubsection{Correlación entre variables}
 
@@ -925,7 +926,7 @@ ModeloCompleto %>%
 A partir del cuadro presentado y conforme a los tests realizados, se ve claramente que son tan solo 4 son las variables que de manera independiente (\textbf{y muy importantemente, en presencia de todas las demás}) logran un aporte significativo al momento de explicar el comportamiento de la tasa de criminalidad.
 \\
 
-Ellas son \textbf{M},\textbf{PO1},\textbf{U2} y por último \textbf{Prob*1000}.
+Ellas son \textbf{M},\textbf{PO1},\textbf{U2} y por último \textbf{Prob*100}.
 \\
 
 ¿Significa esto que se debe descartar el resto de las varibles y plantear un modelo caracterízado por tan solo las 4?, la respuesta es \textbf{no}. 
@@ -1406,6 +1407,8 @@ ModeloRedInter %>%
 @
 
 En base a los test se puede afirmar que la distribución de los errores sigue una distribución Normal, a continuación se hará el análisis de la homocedasticidad.
+
+\newpage
 
 \subsection{Homocedasticidad}
 En esta sección se discutirá lo siguiente:
