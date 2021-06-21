@@ -1139,12 +1139,12 @@ Tomando como regla empírica el valor de $\frac{4}{n-k-1} = 4/40$ puede verse qu
 
 \newpage
 
-\subsection{Observaciones atipicas}
-Analizaremos aquellas observaciones que son atipicas, es decir aquellas que tienen una dispersión mayor a las demás, pero no 
+\subsection{Observaciones atípicas}
+Se analizaran aquellas observaciones que son atípicas, es decir aquellas que tienen una dispersión mayor a las demás, pero no 
 hacen variar las estimaciones de los regresores.
 \\
 
-Para detectar observatios atípicas, construimos un vector con los residuos studentisados del modelo,lo comparamos con un umbral definido por
+Para detectar observatios atípicas, se construye un vector con los residuos studentisados del modelo y se compara con el umbral definido por
 una distribución t y en el caso que la superen, se consideran atípicos.
 
 Se definen los residudos studentisados como :
@@ -1175,11 +1175,11 @@ ModeloRed  %>%
       y = .
     )
   ) + 
-  geom_point() + 
+  geom_point(colour="#8C04C2") + 
   geom_hline(
     yintercept = 0,
     linetype = "dashed",
-    color = "red",
+    color = "#8F3A847A",
     size = 1.2
   ) +
   geom_hline(
@@ -1188,7 +1188,7 @@ ModeloRed  %>%
       ModeloRed %$% df.residual
     ),
     size = 1.2,
-    color = "blue"
+    color = "#280434FF"
   ) +
   geom_hline(
       yintercept = - qt(
@@ -1196,7 +1196,7 @@ ModeloRed  %>%
         ModeloRed %$% df.residual
       ),
       size = 1.2,
-      color = "blue"
+      color = "#280434FF"
   ) + 
   geom_point(
     aes(
@@ -1210,7 +1210,7 @@ ModeloRed  %>%
     breaks = seq(1,nrow(Datos),2)
   ) +
   labs(
-    x = "Número de fila",
+    x = "Observación",
     y = "Residudos studentisados"
   ) +
   theme(
@@ -1430,7 +1430,31 @@ El test de \textbf{White} consiste en la siguiente serie de pasos:
 \newpage
 
 El test de \textbf{Breusch-Pagan} empleado se basa en:
+\begin{itemize}
+\item{Se supone que la heterocedasticidad se debe a todas las variables.}
+\item{Se estima el modelo $Y=X\beta+\varepsilon$, en conjunto con $e$ y $\hat{\sigma}$.}
+\item{Se ajusta el modelo $\frac{e}{\hat{\sigma}^{2}}=X\alpha+\mu$.}
+\item{Se define $BP=\frac{SCE}{2}$ estadístico con distribución $\chi _{k}$ bajo H0 cierta.}
+\item{Se testea.}
+\end{itemize}
 
+Finalmente el test de \textbf{Glejser} consiste en:
+\begin{itemize}
+\item {Se estima el modelo y luego se genera el vector de errores estimados.}
+\item{Se calcula $\left | e_{i} \right |$ para toda variable.}
+\item{Se ajustan los siguientes modelos:
+\begin{equation*}
+\left | e \right |=\alpha+\beta X+\mu
+\end{equation*}
+\begin{equation*}
+\left | e \right |=\alpha+\beta \sqrt{X}+\mu
+\end{equation*}
+\begin{equation*}
+\left | e \right |=\alpha+\beta \frac{1}{X}+\mu
+\end{equation*}}
+\item{Se selecciona la regresión con el ajuste más alto}
+\item{Se testea $H_{0})\beta=0$, si se rechaza la hipótesis nula, se rechaza la homocedasticidad}
+\end{itemize}
 <<>>=
 
 # Test de heterocedasticidad
@@ -1438,17 +1462,20 @@ El test de \textbf{Breusch-Pagan} empleado se basa en:
 Het<-function(lm) {
   Esta = c(
     bptest(lm)$statistic,
-    white_lm(lm)$statistic
+    white_lm(lm)$statistic,
+    glejser(lm)$statistic
   )
   Pvalue = c(
     bptest(lm)$p.value,
-    white_lm(lm)$p.value
+    white_lm(lm)$p.value,
+    glejser(lm)$p.value
   )
   return(
     data.frame(
       "Test" = c(
         "Breusch-Pagan",
-        "White"),
+        "White",
+        "Glejser"),
       "Pvalor" = Pvalue,
       "Estadistico" = Esta
     )
@@ -1478,7 +1505,8 @@ Het(ModeloRedInter)%>%
     font_size = 7.5
   )
 @
- 
+
+Trás la realización de los 3 tests, se confirma con gran nivel de seguridad que el modelo actual no presenta problemas con respecto al supuesto de la homocedasticidad.
 \newpage
 
 \section{Anexo}
