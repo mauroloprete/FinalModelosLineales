@@ -126,7 +126,7 @@ Para ello se hará uso de una base de datos con un conjunto de variables que en 
 Haciendo uso de las distintas técnicas estadíticas aprendidas en el curso se buscará descartar variables cuyo aporte no sea suficientemente significativo. Esto busca llegar a un modelo final eficiente (es decír, que explique la tasa de criminalidad de manera acertada haciendo uso de la menor cantidad de variables posibles).
 \\
 
-En el transcurso del texto se pondrán a prueba las distintas hipótesis centrales del modelo, tales como la normalidad de los errores y la heterosedasticidad.
+En el transcurso del texto se pondrán a prueba las distintas hipótesis centrales del modelo, tales como la normalidad de los errores,multicolinealidad y la homocedasticidad.
 \\
 
 También se trabajará con las observaciones y la existencia de algunas que aporten el mismo nivel de información.
@@ -634,7 +634,7 @@ multiplot(HistU1,HistU2,HistGDP,HistIneq,HistProb,HistTime,cols=3)
 @
 }
 
-Como se verá en los histogramas presentados a continuación y haciendo uso de la tabla (más precisamente del \textbf{CV}) es claro que las variables, de manera generalizada, presentan una variabilidad baja.
+Como se puede apreciar en los histogramas  presentados anteriormente y haciendo uso de la tabla (más precisamente del \textbf{CV}) es claro que las variables, de manera generalizada, presentan una variabilidad baja.
 \\
 
 De manera más específica, los histogramas de las variables M, Po1, Nw, Po2, M.F, Pop, U1, U2, Prob y Time cuentan con una distribución asimétrica. La variabilidad entre los valores comprendidos hasta la mediana (aunque baja, como ya se mencionó) es menor que en el resto de las observaciones.
@@ -866,7 +866,7 @@ lm(
 @
 
 Recordando que el $R^{2}_{a}$ hace referencia al porcentaje de variabilidad de \textbf{y} que es explicada con el modelo estimado,
-se considera al mismo como \textit{aceptable}. Por otro lado, haciendo referecia a la significación del modelo, se consideranda el siguiente test de hipótesis y el estadístico $F$ :
+se considera al mismo como \textit{aceptable}. Por otro lado, haciendo referecia a la significación del modelo, se considera el siguiente test de hipótesis y el estadístico $F$ :
 
 \begin{equation*}
   H_{0})\beta_{1} = \beta{2} = \cdots = \beta_{k} = 0
@@ -959,7 +959,7 @@ Como se menciono anteriormente, ante una posible relación lineal el determinant
 demasiado grande. Es decir para un $\sigma^{2}$ fijo, la incertidumbre sería demasiado alta.
 \\
 
-Como se vió previamente, el modelo presentado hasta el momento es globalmente significativo, sin embargo tan solo 4 de las variables consideradas son significativas de manera independiente (presente todas las demás), es por esto que se cuantificaré la intensidad de la multicolinealidad con el \textbf{Factor de inflación de varianza}.
+Como se vió previamente, el modelo presentado hasta el momento es globalmente significativo, sin embargo tan solo 4 de las variables consideradas son significativas de manera independiente (presente todas las demás), es por esto que se cuantificará la intensidad de la multicolinealidad con el \textbf{Factor de inflación de varianza}.
 
 El \textbf{VIF} nos indica en cuantas unidades se incrementa la varianza del estimador ante presencia de colinealidad y se define como : 
 
@@ -1145,7 +1145,7 @@ Se analizaran aquellas observaciones que son atípicas, es decir aquellas que ti
 hacen variar las estimaciones de los regresores.
 \\
 
-Para detectar observatios atípicas, se construye un vector con los residuos studentisados del modelo y se compara con el umbral definido por
+Para detectar observaciones atípicas, se construye un vector con los residuos studentisados del modelo y se compara con el umbral definido por
 una distribución t y en el caso que la superen, se consideran atípicos.
 
 Se definen los residudos studentisados como :
@@ -1230,7 +1230,7 @@ ModeloRed  %>%
 @
 
 Recordando el analisis de la sección anterior, el estado número \textbf{11}, \textbf{29} y \textbf{18} presentan problemas con la distancia de Cook, con este gráfico podemos afirmar que las observaciones \textbf{29} y 
-\textbf{11} son influyentes y atipicas, mientras que para la número \textbf{18} podemos ver que es muy cercana a cero, la esperanza de los errores por lo que es solamente atipica.
+\textbf{11} son influyentes y atipicas, mientras que para la número \textbf{18} podemos ver que es muy cercana a cero, la esperanza de los errores por lo que es solamente atípica.
 
 Por ende, se decide retirarlas del modelo reducido ya que las mismas tienen una influencia preponderante en la estimación. 
 Como se vió en clase, observaciones de este tipo pueden llevar a un modelo alejado de la realidad.
@@ -1260,11 +1260,9 @@ ModeloRed %>%
 @
 
 
-\newpage
-
 \subsection{Normalidad}
 
-Uno de los supuestos fundamentales al momento de construír este modelo lineal, refiere a la distribución de los errores, en este caso siguen una distribución normal.
+Uno de los supuestos fundamentales al momento de construír este modelo lineal, refiere a la distribución de los errores, en este caso se asume que siguen una distribución normal.
 Esto permite realizar las pruebas anteriormente presentadas a lo largo de este trabajo, en el caso que este supuesto no se cumpla los estadísticos no reflejarán 
 lo que se desea probar (su distribución no será la esperada), es por esto que es de crucial importancia chequear la distribución de los errores.
 \\
@@ -1342,7 +1340,8 @@ ModeloRedInter  %>%
 Con base en los gráficos se observa que la esperanza de los errores se mantiene cercana a cero, con excepción de algunas observaciones.
 También se debe mencionar que no es posible encontrar un patrón en la dispersión de los errores, en cambio en la gráfica QQ-plot muestra como los valores centrales de
 la distribución se asemeja a una distribución normal, a exepción de la observación 17, 20 y 21, lo mismo se puede apreciar en gráfica que compara la distribución de los errores
-(que fue construida con la función \textit{geom density} de ggplot que calcula y dibuja la estimación de la densidad Kernel con valores por defecto) con una distribución normal.
+(que fue construida con la función \textit{geom density} de ggplot que calcula y dibuja la estimación de la densidad Kernel con valores por defecto) con una distribución normal,
+teniendo problemas en valores particulares y una gran concentración en valores poco antes de cero. 
 \\
 
 Para poder afirmar que se cumple el supuesto de normalidad de los errores se relizan, tres pruebas:
@@ -1396,7 +1395,7 @@ ModeloRedInter %>%
   ) %>% 
   kbl(
     booktabs = T, 
-    caption = "Test de Normalidad ",
+    caption = "Test de Normalidad $\\alpha = 0.05$",
     escape = FALSE,
     row.names = FALSE
   ) %>% 
@@ -1430,7 +1429,6 @@ El test de \textbf{White} consiste en la siguiente serie de pasos:
 \item{Se calcula el estadístico $nR^{2}$ que se distribuye $\chi _{k}$ con k cantidad de variables del modelo.}
 \item{Se realiza el test.}
 \end{itemize}
-\newpage
 
 El test de \textbf{Breusch-Pagan} empleado se basa en:
 \begin{itemize}
@@ -1576,9 +1574,53 @@ ModeloRedInter %>%
     is.numeric,
     ~round(.x,3)
   ) %>% 
+assign(
+  "ResumenRedInter",
+  .,
+  envir = .GlobalEnv
+)
+
+ModeloCompleto %>% 
+  glance() %>% 
+  mutate(
+    Modelo = "Modelo Completo",
+    "$R^{2}.adj$" = adj.r.squared*100,
+    "RSE" = sigma,
+    "SCE" = sum((ModeloCompleto$fitted.values-mean(Datos$y))^(2)),
+    "F Obs." = statistic,
+    "P-valor*100" = p.value*100,
+    "Regresión.gl" = df,
+    "Residuos.gl" = df.residual,
+    .keep = "none"
+  ) %>% 
+  summarise_if(
+    is.numeric,
+    ~round(.x,3)
+  ) %>% 
+assign(
+  "ResumenCompleto",
+  .,
+  envir = .GlobalEnv
+)
+
+
+rbind.data.frame(
+  ResumenRedInter,
+  ResumenCompleto
+) %>% 
+mutate(
+  Modelo = c(
+    "Modelo Reducido e intervenido",
+    "Modelo Completo"
+  )
+) %>% 
+relocate(
+  Modelo,
+  .before = `$R^{2}.adj$`
+) %>% 
   kbl(
     booktabs = T,
-    caption = "Test sobre el modelo completo",
+    caption = "Comparación modelo completo vs reducido e intervenido",
     escape = FALSE
   ) %>% 
     kable_styling(
