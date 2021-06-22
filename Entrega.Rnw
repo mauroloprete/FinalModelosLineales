@@ -1145,13 +1145,13 @@ Se analizaran aquellas observaciones que son atípicas, es decir aquellas que ti
 hacen variar las estimaciones de los regresores.
 \\
 
-Para detectar observaciones atípicas, se construye un vector con los residuos studentisados del modelo y se compara con el umbral definido por
+Para detectar observaciones atípicas, se construye un vector con los residuos studentizados del modelo y se compara con el umbral definido por
 una distribución t y en el caso que la superen, se consideran atípicos.
 
-Se definen los residudos studentisados como :
+Se definen los residudos studentizados como :
 
 \begin{equation*}
-  t_{i} = \frac{e}{\sqrt{\hat{\sigma^{2}_{i}}(1-h_{ii})}}
+  t_{i} = \frac{e}{\sqrt{\hat{\sigma^{2}_{-i}}(1-h_{ii})}}
 \end{equation*}
 
 Una vez calculado los residuos de esta manera, podemos definir a los outliers como aquellas observaciones que sobrepasen el umbral de 
@@ -1212,7 +1212,7 @@ ModeloRed  %>%
   ) +
   labs(
     x = "Observación",
-    y = "Residudos studentisados"
+    y = "Residudos studentizados"
   ) +
   theme(
     aspect.ratio = 1,
@@ -2544,7 +2544,7 @@ ModeloRed  %>%
   ) +
   labs(
     x = "Observación",
-    y = "Residudos studentisados"
+    y = "Residudos studentizados"
   ) +
   theme(
     aspect.ratio = 1,
