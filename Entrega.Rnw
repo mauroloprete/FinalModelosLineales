@@ -1510,15 +1510,20 @@ Het(ModeloRedInter)%>%
 Trás la realización de los 3 tests, se confirma con gran nivel de seguridad que el modelo actual no presenta problemas con respecto al supuesto de la homocedasticidad.
 \newpage
 \section{Modelo Final}
+\subsection{Expresión}
 
+Terminados ya todos los procesor referentes a la refinación del modelo completo original, se llega al denominado \textbf{Modelo Final}.El mismo incluye las siguientes variables:
+\begin{itemize}
+\item{\textit{Gasto per cápita en policía en 1960} (\textbf{Po1}).} 
+\item{\textit{Desigualdad en el ingreso} (\textbf{Ineq})}  
+\item{\textit{Índice de la escolaridad del estado} (\textbf{Ed}).}
+\item{\textit{cantidad de hombres entre 14 y 20 años de edad cada 1.000 habitantes.} 
+(\textbf{M})}
+\item{\textit{Tasa de desempleo urbana de hombres de 35 a 39 años por 1000 habitantes.} (\textbf{U2})}
+\item{\textit{Probabilidad de encarcelamiento*100} (\textbf{Prob}).}
+\end{itemize}
 
-Una vez recorrido todo el procedimiento anteriormente mencionado, llegamos a lo que conocemos como \textbf{Modelo Final}.
-
-El mismo inlcuye a el \textit{Gasto per cápita en policía en 1960} (\textbf{Po1}), la \textit{Desigualdad en el ingreso} (\textbf{Ineq}) , 
-un \textit{indice que refleja la escolaridad del estado} (\textbf{Ed}), la \textit{cantidad de hombres entre 14 y 20 años de edad cada 1.000 habitantes} 
-(\textbf{M}), \textit{Tasa de desempleo urbana de hombres de 35 a 39 años por 1000 habitantes} (\textbf{U2}) y por último \textit{Probabilidad de encarcelamiento*100} (\textbf{Prob}).   
-
-Obteniendo el siguiente resultado : 
+De manera resumida : 
 
 <<>>=
 ModeloRed %>%  
@@ -1629,27 +1634,34 @@ relocate(
   )
 @
 
-De esta manera, podemos ver que ante una variación en un peso en el gasto de policia en el 1960 la \textit{Tasa de Criminalidad} se esperaría que hubiera aumentado en 11.50, dejando
-las demás variables constantes. También podemos concluir que en estados donde existe una mayor desigualdad en el ingreso, se espera que la tasa de criminalidad sea mayor, lo mismo ocurre con el
-indice de escolaridad, la cantidad de hombres de 14 y 24 años y la tasa de desempleo de 35 y 39 años. 
+De esta manera, puede verse que ante una variación en un peso en el gasto de la policia la \textit{Tasa de Criminalidad} se esperaría que la tasa de criminalidad aumente en 11.50, dejando
+las demás variables constantes. También es preciso afirmar que en estados donde existe una mayor desigualdad en el ingreso, se espera que la tasa de criminalidad sea mayor, lo mismo ocurre con el
+indice de escolaridad, la cantidad de hombres de 14 y 24 años y la tasa de desempleo de 35 y 39 años (cosa que se podía afirmar desde el análisis descriptivo se encuentra ahora cuantificada de manera más precisa). 
 \\
 
-Para las variables que refieren a cantidad de hombres o nivel de empelo de un tramo etario, hay que considerar que inicialmente se tiene información acerca de 
-la tasa de desempleo en hombres de 14 a 24 años, sin embargo, la cantidad de hombres de 14 a 24 es años tiene una mayor fuerza explicativa.
+Las variables relacionadas con la cantidad de hombres o nivel de empleo en un tramo etario dado, se debe considerar si bien se tiene información acerca de 
+la tasa de desempleo en hombres de 14 a 24 años, la cantidad de hombres de 14 a 24 años por cada 1000 habitantes (independientemente de su condición laboral) tiene una mayor fuerza explicativa.
 \\
 
-Con una interpertación objetiva, importa mas la cantidad de adolecentes y jovenes adultos, que la situación en el mercado laboral ya que la tasa de desempelo toma en cuenta la población 
-economicamente activa (aquellas que con la edad suficiente buscan empelo), en cambio a edades mayores es crucial la situación labroral de este grupo de personas.
+Realizando una interpertación objetiva, en el modelo influye más la cantidad de adolecentes y jovenes adultos, que la situación del mercado laboral a la hora de estimar la tasa de delincuencia.
 \\
 
-
-Por último la estimación del regresor asociado a la \textit{Probabilidad de encarcelamiento} tiene una interpertación bastante fuerte ya que si comparamos dos estados con
+Por último la estimación del regresor asociado a la \textit{Probabilidad de encarcelamiento} tiene una interpertación bastante fuerte, ya que si se comparan dos estados con
 la misma situación de Gasto,Desigualdad en el ingreso, Desempleo en Hombres de 35 a 39 años, cantidad de hombres de 14 y 24 años y con un mismo nivel educativo, la tasa de criminalidad
-sera sustancialmente menor ante una variación en esta medida.
+sera sustancialmente menor ante una variación positiva de esta variable.
 \\
 
-Algo importante a considerar es que para que se cumplieran los supuestos del modelo eliminamos tres observaciones, que en este caso refiere a que el modelo para tres estados de Estados
-Unidos no esta siendo representado por lo que una posible solución para futuros trabajos sería aplicar \textit{Bootstrap residuals} en el modelo sin intervenir y aproximar la variabilidad de los estimadores.
+\subsection{Conclusiones}
+
+De manera resumida y quizás en cierta parte reiterativa, el proceso de construcción del modelo se basó en 3 pilares fundamentales:
+
+\begin{itemize}
+\item{\textbf{Fidelidad en la representación:} se buscó construír un modelo que efectivamente logre explicar el comportamiento de la tasa de la manera más certera posible. Como se vé en el cuadro anterior, se llegó a una expresión cuyo ajuste es del 80,56\% apróximadamente.}
+\item{\textbf{Balance:} se buscó una cantidad de variables adecuadas, la eliminación de parte de ellas permitió obtener un modelo para nada sobrecargado y sobre todo eficiente. A su vez, la eliminación de variables no fue desmedida, en todo momento una justificación teórica la respalda}
+\item{\textbf{Control:} si bien la eliminación de observaciones que perturban los supuestos clásicos del modelo puede ser absorbente, en un modelo construído a partir de una cantidad medianamente acotada de observaciones esto lleva sin ninguna duda a la pérdida de fidelidad representativa. Nuevamente, es claro que en el proceso estas decisiones tomaron tiempo de pensamiento y se basaron en los conceptos estudiados en clase }
+\end{itemize}
+
+Un detalle final a tener nuevamente en consideración es la eliminación de las 3 observaciones que ponen en jaque a los supuestos planteados. Este modelo no se va adecuar "fielmente" a estos 3 estados, una posible solución para futuros trabajos sería aplicar \textit{Bootstrap residuals} en el modelo sin intervenir y aproximar la variabilidad de los estimadores. Esto es sin duda una herramienta que nos propusimos a explorar en el futuro.
 
 
 
