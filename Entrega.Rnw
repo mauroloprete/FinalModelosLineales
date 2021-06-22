@@ -126,7 +126,7 @@ Para ello se hará uso de una base de datos con un conjunto de variables que en 
 Haciendo uso de las distintas técnicas estadíticas aprendidas en el curso se buscará descartar variables cuyo aporte no sea suficientemente significativo. Esto busca llegar a un modelo final eficiente (es decír, que explique la tasa de criminalidad de manera acertada haciendo uso de la menor cantidad de variables posibles).
 \\
 
-En el transcurso del texto se pondrán a prueba las distintas hipótesis centrales del modelo, tales como la normalidad de los errores,multicolinealidad y la homocedasticidad.
+En el transcurso del texto se pondrán a prueba las distintas hipótesis centrales del modelo, tales como la normalidad de los errores,ausencia de multicolinealidad y la homocedasticidad.
 \\
 
 También se trabajará con las observaciones y la existencia de algunas que aporten el mismo nivel de información.
@@ -694,7 +694,7 @@ DatosTab %>%
     summaryMod
   ) %>% 
   mutate(
-    Estadistico = c(
+    Estadístico = c(
       "Min",
       "1er Qu.",
       "Mediana",
@@ -1375,7 +1375,7 @@ TestNormalidad <- function(lm) {
         "Jarque Bera"
       ),
       "Pvalor" = Pvalue,
-      "Estadistico" = Esta
+      "Estadístico" = Esta
     )
   )
 }
@@ -1478,7 +1478,7 @@ Het<-function(lm) {
         "White",
         "Glejser"),
       "Pvalor" = Pvalue,
-      "Estadistico" = Esta
+      "Estadístico" = Esta
     )
   )
 }
@@ -1781,7 +1781,7 @@ ggplot(Datos,aes(x=y))+
 
 ## ----echo=FALSE,fig.cap = "Histogramas (1)"-----------------------------------
 
-# Histogramas multiples 1
+# Histogramas múltiples 1
 
 multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
   library(grid)
@@ -2207,7 +2207,7 @@ names(DatosTab) <- c(
   "Producto bruto interno per cápita",
   "Desigualdad ingreso",
   "Probabilidad Encarcelamiento",
-  "Tiempo de estadía en carceles",
+  "Tiempo de estadía en cárceles",
   "Tasa de criminalidad"
 )
 
@@ -2257,7 +2257,7 @@ DatosTab %>%
   ) %>% 
   kbl(
     booktabs = T, 
-    caption = "Medidas descriptivas para variables númericas"
+    caption = "Medidas descriptivas para variables numéricas"
   ) %>% 
   kable_styling(
     latex_options = c("striped", "hold_position"),
@@ -2361,7 +2361,7 @@ ModeloCompleto %>%
   ) %>% 
   kbl(
     booktabs = T, 
-    caption = "Estimación,error estandar y test individual del modelo completo ",
+    caption = "Estimación,error estándar y test individual del modelo completo ",
     escape = FALSE
   ) %>% 
   kable_styling(
@@ -2437,7 +2437,7 @@ ModeloRed %>%
       "Tasa de desempleo urbana hombres 35-39 años x 1000"
     ),
     "Estimación" = estimate,
-    "Error estandar" = std.error,
+    "Error estándar" = std.error,
     "Estadístico F" = statistic,
     "P valor" = p.value,
     "$\\left(H_{0}^{\\alpha = 0.05}\\right)\\beta_{i} = 0$" = case_when(
@@ -2448,7 +2448,7 @@ ModeloRed %>%
   ) %>% 
   kbl(
     booktabs = T, 
-    caption = "Estimación,error estandar y test individual tras aplicar el método Stepwise ",
+    caption = "Estimación,error estándar y test individual tras aplicar el método Stepwise ",
     escape = FALSE
   ) %>% 
   kable_styling(
@@ -2503,7 +2503,7 @@ geom_text( label="Regla empírica",
 
 ## ----fig.align= "center",out.width = "0.8\\textwidth"-------------------------
 
-# Observaciones atipicas
+# Observaciones atípicas
 
 ModeloRed  %>% 
   rstudent() %>% 
@@ -2598,7 +2598,7 @@ ModeloRed %>%
 
 ## ----out.width = "0.65\\textwidth",fig.align = "center"-----------------------
 
-# Gráfico de erorres y qq plot
+# Gráfico de errores y qq plot
 ModeloRedInter %>% 
   autoplot(
     which = c(1,2)
@@ -2620,7 +2620,7 @@ ModeloRedInter %>%
 
 ## ----out.width = "0.5\\textwidth",fig.align = "center"------------------------
 
-# Distribución teorica vs normal 
+# Distribución teórica vs normal 
 
 ModeloRedInter  %>% 
   rstudent() %>% 
@@ -2643,7 +2643,7 @@ ModeloRedInter  %>%
     size = 1.7
   ) + 
   labs(
-    title = "Valores téoricos y errores studentizados " ,
+    title = "Valores teóricos y errores studentizados " ,
     x="x",
     y = "Densidad"
   ) +
@@ -2784,7 +2784,7 @@ ModeloRed %>%
       "Tasa de desempleo urbana hombres 35-39 años x 1000"
     ),
     "Estimación" = estimate,
-    "Error estandar" = std.error,
+    "Error estándar" = std.error,
     "$\\left(H_{0}^{\\alpha = 0.05}\\right)\\beta_{i} = 0$" = case_when(
       p.value < 0.05 ~ "Se rechaza H0",
       p.value >= 0.05 ~ "No se rechaza H0"
@@ -2793,7 +2793,7 @@ ModeloRed %>%
   ) %>% 
   kbl(
     booktabs = T, 
-    caption = "Estimación,error estandar y test individual tras aplicar el método Stepwise intervenido por observaciones influyentes",
+    caption = "Estimación,error estándar y test individual tras aplicar el método Stepwise intervenido por observaciones influyentes",
     escape = FALSE
   ) %>% 
   kable_styling(
