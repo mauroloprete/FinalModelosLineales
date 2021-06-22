@@ -1675,6 +1675,8 @@ En esta gráfica se puede ver la correlación entre las variables presentadas y 
   \includegraphics[width = 1.05\textwidth]{Grafico.png}
 \end{figure}
 
+\newpage
+
 \subsection{Selección de Modelos : stepWise}
 
 En este apartado se muestra la salida de la selección a pasos de Stepwise, se puede ver que el $\alpha$ de entrada y salida es igual a $0.15$, comienza
