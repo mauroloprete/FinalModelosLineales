@@ -1669,7 +1669,7 @@ Un detalle final a tener nuevamente en consideración es la eliminación de las 
 \section{Anexo}
 
 \subsection{Gráfico descriptivo}
-En esta gráfica se puede ver la correlación entre las variables presentadas y un gráfico de dispersión y la distribución de la variable.
+En esta gráfica se puede ver la correlación entre las variables presentadas ,un gráfico de dispersión y la distribución de la variable.
 
 \begin{figure}[h]
   \includegraphics[width = 1.05\textwidth]{Grafico.png}
@@ -1680,7 +1680,7 @@ En esta gráfica se puede ver la correlación entre las variables presentadas y 
 \subsection{Selección de Modelos : stepWise}
 
 En este apartado se muestra la salida de la selección a pasos de Stepwise, se puede ver que el $\alpha$ de entrada y salida es igual a $0.15$, comienza
-solo incluyendo la constante en el modelo, luego agrega \textbf{Po1} hasta llegar al séptimo paso y terminar el algorítmo
+solo incluyendo la constante en el modelo, luego agrega \textbf{Po1} hasta llegar al séptimo paso y terminar el algorítmo.
 
 <<>>=
 lm(
@@ -1695,10 +1695,10 @@ lm(
 \subsection{Script de R}
 
 Aquí se mostrará el código R utilizado para el trabajo, para reproducirlo solo hace falta incluir en el mismo directorio de trabajo
-el archivo \textbf{USCrime.txt}, en el proceso se desplegaran las diferentes gráficas y tablas, así como el modelo completo \textit{ModeloCompleto}
+el archivo \textbf{USCrime.txt}. En el proceso se desplegarán las diferentes gráficas y tablas, así como también el modelo completo \textit{ModeloCompleto},
 el modelo reducido \textit{ModeloRed} y el modelo reducido intervenido como \textit{ModeloRedInter} en el ambiente de trabajo.
 
-El mismo puede encontrarse en \url{https://gist.github.com/mauroloprete/dcb1c0bba5215baa24311be4e77be8cb}
+El mismo puede encontrarse en \url{https://gist.github.com/mauroloprete/dcb1c0bba5215baa24311be4e77be8cb}.
 
 <<eval =F,echo = T>>=
 ## ----include=FALSE------------------------------------------------------------
