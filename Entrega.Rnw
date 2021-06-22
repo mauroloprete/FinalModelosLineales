@@ -694,7 +694,7 @@ DatosTab %>%
     summaryMod
   ) %>% 
   mutate(
-    Estadístico = c(
+    Estadistico = c(
       "Min",
       "1er Qu.",
       "Mediana",
@@ -732,7 +732,7 @@ DatosTab %>%
   )
 @
 
-\subsection{Análisis bivariado}
+\subsection{Análisis Bivariado}
 
 \subsubsection{Correlación entre variables}
 
@@ -1667,6 +1667,9 @@ Un detalle final a tener nuevamente en consideración es la eliminación de las 
 
 \newpage
 \section{Anexo}
+
+\subsection{Gráfico descriptivo}
+En esta gráfica se puede ver la correlación entre las variables presentadas y un gráfico de dispersión y la distribución de la variable.
 
 \begin{figure}[h]
   \includegraphics[width = 1.05\textwidth]{Grafico.png}
