@@ -61,3 +61,6 @@ figure/*.pdf
 *.lof
 Entrega.log
 Entrega.pdf
+Entrega.run.xml
+.gitignore
+Entrega.bcf

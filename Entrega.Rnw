@@ -117,7 +117,7 @@ read.table(
 @
 \section{Introducción}
 
-El objetivo de este informe es la construcción de un modelo de regresión lineal múltiple que explique la tasa de criminalidad en USA (número se ofensas reportadas a la policia por habitante).
+El objetivo de este informe es la construcción de un modelo de regresión lineal múltiple que explique la tasa de criminalidad en USA (número se ofensas reportadas a la policía por habitante).
 \\
 
 Para ello se hará uso de una base de datos con un conjunto de variables que en principio se encuentran relacionadas con la variable a explicar.
@@ -185,7 +185,7 @@ Para ello se hará uso de distintas medidas de resumen univariadas y bivariadas,
 Es esta sección fundamental al momento de discutir el modelo final y como a partir de distintas técnicas estadísticas aprendidas en el curso se puede simplificar el \textit{modelo completo} que se presentará en la sección siguiente.
 
 \subsection{Análisis Univariado}
-En esta primer sección se hará especial enfásis en las variables por sí mismas.
+En esta primer sección se hará especial énfasis en las variables por sí mismas.
 \\
 
 Se estudiarán medidas de resumen y a partir de histogramas tendremos un primer acercamiento a la distribución de las mismas y su comportamiento.
@@ -198,7 +198,7 @@ Se estudiarán medidas de resumen y a partir de histogramas tendremos un primer 
 \textbf{Y}      & Tasa de criminalidad, número de ofensas reportadas a la policía por habitante                                                                          & Cuantitativa                                \\ \hline
 \textbf{M}      & Número de hombres entre 14 y 24 años cada 1000 habitantes                                                                                             & Cuantitativa                                \\ \hline
 \textbf{So}     & Variables indicadora de los estados del sur (0=No, 1=Si)                                                                                               & Cualitativa                                 \\ \hline
-\textbf{Ed}     & Indice que refeleja la escolaridad del estado                                                                                                          & Cuantitativa                                \\ \hline
+\textbf{Ed}     & Indice que refleja la escolaridad del estado                                                                                                          & Cuantitativa                                \\ \hline
 \textbf{Po1}    & Gasto per cápita en policía realizado por el gobierno estatal o local en 1960                                                                          & Cuantitativa                                \\ \hline
 \textbf{Po2}    & Gasto per cápita en policía realizado por el gobierno estatal o local en 1959                                                                          & Cuantitativa                                \\ \hline
 \textbf{LF}     & \begin{tabular}[c]{@{}l@{}}Tasa de participación en la fuerza laboral civil de sexo masculino entre 14 y 24 \\ años, cada 1000 habitantes\end{tabular} & Cuantitativa                                \\ \hline
@@ -222,7 +222,7 @@ Se estudiarán medidas de resumen y a partir de histogramas tendremos un primer 
 \centering
 <<echo=FALSE,fig.cap = "Histogramas (1)">>=
 
-# Histogramas multiples 1
+# Histogramas múltiples 1
 
 multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
   library(grid)
@@ -650,7 +650,7 @@ La variable Ineq también cuenta con una distribución asimétrica pero a difere
 
 \subsubsection{Medidas de resumen}
 
-Se presenta en forma de tabla el resumen de las variables númericas. En el mismo se presenta el valor mínimo y máximo de cada variable, medidas de tendencia central tales como lo son el primer y tercer cuartil, junto a la mediana. 
+Se presenta en forma de tabla el resumen de las variables numéricas. En el mismo se presenta el valor mínimo y máximo de cada variable, medidas de tendencia central tales como lo son el primer y tercer cuartil, junto a la mediana. 
 \\
 
 A su vez, para estudiar la dispersión se incluye la media aritmética y una medida de variabilidad de la misma, el coeficiente de variación. 
@@ -674,7 +674,7 @@ names(DatosTab) <- c(
   "Producto bruto interno per cápita",
   "Desigualdad ingreso",
   "Probabilidad Encarcelamiento",
-  "Tiempo de estadía en carceles",
+  "Tiempo de estadía en cárceles",
   "Tasa de criminalidad"
 )
 
@@ -724,7 +724,7 @@ DatosTab %>%
   ) %>% 
   kbl(
     booktabs = T, 
-    caption = "Medidas descriptivas para variables númericas"
+    caption = "Medidas descriptivas para variables numéricas"
   ) %>% 
   kable_styling(
     latex_options = c("striped", "hold_position"),
@@ -797,7 +797,7 @@ Esto se evidencia en los tests de hipótesis en donde se analiza el aporte de ca
 
 Al comienzo de este trabajo jugó este principio de la correlación un rol monumental. Basándose en la alta correlación de variables 2 a 2, se procedió a retirar de la dupla a aquella que menor correlación mantenía con \textbf{y}.
 
-Esto es en principio coherente, a pesar de ello y trás el análisis de disntitos panoramas, el caso partícular de \textbf{Ineq} y \textbf{GDP} dejó en claro que esta técnica fue en un principio apresurada. Si bien las variables comparten gran nivel de información, trás la aplicación de las técnicas de \textbf{Forward,Backwards,Stepwise} ambas varibles eran incluídas en el modelo en todo escenario.
+Esto es en principio coherente, a pesar de ello y trás el análisis de distintos panoramas, el caso partícular de \textbf{Ineq} y \textbf{GDP} dejó en claro que esta técnica fue en un principio apresurada. Si bien las variables comparten gran nivel de información, trás la aplicación de las técnicas de \textbf{Forward,Backwards,Stepwise} ambas variables eran incluídas en el modelo en todo escenario.
 \\
 
 Esta situación subyace de que incluso cuando ambas comparten un nivel elevado de información, el aporte único de las mismas es alto en comparación con el resto de las variables presentadas.
@@ -814,7 +814,7 @@ En principio, a partir del ``arsenal`` descriptivo es claro que:
 \item {\textbf{SO} y \textbf{NW} mantienen una correlación positiva y de nivel alto (0,767)}
 \end{itemize}
 
-Como veremos en las siguientes secciones del documento, el caso de \textbf{Ineq} y \textbf{GDP} es partícular. Como se pensó en un principio, en el resto de las duplas muy probablemente sobreviva una sola de las varibles (si no es que ambas son descartadas).
+Como veremos en las siguientes secciones del documento, el caso de \textbf{Ineq} y \textbf{GDP} es partícular. Como se pensó en un principio, en el resto de las duplas muy probablemente sobreviva una sola de las variables (si no es que ambas son descartadas).
 
 
 
@@ -866,7 +866,7 @@ lm(
 @
 
 Recordando que el $R^{2}_{a}$ hace referencia al porcentaje de variabilidad de \textbf{y} que es explicada con el modelo estimado,
-se considera al mismo como \textit{aceptable}. Por otro lado, haciendo referecia a la significación del modelo, se considera el siguiente test de hipótesis y el estadístico $F$ :
+se considera al mismo como \textit{aceptable}. Por otro lado, haciendo referencia a la significación del modelo, se considera el siguiente test de hipótesis y el estadístico $F$ :
 
 \begin{equation*}
   H_{0})\beta_{1} = \beta{2} = \cdots = \beta_{k} = 0
@@ -881,11 +881,11 @@ se considera al mismo como \textit{aceptable}. Por otro lado, haciendo referecia
 \end{align*}
 
 
-Siendo $SCE$ la suma de cuadrados explicados por la regresión y $RSE^{2}$ el cuadrado del error estandar de los residuos, resulta para este caso partícular $SCE = 5.525.982$ y $RSE^{2} = 43707,766$,
+Siendo $SCE$ la suma de cuadrados explicados por la regresión y $RSE^{2}$ el cuadrado del error estándar de los residuos, resulta para este caso partícular $SCE = 5.525.982$ y $RSE^{2} = 43707,766$,
 de esta manera se obtiene el $F_{obs}$ que permite rechazar $H_{0}$ y así afirmar que el modelo es estadísticamente significativo para explicar a \textbf{y}.
 \\
 
-A continuación se testea la siginificación de cada variable en forma independiente, los resultados se muestran en el siguiente cuadro : 
+A continuación se testea la significación de cada variable en forma independiente, los resultados se muestran en el siguiente cuadro : 
 
 <<>>=
 # Test de forma independiente Modelo Completo
@@ -902,7 +902,7 @@ ModeloCompleto %>%
       names(DatosTab)[-length(DatosTab)]
     ),
     "Estimación" = estimate,
-    "Error estandar" = std.error,
+    "Error estándar" = std.error,
     "Estadístico F" = statistic,
     "P valor" = p.value,
     "$\\left(H_{0}^{\\alpha = 0.05}\\right)\\beta_{i} = 0$" = case_when(
@@ -913,7 +913,7 @@ ModeloCompleto %>%
   ) %>% 
   kbl(
     booktabs = T, 
-    caption = "Estimación,error estandar y test individual del modelo completo ",
+    caption = "Estimación,error estándar y test individual del modelo completo ",
     escape = FALSE
   ) %>% 
   kable_styling(
@@ -923,13 +923,13 @@ ModeloCompleto %>%
 @
 
 \newpage
-A partir del cuadro presentado y conforme a los tests realizados, se ve claramente que son tan solo 4 son las variables que de manera independiente (\textbf{y muy importantemente, en presencia de todas las demás}) logran un aporte significativo al momento de explicar el comportamiento de la tasa de criminalidad.
+A partir del cuadro presentado y conforme a los tests realizados, se ve claramente que son tan solo 4 son las variables que de manera independiente (\textbf{y muy importante, en presencia de todas las demás}) logran un aporte significativo al momento de explicar el comportamiento de la tasa de criminalidad.
 \\
 
 Ellas son \textbf{M},\textbf{PO1},\textbf{U2} y por último \textbf{Prob*100}.
 \\
 
-¿Significa esto que se debe descartar el resto de las varibles y plantear un modelo caracterízado por tan solo las 4?, la respuesta es \textbf{no}. 
+¿Significa esto que se debe descartar el resto de las variables y plantear un modelo caracterízado por tan solo las 4?, la respuesta es \textbf{no}. 
 \\
 
 Como bien se menciona anteriormente, los tests analizan el aporte dada las demás variables. Una correlación alta entre variables, podría indicar que parte de la información que aportan una de ellas está también presente en otra y esa cantidad de información se vió cuantificada de manera previa.
@@ -941,7 +941,7 @@ Con base en esta última afirmación es que se promueve el uso de distintas téc
 
 \subsection{Análisis de multicolinealidad}
 
-Consierando el problema previamente mencionado, se analizará la multicolinealidad (aproximada) de las variables independientes del modelo planteado. 
+Considerando el problema previamente mencionado, se analizará la multicolinealidad (aproximada) de las variables independientes del modelo planteado. 
 Esto es relevante ya que si existe una relación lineal en la matriz de diseño, esto impactaría directamente en la varianza de los regresores $\beta_{k} = \left(X^{T}X\right)^{-1}X^{T}$, 
 haciendo que las estimaciones varíen ante pequeñas perturbaciones en las observaciones, logrando así que predicciones sean menos confiables. 
 \\
@@ -955,7 +955,7 @@ Recordando que  :
   \hat{\beta_{k}} \sim N\left(\beta,\sigma^{2}\left(X^{T}X\right)^{-1}\right)
 \end{equation*}  
 
-Como se menciono anteriormente, ante una posible relación lineal el determinante de la matriz $X^{T}X$ sería proximo a cero, siendo el determinante de la matriz inversa
+Como se menciono anteriormente, ante una posible relación lineal el determinante de la matriz $X^{T}X$ sería próximo a cero, siendo el determinante de la matriz inversa
 demasiado grande. Es decir para un $\sigma^{2}$ fijo, la incertidumbre sería demasiado alta.
 \\
 
@@ -967,7 +967,7 @@ El \textbf{VIF} nos indica en cuantas unidades se incrementa la varianza del est
   VIF_{j} = \frac{1}{1-R^{2}_{j}}
 \end{equation*}
 
-Donde $R^{2}_{j}$ hace referecia al coeficiente de determinación de una regresión que intenta establecer una relación lineal de $X_{j}$ con las demás variables explicativas.
+Donde $R^{2}_{j}$ hace referencia al coeficiente de determinación de una regresión que intenta establecer una relación lineal de $X_{j}$ con las demás variables explicativas.
 
 \newpage
 
@@ -1048,7 +1048,7 @@ ModeloRed %>%
       "Tasa de desempleo urbana hombres 35-39 años x 1000"
     ),
     "Estimación" = estimate,
-    "Error estandar" = std.error,
+    "Error estándar" = std.error,
     "Estadístico F" = statistic,
     "P valor" = p.value,
     "$\\left(H_{0}^{\\alpha = 0.05}\\right)\\beta_{i} = 0$" = case_when(
@@ -1059,7 +1059,7 @@ ModeloRed %>%
   ) %>% 
   kbl(
     booktabs = T, 
-    caption = "Estimación,error estandar y test individual tras aplicar el método Stepwise ",
+    caption = "Estimación,error estándar y test individual tras aplicar el método Stepwise ",
     escape = FALSE
   ) %>% 
   kable_styling(
@@ -1076,7 +1076,7 @@ Para continuar con el diagnostico del modelo, en la siguiente sección se hará 
 las observaciones atípicas y/o influyentes.
 
 \newpage
-\subsection{Busqueda de observaciones influyentes}
+\subsection{Búsqueda de observaciones influyentes}
 
 En esta sección se buscará estudiar cuales de las observaciones presentan valores influyentes,
 para ello se hará uso de la Distancia de Cook.
@@ -1159,7 +1159,7 @@ una distribución $t^{df.res}_{1-0.01/2}$ (lineas continuas horizontales en el g
 
 <<fig.align= "center",out.width = "0.8\\textwidth",fig.cap = "Análisis de observaciones atípicas">>=
 
-# Observaciones atipicas
+# Observaciones atípicas
 
 ModeloRed  %>% 
   rstudent() %>% 
@@ -1229,8 +1229,8 @@ ModeloRed  %>%
     )
 @
 
-Recordando el analisis de la sección anterior, el estado número \textbf{11}, \textbf{29} y \textbf{18} presentan problemas con la distancia de Cook, con este gráfico podemos afirmar que las observaciones \textbf{29} y 
-\textbf{11} son influyentes y atipicas, mientras que para la número \textbf{18} podemos ver que es muy cercana a cero, la esperanza de los errores por lo que es solamente atípica.
+Recordando el análisis de la sección anterior, el estado número \textbf{11}, \textbf{29} y \textbf{18} presentan problemas con la distancia de Cook, con este gráfico podemos afirmar que las observaciones \textbf{29} y 
+\textbf{11} son influyentes y atípicas, mientras que para la número \textbf{18} podemos ver que es muy cercana a cero, la esperanza de los errores por lo que es solamente atípica.
 
 Por ende, se decide retirarlas del modelo reducido ya que las mismas tienen una influencia preponderante en la estimación. 
 Como se vió en clase, observaciones de este tipo pueden llevar a un modelo alejado de la realidad.
@@ -1267,12 +1267,12 @@ Esto permite realizar las pruebas anteriormente presentadas a lo largo de este t
 lo que se desea probar (su distribución no será la esperada), es por esto que es de crucial importancia chequear la distribución de los errores.
 \\
 
-En primer se hará un primer acercamiento con un gráfico de QQ-Plot, que muestra la similitud de los percentiles de la distribución normal téorica y la observada en nuestros errores, por último un gráfico de residudos contra los valores predichos para ver si existe algun patrón en su recorrido. 
+En primer se hará un primer acercamiento con un gráfico de QQ-Plot, que muestra la similitud de los percentiles de la distribución normal teórica y la observada en nuestros errores, por último un gráfico de residudos contra los valores predichos para ver si existe algún patrón en su recorrido. 
 
 
 <<out.width = "0.65\\textwidth",fig.align = "center",fig.cap = "Normalidad: Residuos vs modelo y Normal QQ-Plot">>=
 
-# Gráfico de erorres y qq plot
+# Gráfico de errores y qq plot
 ModeloRedInter %>% 
   autoplot(
     which = c(1,2)
@@ -1294,7 +1294,7 @@ ModeloRedInter %>%
 
 <<out.width = "0.5\\textwidth",fig.align = "center",fig.cap = "Distribución normal y distribución errores (Suavizada distribución Kernel)">>=
 
-# Distribución teorica vs normal 
+# Distribución teórica vs normal 
 
 ModeloRedInter  %>% 
   rstudent() %>% 
@@ -1317,7 +1317,7 @@ ModeloRedInter  %>%
     size = 1.7
   ) + 
   labs(
-    title = "Valores téoricos y errores studentizados " ,
+    title = "Valores teóricos y errores studentizados " ,
     x="x",
     y = "Densidad"
   ) +
@@ -1339,17 +1339,17 @@ ModeloRedInter  %>%
 
 Con base en los gráficos se observa que la esperanza de los errores se mantiene cercana a cero, con excepción de algunas observaciones.
 También se debe mencionar que no es posible encontrar un patrón en la dispersión de los errores, en cambio en la gráfica QQ-plot muestra como los valores centrales de
-la distribución se asemeja a una distribución normal, a exepción de la observación 17, 20 y 21, lo mismo se puede apreciar en gráfica que compara la distribución de los errores
+la distribución se asemeja a una distribución normal, a excepción de la observación 17, 20 y 21, lo mismo se puede apreciar en gráfica que compara la distribución de los errores
 (que fue construida con la función \textit{geom density} de ggplot que calcula y dibuja la estimación de la densidad Kernel con valores por defecto) con una distribución normal,
 teniendo problemas en valores particulares y una gran concentración en valores poco antes de cero. 
 \\
 
-Para poder afirmar que se cumple el supuesto de normalidad de los errores se relizan, tres pruebas:
+Para poder afirmar que se cumple el supuesto de normalidad de los errores se realizan, tres pruebas:
 
 \begin{itemize}
   \item {\textbf{Test Kolmogrov-Smirnov Lillie:} Compara la distribución teórica $F^{*}$ y la distribución empírica de los errores $S(x)$ $T = sup_{x}|F^{*}(x) - S(X)|$}
-  \item {\textbf{Shapiro-Wilks:} Que plantea un estadísitco que es una función de las estadísticas de órden de la distribución de los errores y se compara con un valor de tabla}
-  \item {\textbf{Jarque Bera:} Se basa en los coeficientes de simetría y curtosis de la muestra, que para una nomral son 0 y 3 respectivamente y con estadístico $\chi^{2}_{2}$}
+  \item {\textbf{Shapiro-Wilks:} Que plantea un estadístico que es una función de las estadísticas de órden de la distribución de los errores y se compara con un valor de tabla}
+  \item {\textbf{Jarque Bera:} Se basa en los coeficientes de simetría y kurtosis de la muestra, que para una normal son 0 y 3 respectivamente y con estadístico $\chi^{2}_{2}$}
 \end{itemize}
 
 <<>>=
@@ -1512,7 +1512,7 @@ Trás la realización de los 3 tests, se confirma con gran nivel de seguridad qu
 \section{Modelo Final}
 \subsection{Expresión}
 
-Terminados ya todos los procesor referentes a la refinación del modelo completo original, se llega al denominado \textbf{Modelo Final}.El mismo incluye las siguientes variables:
+Terminados ya todos los procesos referentes a la refinación del modelo completo original, se llega al denominado \textbf{Modelo Final}.El mismo incluye las siguientes variables:
 \begin{itemize}
 \item{\textit{Gasto per cápita en policía en 1960} (\textbf{Po1}).} 
 \item{\textit{Desigualdad en el ingreso} (\textbf{Ineq})}  
@@ -1543,7 +1543,7 @@ ModeloRed %>%
       "Tasa de desempleo urbana hombres 35-39 años x 1000"
     ),
     "Estimación" = estimate,
-    "Error estandar" = std.error,
+    "Error estándar" = std.error,
     "$\\left(H_{0}^{\\alpha = 0.05}\\right)\\beta_{i} = 0$" = case_when(
       p.value < 0.05 ~ "Se rechaza H0",
       p.value >= 0.05 ~ "No se rechaza H0"
@@ -1552,7 +1552,7 @@ ModeloRed %>%
   ) %>% 
   kbl(
     booktabs = T, 
-    caption = "Estimación,error estandar y test individual tras aplicar el método Stepwise intervenido por observaciones influyentes",
+    caption = "Estimación,error estándar y test individual tras aplicar el método Stepwise intervenido por observaciones influyentes",
     escape = FALSE
   ) %>% 
   kable_styling(
@@ -1634,7 +1634,7 @@ relocate(
   )
 @
 
-De esta manera, puede verse que ante una variación en un peso en el gasto de la policia la \textit{Tasa de Criminalidad} se esperaría que la tasa de criminalidad aumente en 11.50, dejando
+De esta manera, puede verse que ante una variación en un peso en el gasto de la policía la \textit{Tasa de Criminalidad} se esperaría que la tasa de criminalidad aumente en 11.50, dejando
 las demás variables constantes. También es preciso afirmar que en estados donde existe una mayor desigualdad en el ingreso, se espera que la tasa de criminalidad sea mayor, lo mismo ocurre con el
 indice de escolaridad, la cantidad de hombres de 14 y 24 años y la tasa de desempleo de 35 y 39 años (cosa que se podía afirmar desde el análisis descriptivo se encuentra ahora cuantificada de manera más precisa). 
 \\
@@ -1643,10 +1643,10 @@ Las variables relacionadas con la cantidad de hombres o nivel de empleo en un tr
 la tasa de desempleo en hombres de 14 a 24 años, la cantidad de hombres de 14 a 24 años por cada 1000 habitantes (independientemente de su condición laboral) tiene una mayor fuerza explicativa.
 \\
 
-Realizando una interpertación objetiva, en el modelo influye más la cantidad de adolecentes y jovenes adultos, que la situación del mercado laboral a la hora de estimar la tasa de delincuencia.
+Realizando una interpretación objetiva, en el modelo influye más la cantidad de adolescentes y jóvenes adultos, que la situación del mercado laboral a la hora de estimar la tasa de delincuencia.
 \\
 
-Por último la estimación del regresor asociado a la \textit{Probabilidad de encarcelamiento} tiene una interpertación bastante fuerte, ya que si se comparan dos estados con
+Por último la estimación del regresor asociado a la \textit{Probabilidad de encarcelamiento} tiene una interpretación bastante fuerte, ya que si se comparan dos estados con
 la misma situación de Gasto,Desigualdad en el ingreso, Desempleo en Hombres de 35 a 39 años, cantidad de hombres de 14 y 24 años y con un mismo nivel educativo, la tasa de criminalidad
 sera sustancialmente menor ante una variación positiva de esta variable.
 \\
@@ -2350,7 +2350,7 @@ ModeloCompleto %>%
       names(DatosTab)[-length(DatosTab)]
     ),
     "Estimación" = estimate,
-    "Error estandar" = std.error,
+    "Error estándar" = std.error,
     "Estadístico F" = statistic,
     "P valor" = p.value,
     "$\\left(H_{0}^{\\alpha = 0.05}\\right)\\beta_{i} = 0$" = case_when(
