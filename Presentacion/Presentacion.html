@@ -4,6 +4,7 @@
     <title>Tasa de criminalidad en USA 1960</title>
     <meta charset="utf-8" />
     <meta name="author" content="Trabajo final Modelos Lineales" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
     <link href="libs/tile-view/tile-view.css" rel="stylesheet" />
     <script src="libs/tile-view/tile-view.js"></script>
     <link href="libs/panelset/panelset.css" rel="stylesheet" />
@@ -52,16 +53,16 @@ class: header_background
 El objetivo de este trabajo es poder construir un modelo de regresión lineal múltiple que explique las tasa de criminalidad en USA (a través del número de ofensas
 reportadas a la policía por habitante). 
 
-Contamos una tabla de datos, con una observación por cada estado y 16 variables (una de ellas la tasa de criminalidad). 
+Se cuenta con una tabla de datos, constituída por una observación por cada estado y 16 variables (una de ellas la tasa de criminalidad). 
 
 Se construye un modelo :
 
-- Asumiendo relación lineal entre las variables independientes y dependientes (Todo cambio en `\(X\)` en una misma unidad tiene el mismo impacto en `\(y\)`) 
+- Asumiendo relación lineal entre las variables independientes y dependientes.
 - Aditividad en los errores e independencia de las observaciones (Media independiente)
 - Distribución normal, varianza constante y esperanza cero. 
 .center[
 &lt;h3&gt;
-A lo largo de esta presentación se mostrara si esto es válido para nuestro ejemplo o bajo que condiciones lo hacen.
+A lo largo de esta presentación se mostrara si esto es válido para nuestro ejemplo o bajo que condiciones se logra.
 &lt;/h3&gt;
 ]
 ---
@@ -158,7 +159,7 @@ Dado el supuesto de normalidad de los errores, podemos definir al estadísitico 
    &lt;td style="text-align:right;"&gt; 70.781 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 209.064 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 8.429 &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Casi cero &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Aproximadamente cero &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 15 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 31 &lt;/td&gt;
   &lt;/tr&gt;
@@ -506,6 +507,51 @@ class: header_background
 class: header_background
 # Normalidad
 
+
+
+.panelset[
+.panel[.panel-name[Gráficos]
+
+
+
+]
+
+.panel[.panel-name[Test]
+
+&lt;table class=" lightable-material lightable-striped lightable-hover table" style='font-family: "Source Sans Pro", helvetica, sans-serif; margin-left: auto; margin-right: auto; font-size: 12px; margin-left: auto; margin-right: auto;'&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Test &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Pvalor &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Estadístico &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Resultado &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Lillie &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.148 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.116 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No rechazo normalidad &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Shapiro &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.088 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.955 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No rechazo normalidad &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Jarque Bera &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.119 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.264 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No rechazo normalidad &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+]
+
+]
 ---
 
 class: header_background
@@ -710,6 +756,7 @@ Relationships". In: _R News_ 2.3 (2002), pp. 7-10. URL:
 Pipe Syntax_. R package version 1.3.4. 2021. URL:
 [https://CRAN.R-project.org/package=kableExtra](https://CRAN.R-project.org/package=kableExtra).
 ]
+
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
