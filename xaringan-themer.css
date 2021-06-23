@@ -34,17 +34,17 @@
   --header-font-family-fallback: Georgia, serif;
   --code-font-family: 'IBM Plex Mono';
   --code-font-is-google: 1;
-  --base-font-size: 17px;
+  --base-font-size: 20px;
   --text-font-size: 1rem;
-  --code-font-size: 0.7rem;
-  --code-inline-font-size: 0.7em;
+  --code-font-size: 1.2rem;
+  --code-inline-font-size: 1.2em;
   --header-h1-font-size: 1.7rem;
   --header-h2-font-size: 1.50rem;
   --header-h3-font-size: 1.2rem;
 
   /* Colors */
   --text-color: #000000;
-  --header-color: #8C04C2;
+  --header-color: #512E5F;
   --background-color: #FFFFFF;
   --link-color: #280434FF;
   --text-bold-color: #280434FF;
@@ -53,11 +53,11 @@
   --inverse-background-color: #280434FF;
   --inverse-header-color: #FFFFFF;
   --inverse-link-color: #280434FF;
-  --title-slide-background-color: #8C04C2;
+  --title-slide-background-color: #512E5F;
   --title-slide-text-color: #FFFFFF;
-  --header-background-color: #8C04C2;
+  --header-background-color: #512E5F;
   --header-background-text-color: #FFFFFF;
-  --primary: #8C04C2;
+  --primary: #512E5F;
   --secondary: #280434FF;
   --white: #FFFFFF;
   --black: #000000;
@@ -104,7 +104,7 @@ h1, h2, h3 {
   color: #280434FF;
 }
 .remark-slide-number {
-  color: #8C04C2;
+  color: #512E5F;
   opacity: 1;
   font-size: 0.9em;
 }
@@ -149,10 +149,10 @@ a, a > code {
   float: left;
 }
 .left-column h2, .left-column h3 {
-  color: #8C04C299;
+  color: #512E5F99;
 }
 .left-column h2:last-of-type, .left-column h3:last-child {
-  color: #8C04C2;
+  color: #512E5F;
 }
 .right-column {
   width: 75%;
