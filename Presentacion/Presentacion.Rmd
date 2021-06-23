@@ -79,6 +79,7 @@ xaringanExtra::use_xaringan_extra(
   )
 )
 
+
 options(htmltools.dir.version = FALSE)
 
 knitr::opts_chunk$set(
