@@ -179,16 +179,16 @@ class: header_background
 El objetivo de este trabajo es poder construir un modelo de regresión lineal múltiple que explique las tasa de criminalidad en USA (a través del número de ofensas
 reportadas a la policía por habitante). 
 
-Contamos una tabla de datos, con una observación por cada estado y 16 variables (una de ellas la tasa de criminalidad). 
+Se cuenta con una tabla de datos, constituída por una observación por cada estado y 16 variables (una de ellas la tasa de criminalidad). 
 
 Se construye un modelo :
 
-- Asumiendo relación lineal entre las variables independientes y dependientes (Todo cambio en $X$ en una misma unidad tiene el mismo impacto en $y$) 
+- Asumiendo relación lineal entre las variables independientes y dependientes.
 - Aditividad en los errores e independencia de las observaciones (Media independiente)
 - Distribución normal, varianza constante y esperanza cero. 
 .center[
 <h3>
-A lo largo de esta presentación se mostrara si esto es válido para nuestro ejemplo o bajo que condiciones lo hacen.
+A lo largo de esta presentación se mostrara si esto es válido para nuestro ejemplo o bajo que condiciones se logra.
 </h3>
 ]
 ---
@@ -501,7 +501,7 @@ lm(
     "RSE" = sigma,
     "F Observado" = statistic,
     "P-valor" = case_when(
-      p.value < 0.04 ~ "Casi cero"
+      p.value < 0.04 ~ "Aproximadamente cero"
     ),
     "Regresión.gl" = df,
     "Residuos.gl" = df.residual,
