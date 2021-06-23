@@ -430,6 +430,7 @@ qplot(x=Var1,
 )+scale_fill_gradient2(limits = c(-1, 1),
                        low = "#A50303", high = "#250455")+
   theme(
+        aspect.ratio = 1,
         plot.title = element_text(
           face = "bold",
           color = "#280434FF"),
