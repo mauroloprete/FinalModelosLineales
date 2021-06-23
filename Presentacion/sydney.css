@@ -63,3 +63,9 @@
 .pull-right ~ p {
   clear: both;
 }
+
+<style>
+.table-hover > tbody > tr:hover { 
+  background-color: #f4f442;
+}
+</style>

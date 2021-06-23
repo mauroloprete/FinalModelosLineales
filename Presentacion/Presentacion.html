@@ -21,6 +21,7 @@ class: center, middle, inverse, title-slide
 # Tasa de criminalidad en USA 1960
 ## Ignacio Acosta, Mauro Loprete y Sofia Itté
 ### Trabajo final Modelos Lineales
+### <img src="https://img.icons8.com/ios/50/000000/scales--v1.png"/>
 
 ---
 
@@ -29,17 +30,42 @@ class: center, middle, inverse, title-slide
 class: header_background
 
 # Índice 
-
-
+&lt;h3&gt;
+  &lt;ol&gt;
+    &lt;li&gt; Objetivo &lt;/li&gt;
+    &lt;li&gt; Resumen descriptivo &lt;/li&gt;
+    &lt;li&gt; Modelo completo &lt;/li&gt;
+    &lt;li&gt; Análisis de multicolinealidad &lt;/li&gt; 
+    &lt;li&gt; Selección de modelos  &lt;/li&gt; 
+    &lt;li&gt; Busqueda de observaciones atípicas y/o influyentes &lt;/li&gt; 
+    &lt;li&gt; Revisión al supuesto de normalidad &lt;/li&gt;
+    &lt;li&gt; Chequeo de homocedasticidad &lt;/li&gt;
+    &lt;li&gt; Conclusiones &lt;/li&gt;
+    &lt;li&gt; Pasos a futuro &lt;/li&gt;
+    &lt;li&gt; Referencias &lt;/li&gt;
+  &lt;/ol&gt;
+&lt;/h3&gt;
 ---
 
 class: header_background
 # Objetivo
 
+El objetivo de este trabajo es poder construir un modelo de regresión lineal múltiple que explique las tasa de criminalidad en USA (a través del número de ofensas
+reportadas a la policía por habitante). 
 
+Contamos una tabla de datos, con una observación por cada estado y 16 variables (una de ellas la tasa de criminalidad). 
 
+Se construye un modelo :
+
+- Asumiendo relación lineal entre las variables independientes y dependientes (Todo cambio en `\(X\)` en una misma unidad tiene el mismo impacto en `\(y\)`) 
+- Aditividad en los errores e independencia de las observaciones (Media independiente)
+- Distribución normal, varianza constante y esperanza cero. 
+.center[
+&lt;h3&gt;
+A lo largo de esta presentación se mostrara si esto es válido para nuestro ejemplo o bajo que condiciones lo hacen.
+&lt;/h3&gt;
+]
 ---
-
 
 class: header_background
 # Análisis descriptivo 
@@ -48,6 +74,8 @@ class: header_background
 .panel[.panel-name[Tasa de criminalidad]
 .center[
 &lt;img src="Presentacion_files/figure-html/unnamed-chunk-1-1.png" width="450px" /&gt;
+
+Esta claro que `\(y\)` presenta una distribución mediantamente asimétrica donde se tiene un intervalo modal de 500 y 800 ofensas (por habitante). 
 ]
 ]
 
@@ -115,7 +143,7 @@ Dado el supuesto de normalidad de los errores, podemos definir al estadísitico 
 `$$F_{obs} = \frac{SCE/Regresion.gl}{RSE^2}  = \frac{SCE/Regresion.gl}{SCR/Residuos.gl} = \frac{\sum{\left(\hat{y}_{i}-\bar{y}\right)^{2}}/Regresion.gl}{\sum{\left(y_{i}-\hat{y}_{i}\right)^{2}}/Residuos.gl}$$`
 
 
-&lt;table class="table table-striped table-hover table-condensed table-responsive" style="font-size: 15px; margin-left: auto; margin-right: auto;"&gt;
+&lt;table class=" lightable-material lightable-striped lightable-hover table" style='font-family: "Source Sans Pro", helvetica, sans-serif; margin-left: auto; margin-right: auto; font-size: 12px; margin-left: auto; margin-right: auto;'&gt;
  &lt;thead&gt;
   &lt;tr&gt;
    &lt;th style="text-align:right;"&gt; `\(R^{2}\)` ajustado &lt;/th&gt;
@@ -154,16 +182,16 @@ Como se puede ver tenemos un modelo significativo para cualquier valor de `\(\al
  &lt;/thead&gt;
 &lt;tbody&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:left;font-weight: bold;color: white !important;background-color: #33D4FF !important;"&gt; Intercepto &lt;/td&gt;
-   &lt;td style="text-align:right;font-weight: bold;color: white !important;background-color: #33D4FF !important;"&gt; -5984.288 &lt;/td&gt;
-   &lt;td style="text-align:right;font-weight: bold;color: white !important;background-color: #33D4FF !important;"&gt; 0.001 &lt;/td&gt;
-   &lt;td style="text-align:left;font-weight: bold;color: white !important;background-color: #33D4FF !important;"&gt; Se rechaza H0 &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: black !important;background-color: #EBDEF0 !important;"&gt; Intercepto &lt;/td&gt;
+   &lt;td style="text-align:right;font-weight: bold;color: black !important;background-color: #EBDEF0 !important;"&gt; -5984.288 &lt;/td&gt;
+   &lt;td style="text-align:right;font-weight: bold;color: black !important;background-color: #EBDEF0 !important;"&gt; 0.001 &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: black !important;background-color: #EBDEF0 !important;"&gt; Se rechaza H0 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:left;font-weight: bold;color: white !important;background-color: #33D4FF !important;"&gt; Número de Hombres 14-24 / 1.000 &lt;/td&gt;
-   &lt;td style="text-align:right;font-weight: bold;color: white !important;background-color: #33D4FF !important;"&gt; 8.783 &lt;/td&gt;
-   &lt;td style="text-align:right;font-weight: bold;color: white !important;background-color: #33D4FF !important;"&gt; 0.043 &lt;/td&gt;
-   &lt;td style="text-align:left;font-weight: bold;color: white !important;background-color: #33D4FF !important;"&gt; Se rechaza H0 &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: black !important;background-color: #EBDEF0 !important;"&gt; Número de Hombres 14-24 / 1.000 &lt;/td&gt;
+   &lt;td style="text-align:right;font-weight: bold;color: black !important;background-color: #EBDEF0 !important;"&gt; 8.783 &lt;/td&gt;
+   &lt;td style="text-align:right;font-weight: bold;color: black !important;background-color: #EBDEF0 !important;"&gt; 0.043 &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: black !important;background-color: #EBDEF0 !important;"&gt; Se rechaza H0 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; Indicadora Estado Sur &lt;/td&gt;
@@ -172,10 +200,10 @@ Como se puede ver tenemos un modelo significativo para cualquier valor de `\(\al
    &lt;td style="text-align:left;"&gt; No se rechaza H0 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:left;font-weight: bold;color: white !important;background-color: #33D4FF !important;"&gt; Indice Escolaridad &lt;/td&gt;
-   &lt;td style="text-align:right;font-weight: bold;color: white !important;background-color: #33D4FF !important;"&gt; 18.832 &lt;/td&gt;
-   &lt;td style="text-align:right;font-weight: bold;color: white !important;background-color: #33D4FF !important;"&gt; 0.005 &lt;/td&gt;
-   &lt;td style="text-align:left;font-weight: bold;color: white !important;background-color: #33D4FF !important;"&gt; Se rechaza H0 &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: black !important;background-color: #EBDEF0 !important;"&gt; Indice Escolaridad &lt;/td&gt;
+   &lt;td style="text-align:right;font-weight: bold;color: black !important;background-color: #EBDEF0 !important;"&gt; 18.832 &lt;/td&gt;
+   &lt;td style="text-align:right;font-weight: bold;color: black !important;background-color: #EBDEF0 !important;"&gt; 0.005 &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: black !important;background-color: #EBDEF0 !important;"&gt; Se rechaza H0 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; Gasto per cápita 1.960 &lt;/td&gt;
@@ -232,16 +260,16 @@ Como se puede ver tenemos un modelo significativo para cualquier valor de `\(\al
    &lt;td style="text-align:left;"&gt; No se rechaza H0 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:left;font-weight: bold;color: white !important;background-color: #33D4FF !important;"&gt; Desigualdad ingreso &lt;/td&gt;
-   &lt;td style="text-align:right;font-weight: bold;color: white !important;background-color: #33D4FF !important;"&gt; 7.067 &lt;/td&gt;
-   &lt;td style="text-align:right;font-weight: bold;color: white !important;background-color: #33D4FF !important;"&gt; 0.004 &lt;/td&gt;
-   &lt;td style="text-align:left;font-weight: bold;color: white !important;background-color: #33D4FF !important;"&gt; Se rechaza H0 &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: black !important;background-color: #EBDEF0 !important;"&gt; Desigualdad ingreso &lt;/td&gt;
+   &lt;td style="text-align:right;font-weight: bold;color: black !important;background-color: #EBDEF0 !important;"&gt; 7.067 &lt;/td&gt;
+   &lt;td style="text-align:right;font-weight: bold;color: black !important;background-color: #EBDEF0 !important;"&gt; 0.004 &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: black !important;background-color: #EBDEF0 !important;"&gt; Se rechaza H0 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:left;font-weight: bold;color: white !important;background-color: #33D4FF !important;"&gt; Probabilidad Encarcelamiento &lt;/td&gt;
-   &lt;td style="text-align:right;font-weight: bold;color: white !important;background-color: #33D4FF !important;"&gt; -48.553 &lt;/td&gt;
-   &lt;td style="text-align:right;font-weight: bold;color: white !important;background-color: #33D4FF !important;"&gt; 0.041 &lt;/td&gt;
-   &lt;td style="text-align:left;font-weight: bold;color: white !important;background-color: #33D4FF !important;"&gt; Se rechaza H0 &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: black !important;background-color: #EBDEF0 !important;"&gt; Probabilidad Encarcelamiento &lt;/td&gt;
+   &lt;td style="text-align:right;font-weight: bold;color: black !important;background-color: #EBDEF0 !important;"&gt; -48.553 &lt;/td&gt;
+   &lt;td style="text-align:right;font-weight: bold;color: black !important;background-color: #EBDEF0 !important;"&gt; 0.041 &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: black !important;background-color: #EBDEF0 !important;"&gt; Se rechaza H0 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; Tiempo de estadía en cárceles &lt;/td&gt;
@@ -296,14 +324,14 @@ El **VIF** nos indica en cuantas unidades se incrementa la varianza del estimado
    &lt;td style="text-align:left;"&gt; No hay problema de colinealidad &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:left;font-weight: bold;color: black !important;background-color: #CEFF33 !important;"&gt; Gasto per cápita 1.960 &lt;/td&gt;
-   &lt;td style="text-align:right;font-weight: bold;color: black !important;background-color: #CEFF33 !important;"&gt; 104.659 &lt;/td&gt;
-   &lt;td style="text-align:left;font-weight: bold;color: black !important;background-color: #CEFF33 !important;"&gt; Problema de colinealidad &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: black !important;background-color: #EBDEF0 !important;"&gt; Gasto per cápita 1.960 &lt;/td&gt;
+   &lt;td style="text-align:right;font-weight: bold;color: black !important;background-color: #EBDEF0 !important;"&gt; 104.659 &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: black !important;background-color: #EBDEF0 !important;"&gt; Problema de colinealidad &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:left;font-weight: bold;color: black !important;background-color: #CEFF33 !important;"&gt; Gasto per cápita 1.959 &lt;/td&gt;
-   &lt;td style="text-align:right;font-weight: bold;color: black !important;background-color: #CEFF33 !important;"&gt; 113.559 &lt;/td&gt;
-   &lt;td style="text-align:left;font-weight: bold;color: black !important;background-color: #CEFF33 !important;"&gt; Problema de colinealidad &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: black !important;background-color: #EBDEF0 !important;"&gt; Gasto per cápita 1.959 &lt;/td&gt;
+   &lt;td style="text-align:right;font-weight: bold;color: black !important;background-color: #EBDEF0 !important;"&gt; 113.559 &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: black !important;background-color: #EBDEF0 !important;"&gt; Problema de colinealidad &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; Tasa participación masculina 14-24 por 1.000 &lt;/td&gt;
@@ -336,9 +364,9 @@ El **VIF** nos indica en cuantas unidades se incrementa la varianza del estimado
    &lt;td style="text-align:left;"&gt; No hay problema de colinealidad &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:left;font-weight: bold;color: black !important;background-color: #CEFF33 !important;"&gt; Producto bruto interno per cápita &lt;/td&gt;
-   &lt;td style="text-align:right;font-weight: bold;color: black !important;background-color: #CEFF33 !important;"&gt; 10.530 &lt;/td&gt;
-   &lt;td style="text-align:left;font-weight: bold;color: black !important;background-color: #CEFF33 !important;"&gt; Problema de colinealidad &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: black !important;background-color: #EBDEF0 !important;"&gt; Producto bruto interno per cápita &lt;/td&gt;
+   &lt;td style="text-align:right;font-weight: bold;color: black !important;background-color: #EBDEF0 !important;"&gt; 10.530 &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: black !important;background-color: #EBDEF0 !important;"&gt; Problema de colinealidad &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; Desigualdad ingreso &lt;/td&gt;
@@ -368,6 +396,7 @@ class: header_background
 
 
 
+.scroll-box-14[
 &lt;table class=" lightable-material lightable-striped lightable-hover table" style='font-family: "Source Sans Pro", helvetica, sans-serif; margin-left: auto; margin-right: auto; font-size: 12px; margin-left: auto; margin-right: auto;'&gt;
  &lt;thead&gt;
   &lt;tr&gt;
@@ -438,26 +467,39 @@ class: header_background
   &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
+]
+
+.center[
+
+&lt;h3&gt;
+&lt;font color = #00000&gt;
+Obtenemos un modelo con 6 variables explicativas. Desde un plano explicativo podemos hacer mucho enfasís en los movimientos marginales (algo raro es el signo del 
+nivel educativo) pero se pueden afirmar relaciones sumamente interesantes. 
+
+Antes de dar por terminado, estudiaremos observaciones atípicas y el cumplimiento de los supuestos.
+&lt;/font&gt;
+&lt;/h3&gt;
+]
 
 ---
 class: header_background
 
 # Análisis en las observaciones
 .panelset[
-.panel[.panel-name[Definiciones]
-
-]
-.panel[.panel-name[Observaciones influyentes]
+.panel[.panel-name[Influyentes]
 .center[
 &lt;img src="Presentacion_files/figure-html/unnamed-chunk-11-1.png" width="450px" /&gt;
 ]
 ]
 
-.panel[.panel-name[Observaciones atípicas]
+.panel[.panel-name[Atípicas]
 .center[
 
 &lt;img src="Presentacion_files/figure-html/unnamed-chunk-12-1.png" width="450px" /&gt;
 ]
+]
+.panel[.panel-name[Decisión]
+
 ]
 ]
 ---
@@ -669,7 +711,6 @@ Relationships". In: _R News_ 2.3 (2002), pp. 7-10. URL:
 Pipe Syntax_. R package version 1.3.4. 2021. URL:
 [https://CRAN.R-project.org/package=kableExtra](https://CRAN.R-project.org/package=kableExtra).
 ]
-
 
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
