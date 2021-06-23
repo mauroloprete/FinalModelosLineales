@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Tasa de criminalidad en USA 1960</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Trabajo final Modelos Lineales" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/tile-view/tile-view.css" rel="stylesheet" />
+    <script src="libs/tile-view/tile-view.js"></script>
+    <link href="libs/panelset/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset/panelset.js"></script>
+    <script src="libs/kePrint/kePrint.js"></script>
+    <link href="libs/lightable/lightable.css" rel="stylesheet" />
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+    <link rel="stylesheet" href="sydney.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Tasa de criminalidad en USA 1960
+## Ignacio Acosta, Mauro Loprete y Sofia Itté
+### Trabajo final Modelos Lineales
+
+---
+
+
+
+class: header_background
+
+# Índice 
+
+
+---
+
+class: header_background
+# Objetivo
+
+
+
+---
+
+
+class: header_background
+# Análisis descriptivo 
+
+.panelset[
+.panel[.panel-name[Tasa de criminalidad]
+.center[
+&lt;img src="Presentacion_files/figure-html/unnamed-chunk-1-1.png" width="450px" /&gt;
+]
+]
+
+.panel[.panel-name[Histogramas 1]
+
+.center[
+&lt;img src="Presentacion_files/figure-html/unnamed-chunk-2-1.png" width="450px" /&gt;
+]
+
+]
+
+.panel[.panel-name[Histogramas 2]
+.center[
+&lt;img src="Presentacion_files/figure-html/unnamed-chunk-3-1.png" width="450px" /&gt;
+]
+]
+
+.panel[.panel-name[Histogramas 3]
+
+.center[
+&lt;img src="Presentacion_files/figure-html/unnamed-chunk-4-1.png" width="450px" /&gt;
+]
+.pull-right[
+Hola 
+]
+
+]
+
+.panel[.panel-name[Mapa de correlación]
+.center[
+&lt;img src="Presentacion_files/figure-html/unnamed-chunk-5-1.png" width="450px" /&gt;
+]
+]
+]
+
+---
+
+class: header_background
+
+# Modelo Completo
+
+.panelset[
+.panel[.panel-name[Especificación]
+
+&lt;h2&gt;
+Como primera aproximación, se construye un modelo donde se incluyen todas las variables de la tabla de datos, en concreto el siguiente modelo de regresión lineal múltiple:
+&lt;/h2&gt; 
+
+`$$\hat{y} = \hat{\beta}_{0} + \hat{\beta}_{1}Time + \cdots + \hat{\beta}_{15}M$$`
+
+.center[
+&lt;h2&gt;
+&lt;font color=#000000&gt; 
+El modelo fue estimado médiante MCO, asumiendo el cumplimiento de los supuestos anteriormente mencionados, a continuación se mostraran test de significación y el coeficiente de
+determinación para evaluar esta primera aproximación desde un punto de vista crítico.
+&lt;/font&gt;
+&lt;/h2&gt;
+]
+]
+
+.panel[.panel-name[Prueba de significación]
+
+Dado el supuesto de normalidad de los errores, podemos definir al estadísitico `\(F\)` como : 
+
+`$$F_{obs} = \frac{SCE/Regresion.gl}{RSE^2}  = \frac{SCE/Regresion.gl}{SCR/Residuos.gl} = \frac{\sum{\left(\hat{y}_{i}-\bar{y}\right)^{2}}/Regresion.gl}{\sum{\left(y_{i}-\hat{y}_{i}\right)^{2}}/Residuos.gl}$$`
+
+
+&lt;table class="table table-striped table-hover table-condensed table-responsive" style="font-size: 15px; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:right;"&gt; `\(R^{2}\)` ajustado &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; RSE &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; F Observado &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; P-valor &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Regresión.gl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Residuos.gl &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 70.781 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 209.064 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.429 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Casi cero &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 15 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 31 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+Como se puede ver tenemos un modelo significativo para cualquier valor de `\(\alpha\)`, ahora veamos el nivel de significación de cada variable.
+.panel[.panel-name[Significación de variables]
+
+.scroll-box-16[
+
+&lt;table class=" lightable-material lightable-striped lightable-hover table" style='font-family: "Source Sans Pro", helvetica, sans-serif; margin-left: auto; margin-right: auto; font-size: 12px; margin-left: auto; margin-right: auto;'&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Variable &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Estimación &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; P valor &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; `\(\left(H_{0}^{\alpha = 0.05}\right)\beta_{i} = 0\)` &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: white !important;background-color: #33D4FF !important;"&gt; Intercepto &lt;/td&gt;
+   &lt;td style="text-align:right;font-weight: bold;color: white !important;background-color: #33D4FF !important;"&gt; -5984.288 &lt;/td&gt;
+   &lt;td style="text-align:right;font-weight: bold;color: white !important;background-color: #33D4FF !important;"&gt; 0.001 &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: white !important;background-color: #33D4FF !important;"&gt; Se rechaza H0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: white !important;background-color: #33D4FF !important;"&gt; Número de Hombres 14-24 / 1.000 &lt;/td&gt;
+   &lt;td style="text-align:right;font-weight: bold;color: white !important;background-color: #33D4FF !important;"&gt; 8.783 &lt;/td&gt;
+   &lt;td style="text-align:right;font-weight: bold;color: white !important;background-color: #33D4FF !important;"&gt; 0.043 &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: white !important;background-color: #33D4FF !important;"&gt; Se rechaza H0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Indicadora Estado Sur &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -3.803 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.980 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No se rechaza H0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: white !important;background-color: #33D4FF !important;"&gt; Indice Escolaridad &lt;/td&gt;
+   &lt;td style="text-align:right;font-weight: bold;color: white !important;background-color: #33D4FF !important;"&gt; 18.832 &lt;/td&gt;
+   &lt;td style="text-align:right;font-weight: bold;color: white !important;background-color: #33D4FF !important;"&gt; 0.005 &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: white !important;background-color: #33D4FF !important;"&gt; Se rechaza H0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Gasto per cápita 1.960 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 19.280 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.079 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No se rechaza H0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Gasto per cápita 1.959 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -10.942 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.359 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No se rechaza H0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Tasa participación masculina 14-24 por 1.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.664 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.655 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No se rechaza H0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Hombres cada 1.000 mujeres &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.741 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.399 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No se rechaza H0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Población cada 100.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.733 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.574 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No se rechaza H0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Número de no caucásicos cada 1.000 habitantes &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.420 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.521 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No se rechaza H0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Tasa desempleo urbana Hombres 14-24 por 1.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -5.827 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.176 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No se rechaza H0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Tasa desempleo urbana Hombres 35-39 por 1.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 16.780 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.050 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No se rechaza H0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Producto bruto interno per cápita &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.962 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.361 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No se rechaza H0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: white !important;background-color: #33D4FF !important;"&gt; Desigualdad ingreso &lt;/td&gt;
+   &lt;td style="text-align:right;font-weight: bold;color: white !important;background-color: #33D4FF !important;"&gt; 7.067 &lt;/td&gt;
+   &lt;td style="text-align:right;font-weight: bold;color: white !important;background-color: #33D4FF !important;"&gt; 0.004 &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: white !important;background-color: #33D4FF !important;"&gt; Se rechaza H0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: white !important;background-color: #33D4FF !important;"&gt; Probabilidad Encarcelamiento &lt;/td&gt;
+   &lt;td style="text-align:right;font-weight: bold;color: white !important;background-color: #33D4FF !important;"&gt; -48.553 &lt;/td&gt;
+   &lt;td style="text-align:right;font-weight: bold;color: white !important;background-color: #33D4FF !important;"&gt; 0.041 &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: white !important;background-color: #33D4FF !important;"&gt; Se rechaza H0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Tiempo de estadía en cárceles &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -3.479 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.631 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No se rechaza H0 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+
+Tan solo 4 son las variables que de manera independiente logran un aporte significativo al momento de explicar el comportamiento de la tasa de criminalidad,
+**hay problemas de especificación**.
+]
+]
+]
+---
+class: header_background
+
+# Análisis de multicolinealidad
+
+Como se vió previamente, el modelo presentado hasta el momento es globalmente significativo, sin embargo tan solo 4 de las variables 
+consideradas son significativas de manera independiente (presente todas las demás), es por esto que se cuantificará la intensidad de la multicolinealidad con 
+el **Factor de inflación de varianza**.
+
+El **VIF** nos indica en cuantas unidades se incrementa la varianza del estimador ante presencia de colinealidad y se define como : 
+
+.scroll-box-14[
+
+&lt;table class=" lightable-material lightable-striped lightable-hover table" style='font-family: "Source Sans Pro", helvetica, sans-serif; margin-left: auto; margin-right: auto; font-size: 12px; margin-left: auto; margin-right: auto;'&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Variable &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; VIF &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Prueba &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Número de Hombres 14-24 / 1.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2.892 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No hay problema de colinealidad &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Indicadora Estado Sur &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.343 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No hay problema de colinealidad &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Indice Escolaridad &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.077 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No hay problema de colinealidad &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: black !important;background-color: #CEFF33 !important;"&gt; Gasto per cápita 1.960 &lt;/td&gt;
+   &lt;td style="text-align:right;font-weight: bold;color: black !important;background-color: #CEFF33 !important;"&gt; 104.659 &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: black !important;background-color: #CEFF33 !important;"&gt; Problema de colinealidad &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: black !important;background-color: #CEFF33 !important;"&gt; Gasto per cápita 1.959 &lt;/td&gt;
+   &lt;td style="text-align:right;font-weight: bold;color: black !important;background-color: #CEFF33 !important;"&gt; 113.559 &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: black !important;background-color: #CEFF33 !important;"&gt; Problema de colinealidad &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Tasa participación masculina 14-24 por 1.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.713 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No hay problema de colinealidad &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Hombres cada 1.000 mujeres &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.786 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No hay problema de colinealidad &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Población cada 100.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2.537 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No hay problema de colinealidad &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Número de no caucásicos cada 1.000 habitantes &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.674 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No hay problema de colinealidad &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Tasa desempleo urbana Hombres 14-24 por 1.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.064 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No hay problema de colinealidad &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Tasa desempleo urbana Hombres 35-39 por 1.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.089 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No hay problema de colinealidad &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: black !important;background-color: #CEFF33 !important;"&gt; Producto bruto interno per cápita &lt;/td&gt;
+   &lt;td style="text-align:right;font-weight: bold;color: black !important;background-color: #CEFF33 !important;"&gt; 10.530 &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: black !important;background-color: #CEFF33 !important;"&gt; Problema de colinealidad &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Desigualdad ingreso &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.645 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No hay problema de colinealidad &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Probabilidad Encarcelamiento &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2.809 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No hay problema de colinealidad &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Tiempo de estadía en cárceles &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2.714 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No hay problema de colinealidad &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+
+En base a esto, vamos a realizar un proceso de selección por el método de **Stepwise** basado en el F-Test
+
+---
+class: header_background
+
+# Stepwise
+
+
+
+&lt;table class=" lightable-material lightable-striped lightable-hover table" style='font-family: "Source Sans Pro", helvetica, sans-serif; margin-left: auto; margin-right: auto; font-size: 12px; margin-left: auto; margin-right: auto;'&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Variable &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Estimación &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Error estándar &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Estadístico F &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; P valor &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; `\(\left(H_{0}^{\alpha = 0.05}\right)\beta_{i} = 0\)` &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Intercepto &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -5040.505 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 899.843 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -5.602 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.000 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Se rechaza H0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Gasto per capita en policía 1960 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11.502 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.375 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.363 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.000 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Se rechaza H0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Desigualdad del ingreso &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.765 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.394 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.855 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.000 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Se rechaza H0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Indice que refleja la escolaridad del estado &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 19.647 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.475 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.390 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.000 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Se rechaza H0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Número de hombres entre 14 y 24 / 1000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10.502 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.330 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.154 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.003 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Se rechaza H0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Probabilidad de encarcelamiento &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -38.018 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 15.281 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -2.488 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.017 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Se rechaza H0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Tasa de desempleo urbana hombres 35-39 años x 1000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.937 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.091 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2.185 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.035 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Se rechaza H0 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+class: header_background
+
+# Análisis en las observaciones
+.panelset[
+.panel[.panel-name[Definiciones]
+
+]
+.panel[.panel-name[Observaciones influyentes]
+.center[
+&lt;img src="Presentacion_files/figure-html/unnamed-chunk-11-1.png" width="450px" /&gt;
+]
+]
+
+.panel[.panel-name[Observaciones atípicas]
+.center[
+
+&lt;img src="Presentacion_files/figure-html/unnamed-chunk-12-1.png" width="450px" /&gt;
+]
+]
+]
+---
+
+class: header_background
+# Normalidad
+
+---
+
+class: header_background
+
+# Homocedasticidad
+
+---
+
+class: header_background
+
+# Modelo final
+
+---
+class: header_background
+
+# Conclusiones
+
+La construcción del modelo se basó en tres pilares fundamentales  : 
+
+- **Fidelidad en la representación**
+
+- **Balance**
+
+- **Control**
+
+Un detalle final es que la eliminación de las 3 observaciones ponen en jaque a los spuestos planteados, este modelo no se va a adecuar a estos 3 Estados,
+una posible solución a futuros trabajos sería aplicar *Boostrap residuals* en el modelo sin intervenir y aproximar la variabilidad de los estimadores.
+
+---
+
+class: header_background
+
+# Referencias
+.scroll-box-26[
+[Âll20] K. MÃ¼ller. _here: A Simpler Way to Find Your Files_. R package
+version 1.0.1. 2020. URL:
+[https://CRAN.R-project.org/package=here](https://CRAN.R-project.org/package=here).
+
+[Bra+21] A. Bray, C. Ismay, et al. _infer: Tidy Statistical Inference_.
+R package version 0.5.4. 2021. URL:
+[https://CRAN.R-project.org/package=infer](https://CRAN.R-project.org/package=infer).
+
+[BW20] S. M. Bache and H. Wickham. _magrittr: A Forward-Pipe Operator
+for R_. R package version 2.0.1. 2020. URL:
+[https://CRAN.R-project.org/package=magrittr](https://CRAN.R-project.org/package=magrittr).
+
+[Cor21] R Core Team. _R: A Language and Environment for Statistical
+Computing_. R Foundation for Statistical Computing. Vienna, Austria,
+2021. URL: [https://www.R-project.org/](https://www.R-project.org/).
+
+[Far05] J. J. Faraway. _Linear models with R_. 2005.
+
+[Far20] T. J. Farrar. _skedastic: Heteroskedasticity Diagnostics for
+Linear Regression Models_. R Package Version 1.0.0. Bellville, South
+Africa, 2020. URL:
+[https://github.com/tjfarrar/skedastic](https://github.com/tjfarrar/skedastic).
+
+[Far21] T. Farrar. _skedastic: Heteroskedasticity Diagnostics for
+Linear Regression Models_. R package version 1.0.3. 2021. URL:
+[https://github.com/tjfarrar/skedastic](https://github.com/tjfarrar/skedastic).
+
+[FW19] J. Fox and S. Weisberg. _An R Companion to Applied Regression_.
+Third. Thousand Oaks CA: Sage, 2019. URL:
+[https://socialsciences.mcmaster.ca/jfox/Books/Companion/](https://socialsciences.mcmaster.ca/jfox/Books/Companion/).
+
+[FWP20] J. Fox, S. Weisberg, et al. _car: Companion to Applied
+Regression_. R package version 3.0-10. 2020. URL:
+[https://CRAN.R-project.org/package=car](https://CRAN.R-project.org/package=car).
+
+[FWP20] J. Fox, S. Weisberg, et al. _carData: Companion to Applied
+Regression Data Sets_. R package version 3.0-4. 2020. URL:
+[https://CRAN.R-project.org/package=carData](https://CRAN.R-project.org/package=carData).
+
+[GL15] J. Gross and U. Ligges. _nortest: Tests for Normality_. R
+package version 1.0-4. 2015. URL:
+[https://CRAN.R-project.org/package=nortest](https://CRAN.R-project.org/package=nortest).
+
+[Gle69] H. Glejser. _A new test for heteroskedasticity_. s.n., 1969.
+
+[Hot+20] T. Hothorn, A. Zeileis, et al. _lmtest: Testing Linear
+Regression Models_. R package version 0.9-38. 2020. URL:
+[https://CRAN.R-project.org/package=lmtest](https://CRAN.R-project.org/package=lmtest).
+
+[HT18] M. Horikoshi and Y. Tang. _ggfortify: Data Visualization Tools
+for Statistical Analysis Results_. 2018. URL:
+[https://CRAN.R-project.org/package=ggfortify](https://CRAN.R-project.org/package=ggfortify).
+
+[HT20] M. Horikoshi and Y. Tang. _ggfortify: Data Visualization Tools
+for Statistical Analysis Results_. R package version 0.4.11. 2020. URL:
+[https://github.com/sinhrks/ggfortify](https://github.com/sinhrks/ggfortify).
+
+[HW20] L. Henry and H. Wickham. _purrr: Functional Programming Tools_.
+R package version 0.3.4. 2020. URL:
+[https://CRAN.R-project.org/package=purrr](https://CRAN.R-project.org/package=purrr).
+
+[Kuh20] M. Kuhn. _dials: Tools for Creating Tuning Parameter Values_. R
+package version 0.0.9. 2020. URL:
+[https://CRAN.R-project.org/package=dials](https://CRAN.R-project.org/package=dials).
+
+[Kuh20] M. Kuhn. _modeldata: Data Sets Used Useful for Modeling
+Packages_. R package version 0.1.0. 2020. URL:
+[https://CRAN.R-project.org/package=modeldata](https://CRAN.R-project.org/package=modeldata).
+
+[Kuh21] M. Kuhn. _tune: Tidy Tuning Tools_. R package version 0.1.5.
+2021. URL:
+[https://CRAN.R-project.org/package=tune](https://CRAN.R-project.org/package=tune).
+
+[KV21] M. Kuhn and D. Vaughan. _parsnip: A Common API to Modeling and
+Analysis Functions_. R package version 0.1.6. 2021. URL:
+[https://CRAN.R-project.org/package=parsnip](https://CRAN.R-project.org/package=parsnip).
+
+[KW20] M. Kuhn and H. Wickham. _Tidymodels: a collection of packages
+for modeling and machine learning using tidyverse principles._ 2020.
+URL: [https://www.tidymodels.org](https://www.tidymodels.org).
+
+[KW21] M. Kuhn and H. Wickham. _tidymodels: Easily Install and Load the
+Tidymodels Packages_. R package version 0.1.3. 2021. URL:
+[https://CRAN.R-project.org/package=tidymodels](https://CRAN.R-project.org/package=tidymodels).
+
+[RHC21] D. Robinson, A. Hayes, et al. _broom: Convert Statistical
+Objects into Tidy Tibbles_. R package version 0.7.6. 2021. URL:
+[https://CRAN.R-project.org/package=broom](https://CRAN.R-project.org/package=broom).
+
+[RK19] T. Rinker and D. Kurkiewicz. _pacman: Package Management Tool_.
+R package version 0.5.1. 2019. URL:
+[https://github.com/trinker/pacman](https://github.com/trinker/pacman).
+
+[RS08] A. C. Rencher and G. B. Schaalje. _Linear models in statistics_.
+Wiley-Interscience, 2008.
+
+[Sch+21] B. Schloerke, D. Cook, et al. _GGally: Extension to ggplot2_.
+R package version 2.1.1. 2021. URL:
+[https://CRAN.R-project.org/package=GGally](https://CRAN.R-project.org/package=GGally).
+
+[TH20] A. Trapletti and K. Hornik. _tseries: Time Series Analysis and
+Computational Finance_. R package version 0.10-48. 2020. URL:
+[https://CRAN.R-project.org/package=tseries](https://CRAN.R-project.org/package=tseries).
+
+[THL16] Y. Tang, M. Horikoshi, et al. "ggfortify: Unified Interface to
+Visualize Statistical Result of Popular R Packages". In: _The R
+Journal_ 8 (2 2016). URL:
+[https://journal.r-project.org/](https://journal.r-project.org/).
+
+[WH20] H. Wickham and J. Hester. _readr: Read Rectangular Text Data_. R
+package version 1.4.0. 2020. URL:
+[https://CRAN.R-project.org/package=readr](https://CRAN.R-project.org/package=readr).
+
+[Wic+19] H. Wickham, M. Averick, et al. "Welcome to the tidyverse". In:
+_Journal of Open Source Software_ 4.43 (2019), p. 1686. DOI:
+[10.21105/joss.01686](https://doi.org/10.21105%2Fjoss.01686).
+
+[Wic+20] H. Wickham, W. Chang, et al. _ggplot2: Create Elegant Data
+Visualisations Using the Grammar of Graphics_. R package version 3.3.3.
+2020. URL:
+[https://CRAN.R-project.org/package=ggplot2](https://CRAN.R-project.org/package=ggplot2).
+
+[Wic+21] H. Wickham, R. FranÃ§ois, et al. _dplyr: A Grammar of Data
+Manipulation_. R package version 1.0.6. 2021. URL:
+[https://CRAN.R-project.org/package=dplyr](https://CRAN.R-project.org/package=dplyr).
+
+[Wic07] H. Wickham. "Reshaping Data with the reshape Package". In:
+_Journal of Statistical Software_ 21.12 (2007), pp. 1-20. URL:
+[http://www.jstatsoft.org/v21/i12/](http://www.jstatsoft.org/v21/i12/).
+
+[Wic20] H. Wickham. _reshape2: Flexibly Reshape Data: A Reboot of the
+Reshape Package_. R package version 1.4.4. 2020. URL:
+[https://github.com/hadley/reshape](https://github.com/hadley/reshape).
+
+[Wic21] H. Wickham. _tidyr: Tidy Messy Data_. R package version 1.1.3.
+2021. URL:
+[https://CRAN.R-project.org/package=tidyr](https://CRAN.R-project.org/package=tidyr).
+
+[WS20] H. Wickham and D. Seidel. _scales: Scale Functions for
+Visualization_. R package version 1.1.1. 2020. URL:
+[https://CRAN.R-project.org/package=scales](https://CRAN.R-project.org/package=scales).
+
+[Xie14] Y. Xie. "knitr: A Comprehensive Tool for Reproducible Research
+in R". In: _Implementing Reproducible Computational Research_. Ed. by
+V. Stodden, F. Leisch and R. D. Peng. ISBN 978-1466561595. Chapman and
+Hall/CRC, 2014. URL:
+[http://www.crcpress.com/product/isbn/9781466561595](http://www.crcpress.com/product/isbn/9781466561595).
+
+[Xie21] Y. Xie. _knitr: A General-Purpose Package for Dynamic Report
+Generation in R_. R package version 1.33. 2021. URL:
+[https://yihui.org/knitr/](https://yihui.org/knitr/).
+
+[ZG05] A. Zeileis and G. Grothendieck. "zoo: S3 Infrastructure for
+Regular and Irregular Time Series". In: _Journal of Statistical
+Software_ 14.6 (2005), pp. 1-27. DOI:
+[10.18637/jss.v014.i06](https://doi.org/10.18637%2Fjss.v014.i06).
+
+[ZGR21] A. Zeileis, G. Grothendieck, et al. _zoo: S3 Infrastructure for
+Regular and Irregular Time Series (Z's Ordered Observations)_. R
+package version 1.8-9. 2021. URL:
+[https://zoo.R-Forge.R-project.org/](https://zoo.R-Forge.R-project.org/).
+
+[ZH02] A. Zeileis and T. Hothorn. "Diagnostic Checking in Regression
+Relationships". In: _R News_ 2.3 (2002), pp. 7-10. URL:
+[https://CRAN.R-project.org/doc/Rnews/](https://CRAN.R-project.org/doc/Rnews/).
+
+[Zhu21] H. Zhu. _kableExtra: Construct Complex Table with kable and
+Pipe Syntax_. R package version 1.3.4. 2021. URL:
+[https://CRAN.R-project.org/package=kableExtra](https://CRAN.R-project.org/package=kableExtra).
+]
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"slideNumberFormat": "%current%",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
