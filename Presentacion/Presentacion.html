@@ -524,15 +524,13 @@ class: header_background
 &lt;img src="Presentacion_files/figure-html/unnamed-chunk-14-1.png" width="450px" /&gt;
 ]
 ]
-.panel[.panel-name[Densidad teórica vs Empirica]
+.panel[.panel-name[Densidad teórica vs empírica]
 .center[
 &lt;img src="Presentacion_files/figure-html/unnamed-chunk-15-1.png" width="450px" /&gt;
 ]
 ]
 
 .panel[.panel-name[Test]
-
-Se realizarón los siguientes 
 
 &lt;table class=" lightable-material lightable-striped lightable-hover table" style='font-family: "Source Sans Pro", helvetica, sans-serif; margin-left: auto; margin-right: auto; font-size: 12px; margin-left: auto; margin-right: auto;'&gt;
  &lt;thead&gt;
@@ -618,6 +616,116 @@ class: header_background
 class: header_background
 
 # Modelo final
+
+.panelset[
+.panel[.panel-name[Significación del modelo]
+.scroll-box-14[
+&lt;table class=" lightable-material lightable-striped lightable-hover table" style='font-family: "Source Sans Pro", helvetica, sans-serif; margin-left: auto; margin-right: auto; font-size: 12px; margin-left: auto; margin-right: auto;'&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Variable &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Estimación &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Error estándar &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; `\(\left(H_{0}^{\alpha = 0.05}\right)\beta_{i} = 0\)` &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Intercepto &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -5171.280 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 806.238 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Se rechaza H0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Gasto per capita en policía 1960 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 12.108 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.470 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Se rechaza H0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Desigualdad del ingreso &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7.016 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.222 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Se rechaza H0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Indice que refleja la escolaridad del estado &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 19.835 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.132 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Se rechaza H0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Número de hombres entre 14 y 24 / 1000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10.575 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2.950 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Se rechaza H0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Probabilidad de encarcelamiento &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -37.296 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 17.829 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Se rechaza H0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Tasa de desempleo urbana hombres 35-39 años x 1000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.743 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.629 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Se rechaza H0 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+]
+- Signos de los regresores , "intuitivos" 
+- Es mas importante la cantidad de hombres en edades jovenes que la situación del mercado labroal.
+- La probabilidad de encarcelamiento impacta demasiado fuerte. 
+]
+.panel[.panel-name[Comparación]
+&lt;table class=" lightable-material lightable-striped lightable-hover table" style='font-family: "Source Sans Pro", helvetica, sans-serif; margin-left: auto; margin-right: auto; font-size: 12px; margin-left: auto; margin-right: auto;'&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Modelo &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; `\(R^{2}.adj\)` &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; RSE &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; SCE &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; F Obs. &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; P-valor*100 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Regresión.gl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Residuos.gl &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Modelo Reducido e intervenido &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 80.056 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 170.265 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5177779 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 29.767 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 37 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Modelo Completo &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 70.781 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 209.064 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5547013 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.429 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 15 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 31 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+.panel[.panel-name[Reflexiones]
+
+- Signos de los regresores , "intuitivos" 
+- Es mas importante la cantidad de hombres en edades jovenes que la situación del mercado labroal.
+- La probabilidad de encarcelamiento impacta demasiado fuerte. 
+
+]
+]
 
 ---
 class: header_background

@@ -212,6 +212,9 @@ Datos %>%
     fill = "#8F3A84FF",
     colour = "black"
   ) + 
+  labs(
+    y = "Conteo"
+  ) + 
   theme(
     plot.subtitle = element_text(
           size=6.5
@@ -276,7 +279,10 @@ Datos %>%
   facet_wrap(
     ~Variable,
     scale = "free_x"
-  ) +
+  ) + 
+  labs(
+    y = "Conteo"
+  ) + 
   theme(
     plot.subtitle = element_text(
           size=6.5
@@ -340,6 +346,9 @@ Datos %>%
     ~Variable,
     scale = "free_x"
   ) +
+  labs(
+    y = "Conteo"
+  ) + 
   theme(
     plot.subtitle = element_text(
           size=6.5
@@ -394,7 +403,10 @@ Datos %>%
   facet_wrap(
     ~Variable,
     scale = "free_x"
-  ) +
+  ) + 
+  labs(
+    y = "Conteo"
+  ) + 
   theme(
     aspect.ratio = 1,
     plot.subtitle = element_text(
@@ -851,9 +863,11 @@ ModeloRed %>%
 .center[
 ```{r}
 ModeloRedInter %>% 
+  rstandard() %>% 
+  as.data.frame() %>% 
     ggplot(
         aes(
-            sample = .$residuals
+            sample = .
         )
     ) +
     stat_qq(
@@ -863,12 +877,12 @@ ModeloRedInter %>%
     stat_qq_line(
         linetype = "dashed",
         color = "#8F3A847A",
-        size = 1.2
+        size = 1.2,
+        position = "identity"
     ) + 
     labs(
         x = "Cuantiles téoricos",
-        y = "Cuantiles empiricos",
-        title = "QQ Plot Normal"
+        y = "Residuos estandarizados"
     ) +
     theme(
         aspect.ratio = 1,
@@ -886,11 +900,11 @@ ModeloRedInter %>%
 ```
 ]
 ]
-.panel[.panel-name[Densidad teórica vs Empirica]
+.panel[.panel-name[Densidad teórica vs empírica]
 .center[
 ```{r}
 ModeloRedInter  %>% 
-  rstudent() %>% 
+  rstandard() %>% 
   as.data.frame() %>% 
   ggplot(
     aes(
@@ -910,7 +924,7 @@ ModeloRedInter  %>%
     size = 1.7
   ) + 
   labs(
-    title = "Valores teóricos y errores studentizados " ,
+    title = "Valores teóricos y errores estandarizados " ,
     x="x",
     y = "Densidad"
   ) +
@@ -932,8 +946,6 @@ ModeloRedInter  %>%
 ]
 
 .panel[.panel-name[Test]
-
-Se realizarón los siguientes 
 
 ```{r}
 TestNormalidad <- function(lm) {
@@ -1087,6 +1099,130 @@ Het(ModeloRedInter)%>%
 class: header_background
 
 # Modelo final
+
+.panelset[
+.panel[.panel-name[Significación del modelo]
+.scroll-box-14[
+```{r}
+ModeloRedInter %>%  
+  tidy() %>% 
+  summarise_if(
+    is.numeric,
+    ~round(.x,3)
+  ) %>% 
+  mutate(
+    Variable = c(
+      "Intercepto",
+      "Gasto per capita en policía 1960",
+      "Desigualdad del ingreso",
+      "Indice que refleja la escolaridad del estado",
+      "Número de hombres entre 14 y 24 / 1000",
+      "Probabilidad de encarcelamiento",
+      "Tasa de desempleo urbana hombres 35-39 años x 1000"
+    ),
+    "Estimación" = estimate,
+    "Error estándar" = std.error,
+    "$\\left(H_{0}^{\\alpha = 0.05}\\right)\\beta_{i} = 0$" = case_when(
+      p.value < 0.05 ~ "Se rechaza H0",
+      p.value >= 0.05 ~ "No se rechaza H0"
+    ),
+    .keep = "none"
+  ) %>% 
+  kbl(
+    booktabs = T,
+    escape = FALSE
+  ) %>% 
+  kable_material(c("striped", "hover")) %>% 
+  kable_styling(
+    font_size = 12
+  )
+```
+
+]
+- Signos de los regresores , "intuitivos" 
+- Es mas importante la cantidad de hombres en edades jovenes que la situación del mercado labroal.
+- La probabilidad de encarcelamiento impacta demasiado fuerte. 
+]
+.panel[.panel-name[Comparación]
+```{r}
+ModeloRedInter %>% 
+  glance() %>% 
+  mutate(
+    "$R^{2}.adj$" = adj.r.squared*100,
+    "RSE" = sigma,
+    "SCE" = sum((ModeloRedInter$fitted.values-mean(Datos$y))^(2)),
+    "F Obs." = statistic,
+    "P-valor*100" = p.value*100,
+    "Regresión.gl" = df,
+    "Residuos.gl" = df.residual,
+    .keep = "none"
+  ) %>% 
+  summarise_if(
+    is.numeric,
+    ~round(.x,3)
+  ) %>% 
+assign(
+  "ResumenRedInter",
+  .,
+  envir = .GlobalEnv
+)
+
+ModeloCompleto %>% 
+  glance() %>% 
+  mutate(
+    Modelo = "Modelo Completo",
+    "$R^{2}.adj$" = adj.r.squared*100,
+    "RSE" = sigma,
+    "SCE" = sum((ModeloCompleto$fitted.values-mean(Datos$y))^(2)),
+    "F Obs." = statistic,
+    "P-valor*100" = p.value*100,
+    "Regresión.gl" = df,
+    "Residuos.gl" = df.residual,
+    .keep = "none"
+  ) %>% 
+  summarise_if(
+    is.numeric,
+    ~round(.x,3)
+  ) %>% 
+assign(
+  "ResumenCompleto",
+  .,
+  envir = .GlobalEnv
+)
+
+
+rbind.data.frame(
+  ResumenRedInter,
+  ResumenCompleto
+) %>% 
+mutate(
+  Modelo = c(
+    "Modelo Reducido e intervenido",
+    "Modelo Completo"
+  )
+) %>% 
+relocate(
+  Modelo,
+  .before = `$R^{2}.adj$`
+) %>% 
+  kbl(
+    booktabs = T,
+    escape = FALSE
+  ) %>% 
+  kable_material(c("striped", "hover")) %>% 
+  kable_styling(
+    font_size = 12
+  )
+```
+]
+.panel[.panel-name[Reflexiones]
+
+- Signos de los regresores , "intuitivos" 
+- Es mas importante la cantidad de hombres en edades jovenes que la situación del mercado labroal.
+- La probabilidad de encarcelamiento impacta demasiado fuerte. 
+
+]
+]
 
 ---
 class: header_background
