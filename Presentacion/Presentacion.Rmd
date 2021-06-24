@@ -44,7 +44,8 @@ pacman::p_load(
   lmtest,
   ggfortify,
   skedastic,
-  bibtex
+  bibtex,
+  showtext
 )
 
 #Libreria car 
@@ -207,7 +208,7 @@ Datos %>%
     ) 
   ) +
   geom_histogram(
-    bins=Sturges,
+    bins = Sturges,
     fill = "#8F3A84FF",
     colour = "black"
   ) + 
@@ -842,14 +843,92 @@ ModeloRed %>%
     .,
     envir = .GlobalEnv
   )
-
 ```
 
 .panelset[
-.panel[.panel-name[Gráficos]
+.panel[.panel-name[Q-Q Plot]
 
-
-
+.center[
+```{r}
+ModeloRedInter %>% 
+    ggplot(
+        aes(
+            sample = .$residuals
+        )
+    ) +
+    stat_qq(
+        size = 1.2,
+        color = "#280434FF"
+    ) + 
+    stat_qq_line(
+        linetype = "dashed",
+        color = "#8F3A847A",
+        size = 1.2
+    ) + 
+    labs(
+        x = "Cuantiles téoricos",
+        y = "Cuantiles empiricos",
+        title = "QQ Plot Normal"
+    ) +
+    theme(
+        aspect.ratio = 1,
+        plot.title = element_text(
+        colour = "#280434FF",
+        face = "bold"
+        ),
+        axis.text.x = element_text(
+        color = "#8C04C2"
+        ),
+        axis.text.y = element_text(
+          color = "#8C04C2"
+      )
+    )
+```
+]
+]
+.panel[.panel-name[Densidad teórica vs Empirica]
+.center[
+```{r}
+ModeloRedInter  %>% 
+  rstudent() %>% 
+  as.data.frame() %>% 
+  ggplot(
+    aes(
+      x = .
+    )
+  ) + 
+  geom_density(
+    size = 1.7,
+    colour = "#8F3A84FF"
+  ) + 
+  geom_line(
+    aes(
+      x = seq(-4,4,length.out = 44),
+      y = dnorm(seq(-4,4,length.out = 44))
+    ),
+    colour = "#280434FF",
+    size = 1.7
+  ) + 
+  labs(
+    title = "Valores teóricos y errores studentizados " ,
+    x="x",
+    y = "Densidad"
+  ) +
+  theme(
+    aspect.ratio = 1,
+    plot.title = element_text(
+      colour = "#280434FF",
+      face="bold"
+    ),
+    axis.text.x = element_text(
+      color = "#8C04C2"
+    ),
+    axis.text.y = element_text(
+      color="#8C04C2"
+    )
+  )
+```
+]
 ]
 
 .panel[.panel-name[Test]
@@ -914,7 +993,95 @@ ModeloRedInter %>%
 class: header_background
 
 # Homocedasticidad
+.panelset[
+.panel[.panel-name[Residuos]
+.center[
+```{r}
+ModeloRedInter %>% 
+    ggplot(
+        aes(
+            x = .$fitted,
+            y = .$residuals
+        )
+    ) +
+    geom_point(
+      colour = "#8C04C2"
+    ) + 
+    geom_hline(
+      yintercept = 0,
+      linetype = "dashed",
+      color = "#8F3A847A",
+      size = 1.2
+    ) +
+    labs(
+        x = "Valores predecidos",
+        y = "Residuos"
+    ) +
+    theme(
+        aspect.ratio = 1,
+        plot.title = element_text(
+        colour = "#280434FF",
+        face = "bold"
+        ),
+        axis.text.x = element_text(
+        color = "#8C04C2"
+        ),
+        axis.text.y = element_text(
+          color = "#8C04C2"
+      )
+    )
+```
+]
+]
+.panel[.panel-name[Test]
+```{r}
+Het<-function(lm) {
+  Esta = c(
+    bptest(lm)$statistic,
+    white_lm(lm)$statistic,
+    glejser(lm)$statistic
+  )
+  Pvalue = c(
+    bptest(lm)$p.value,
+    white_lm(lm)$p.value,
+    glejser(lm)$p.value
+  )
+  return(
+    data.frame(
+      "Test" = c(
+        "Breusch-Pagan",
+        "White",
+        "Glejser"),
+      "Pvalor" = Pvalue,
+      "Estadístico" = Esta
+    )
+  )
+}
 
+Het(ModeloRedInter)%>%
+  mutate_if(
+    is.numeric,
+    round,
+    3
+  ) %>% 
+  mutate(
+    Resultado = case_when(
+      Pvalor > 0.05 ~ "No rechazo Homocedasticidad",
+      NA ~ "Rechazo H0"
+    )
+  ) %>% 
+  kbl(
+    booktabs = T,
+    escape = FALSE
+  ) %>% 
+  kable_material(c("striped", "hover")) %>% 
+  kable_styling(
+    font_size = 12
+  )
+```
+
+]
+]
 ---
 
 class: header_background
