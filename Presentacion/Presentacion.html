@@ -98,9 +98,6 @@ Esta claro que `\(y\)` presenta una distribución mediantamente asimétrica dond
 .center[
 &lt;img src="Presentacion_files/figure-html/unnamed-chunk-4-1.png" width="450px" /&gt;
 ]
-.pull-right[
-Hola 
-]
 
 ]
 
@@ -392,7 +389,7 @@ En base a esto, vamos a realizar un proceso de selección por el método de **St
 ---
 class: header_background
 
-# Stepwise
+# Selección de modelos : stepWise
 
 
 
@@ -500,6 +497,17 @@ class: header_background
 ]
 .panel[.panel-name[Decisión]
 
+&lt;h3&gt;
+El estado número 11, 29 y 18 presentan problemas con la distancia de Cook, con este gráfico podemos afirmar que las observaciones 29 y 
+11 son influyentes y atípicas, mientras que para la número 18 podemos ver que es muy cercana a cero, la esperanza de los errores por lo que es solamente influyente.
+&lt;/h3&gt;
+
+&lt;h3&gt;
+&lt;font color = #000000&gt;
+Por ende, se decide retirarlas del modelo reducido ya que las mismas tienen una influencia preponderante en la estimación. 
+Como se vió en clase, observaciones de este tipo pueden llevar a un modelo alejado de la realidad.
+&lt;/font&gt;
+&lt;/h3&gt;
 ]
 ]
 ---

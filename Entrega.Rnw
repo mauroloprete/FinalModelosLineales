@@ -1526,7 +1526,7 @@ Terminados ya todos los procesos referentes a la refinación del modelo completo
 De manera resumida : 
 
 <<>>=
-ModeloRed %>%  
+ModeloRedInter %>%  
   tidy() %>% 
   summarise_if(
     is.numeric,

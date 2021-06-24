@@ -413,9 +413,6 @@ Datos %>%
   )
 ```
 ]
-.pull-right[
-Hola 
-]
 
 ]
 
@@ -617,7 +614,7 @@ En base a esto, vamos a realizar un proceso de selección por el método de **St
 ---
 class: header_background
 
-# Stepwise
+# Selección de modelos : stepWise
 
 ```{r,echo = F,results = "hide"}
 lm(
@@ -807,6 +804,17 @@ ModeloRed  %>%
 ]
 .panel[.panel-name[Decisión]
 
+<h3>
+El estado número 11, 29 y 18 presentan problemas con la distancia de Cook, con este gráfico podemos afirmar que las observaciones 29 y 
+11 son influyentes y atípicas, mientras que para la número 18 podemos ver que es muy cercana a cero, la esperanza de los errores por lo que es solamente influyente.
+</h3>
+
+<h3>
+<font color = #000000>
+Por ende, se decide retirarlas del modelo reducido ya que las mismas tienen una influencia preponderante en la estimación. 
+Como se vió en clase, observaciones de este tipo pueden llevar a un modelo alejado de la realidad.
+</font>
+</h3>
 ]
 ]
 ---
