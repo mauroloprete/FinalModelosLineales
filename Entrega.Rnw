@@ -1,0 +1,2847 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{ulem}
+\usepackage{stackengine}
+\usepackage{appendix}
+\usepackage{caption}
+\usepackage[spanish]{babel}
+\usepackage[left=2.10cm,top=2.54cm,right=2.30cm,bottom=2.54cm]{geometry}
+\setlength{\parindent}{0pt}
+\usepackage[font=small,labelfont=bf]{caption}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage[table]{xcolor}
+\usepackage{wrapfig}
+\usepackage{float}
+\usepackage{colortbl}
+\usepackage{pdflscape}
+\usepackage{tabu}
+\usepackage{threeparttable}
+\usepackage{multicol}
+\usepackage{amsmath}
+\spanishdecimal{.}
+\usepackage[backend=biber]{biblatex}
+\defbibfilter{other}{
+  not type=book
+}
+
+\addbibresource{biblio.bib}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\renewcommand{\listfigurename}{Lista de Figuras}
+\renewcommand{\contentsname}{Lista de Contenidos}
+\renewcommand{\figurename}{Figura}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+\begin{titlepage}
+  \centering
+    {\scshape\Huge\uuline{Tasa de criminalidad en USA} \par}
+  \vspace{3cm}
+  \includegraphics[width=14cm]{Caratula.png}
+  \vfill
+  \vfill
+  {\scshape\LARGE Modelos Líneales \par}
+  {\scshape\Large Trabajo final \par}
+  \vspace{0.5cm}
+  {\scshape\Large Docentes : Laura Nalbarte y Fernando Massa \par}
+  \vspace{3cm}
+  {\Large Ignacio Acosta - Sofía Itté - Mauro Loprete \par}
+  {\Large 1er semestre 2021 \par}
+\end{titlepage}
+\tableofcontents
+\setkeys{Gin}{width=0.8\textwidth}
+\listoffigures
+\newpage
+
+
+<<include=FALSE>>=
+## Configuración 
+knitr::opts_chunk$set(
+  echo = FALSE,
+  fig.pos = 'H',
+  warning = FALSE
+)
+
+## Paquetes
+
+if(!require(pacman)) {
+  install.packages("pacman")
+}
+pacman::p_load(
+  here,
+   reshape2,
+   knitr,
+   tidymodels,
+   kableExtra,
+   magrittr,
+   GGally,
+   car,
+   nortest,
+   tseries,
+   lmtest,
+   tidyverse,
+   ggfortify,
+   skedastic
+ )
+
+# Cargar los datos
+
+read.table(
+  "UScrime.txt",
+  header = TRUE,
+  dec = ","
+) %>% 
+  mutate(
+    Prob = Prob*100
+  ) %>% 
+  assign(
+    "Datos",
+    .,
+    envir = .GlobalEnv
+  )
+
+# Para poder recuperar el script de los chunk
+
+# knitr::purl("Entrega.Rnw")
+
+@
+\section{Introducción}
+
+El objetivo de este informe es la construcción de un modelo de regresión lineal múltiple que explique la tasa de criminalidad en USA (número se ofensas reportadas a la policía por habitante).
+\\
+
+Para ello se hará uso de una base de datos con un conjunto de variables que en principio se encuentran relacionadas con la variable a explicar.
+\\
+
+Haciendo uso de las distintas técnicas estadíticas aprendidas en el curso se buscará descartar variables cuyo aporte no sea suficientemente significativo. Esto busca llegar a un modelo final eficiente (es decír, que explique la tasa de criminalidad de manera acertada haciendo uso de la menor cantidad de variables posibles).
+\\
+
+En el transcurso del texto se pondrán a prueba las distintas hipótesis centrales del modelo, tales como la normalidad de los errores,ausencia de multicolinealidad y la homocedasticidad.
+\\
+
+También se trabajará con las observaciones y la existencia de algunas que aporten el mismo nivel de información.
+\\
+
+El herramental gráfico juega un rol fundamental al momento de transmitir la información de manera concisa y entendible. El mismo se encuentra respaldado por tablas que resumen la información de manera más detallada.
+\\
+
+Cabe destacar que las observaciones se corresponden con los distintos estados de Estado Unidos.
+\\
+
+De manera general se muestra el comportamiento de \textbf{y} de manera resumida:
+
+<<fig.cap = "Histograma de la Tasa de Criminalidad",out.width = "0.4\\textwidth",fig.align = "center">>=
+# Histograma tasa de criminalidad
+
+# Regla de Struges
+
+Sturges<-log2(47)+1
+ggplot(Datos,aes(x=y))+
+  geom_histogram(bins = Sturges,
+                 fill="#8F3A84FF",
+                 colour="black")+
+  theme(aspect.ratio = 1,
+        plot.subtitle = element_text(
+          size=6.5
+        ),
+        plot.title = element_text(
+          face="bold",
+          size=10,
+          color = "#280434FF"
+        ),
+        axis.text.x = element_text(
+          color = "#8C04C2"
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        ))+
+  labs(title="Histograma de Y",
+       subtitle = "Tasa de criminalidad",
+       x="Número de ofensas reportadas",
+       y="Cantidad de Estados")
+@
+
+Es claro que \textbf{y} cuenta con una distribución medianamente asimétrica, tiene un intervalo modal entre los valores de 500 y 800 ofensas (13 estados presentan una tasa de criminalidad comprendida entre esos valores).
+
+\newpage
+\section{Análisis Exploratorio de datos}
+
+El objetivo de esta sección es presentar las variables a estudiar y como las mismas se relacionan entre sí.
+\\
+
+Para ello se hará uso de distintas medidas de resumen univariadas y bivariadas, así como también un herramental gráfico variado que simplificará el entendimiento de las mismas.
+\\
+
+Es esta sección fundamental al momento de discutir el modelo final y como a partir de distintas técnicas estadísticas aprendidas en el curso se puede simplificar el \textit{modelo completo} que se presentará en la sección siguiente.
+
+\subsection{Análisis Univariado}
+En esta primer sección se hará especial énfasis en las variables por sí mismas.
+\\
+
+Se estudiarán medidas de resumen y a partir de histogramas tendremos un primer acercamiento a la distribución de las mismas y su comportamiento.
+
+\begin{center}
+\begin{table}[h]
+\begin{tabular}{|c|l|l|}
+\hline
+\textbf{Nombre} & \multicolumn{1}{c|}{\textbf{Descripción}}                                                                                                              & \multicolumn{1}{c|}{\textbf{Clasificación}} \\ \hline
+\textbf{Y}      & Tasa de criminalidad, número de ofensas reportadas a la policía por habitante                                                                          & Cuantitativa                                \\ \hline
+\textbf{M}      & Número de hombres entre 14 y 24 años cada 1000 habitantes                                                                                             & Cuantitativa                                \\ \hline
+\textbf{So}     & Variables indicadora de los estados del sur (0=No, 1=Si)                                                                                               & Cualitativa                                 \\ \hline
+\textbf{Ed}     & Indice que refleja la escolaridad del estado                                                                                                          & Cuantitativa                                \\ \hline
+\textbf{Po1}    & Gasto per cápita en policía realizado por el gobierno estatal o local en 1960                                                                          & Cuantitativa                                \\ \hline
+\textbf{Po2}    & Gasto per cápita en policía realizado por el gobierno estatal o local en 1959                                                                          & Cuantitativa                                \\ \hline
+\textbf{LF}     & \begin{tabular}[c]{@{}l@{}}Tasa de participación en la fuerza laboral civil de sexo masculino entre 14 y 24 \\ años, cada 1000 habitantes\end{tabular} & Cuantitativa                                \\ \hline
+\textbf{M.F}    & Número de hombres por cada 1000 mujeres                                                                                                                & Cuantitativa                                \\ \hline
+\textbf{Pop}    & Tamaño de la población del estado cada 100000 habitantes                                                                                               & Cuantitativa                                \\ \hline
+\textbf{NW}     & Número de no caucásicos cada 1000 habitantes                                                                                                              & Cuantitativa                                \\ \hline
+\textbf{U1}     & Tasa de desempleo urbana de hombres entre 14 y 24 años por 1000 habitantes                                                                            & Cuantitativa                                \\ \hline
+\textbf{U2}     & Tasa de desempleo urbana de hombres entre 35 y 39 años por 1000 habitantes                                                                            & Cuantitativa                                \\ \hline
+\textbf{GDP}    & Producto bruto interno per cápita                                                                                                                      & Cuantitativa                                \\ \hline
+\textbf{Ineq}   & Desigualdad del ingreso                                                                                                                                & Cuantitativa                                \\ \hline
+\textbf{Prob}   & Probabilidad de encarcelamiento                                                                                                                        & Cuantitativa                                \\ \hline
+\textbf{Time}   & Tiempo promedio de estadía en cárceles estatales                                                                                                       & Cuantitativa                                \\ \hline
+\end{tabular}
+\caption{Variables a trabajar}
+\end{table}
+\end{center}
+\newpage
+\subsubsection{Histogramas y Barplots}
+
+{
+\centering
+<<echo=FALSE,fig.cap = "Histogramas (1)">>=
+
+# Histogramas múltiples 1
+
+multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
+  library(grid)
+
+  
+  plots <- c(list(...), plotlist)
+
+  numPlots = length(plots)
+
+  
+  if (is.null(layout)) {
+  
+    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
+                    ncol = cols, nrow = ceiling(numPlots/cols))
+  }
+
+ if (numPlots==1) {
+    print(plots[[1]])
+
+  } else {
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+
+    for (i in 1:numPlots) {
+      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+
+      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+                                      layout.pos.col = matchidx$col))
+    }
+  }
+}
+
+HistM<-ggplot(Datos,aes(x=M))+
+  geom_histogram(bins=Sturges,
+                 fill="#8F3A84FF",
+                 colour="black")+
+  theme(aspect.ratio = 1,
+        plot.subtitle = element_text(
+          size=6.5
+        ),
+        plot.title = element_text(
+          face="bold",
+          size=10,
+          color = "#280434FF"
+        ),
+        axis.text.x = element_text(
+          color = "#8C04C2"
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        ))+
+  labs(title="Histograma variable M",
+       subtitle="Número de hombres entre 14 y 24
+       años por 1000 habitantes",
+       x="Cantidad de Hombres",
+       y="Cantidad de Estados")
+
+
+BarpSo<-ggplot(data=Datos, aes(x=factor(So))) +
+  geom_bar(stat="count", 
+           fill="#8F3A84FF",
+           colour="black")+
+  theme(plot.subtitle = element_text(
+          size=6.5
+        ),
+        plot.title = element_text(
+          face = "bold",
+          size=10,
+          color = "#280434FF"
+        ),
+        axis.text.x = element_text(
+          color = "#8C04C2"
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        ),
+        aspect.ratio=1)+
+  labs(title = "Barplot variable So",
+       subtitle = "¿Es este un estado sureño?",
+       x="Respuesta",
+       y="Cantidad de respuestas")
+
+HistEd<-ggplot(Datos,aes(x=Ed))+
+  geom_histogram(bins=Sturges,
+                 fill="#8F3A84FF",
+                 colour="black")+
+  theme(aspect.ratio = 1,
+        plot.subtitle = element_text(
+          size=6.5
+        ),
+        plot.title = element_text(
+          size=10,
+          face="bold",
+          color = "#280434FF"
+        ),
+        axis.text.x = element_text(
+          color = "#8C04C2"
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        ))+
+  labs(title="Histograma variable Ed",
+       subtitle="Escolaridad del Estado",
+       x="Puntuación",
+       y="Cantidad de Estados")
+
+HistPo1<-ggplot(Datos,aes(x=Po1))+
+  geom_histogram(bins=Sturges,
+                 fill="#8F3A84FF",
+                 colour="black")+
+  theme(aspect.ratio = 1,
+        plot.subtitle = element_text(
+          size=6.5
+        ),
+        plot.title = element_text(
+          face="bold",
+          size=10,
+          color = "#280434FF"
+        ),
+        axis.text.x = element_text(
+          color = "#8C04C2"
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        ))+
+  labs(title="Histograma variable Po1",
+       subtitle = "1960",
+       x="Gasto",
+       y="Cantidad de Estados")
+
+HistPo2<-ggplot(Datos,aes(x=Po2))+
+  geom_histogram(bins=Sturges,
+                 fill="#8F3A84FF",
+                 colour="black")+
+  theme(aspect.ratio = 1,
+        plot.subtitle = element_text(
+          size=6.5
+        ),
+        plot.title = element_text(
+          face="bold",
+          size=10,
+          color = "#280434FF"
+        ),
+        axis.text.x = element_text(
+          color = "#8C04C2"
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        ))+
+  labs(title="Histograma variable Po2",
+       subtitle = "1959",
+       x="Gasto",
+       y="Cantidad de Estados")
+
+HistLF<-ggplot(Datos,aes(x=LF))+
+  geom_histogram(bins=Sturges,
+                 fill="#8F3A84FF",
+                 colour="black")+
+  theme(aspect.ratio = 1,
+        plot.subtitle = element_text(
+          size=6.5
+        ),
+        plot.title = element_text(
+          face="bold",
+          size=10,
+          color = "#280434FF"
+        ),
+        axis.text.x = element_text(
+          color = "#8C04C2"
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        ))+
+  labs(title="Histograma variable LF",
+       subtitle = "TPFLM de 14 a 24 años",
+       x="Gasto",
+       y="Cantidad de Estados")
+
+HistMF<-ggplot(Datos,aes(x=M.F))+
+  geom_histogram(bins=Sturges,
+                 fill="#8F3A84FF",
+                 colour="black")+
+  theme(aspect.ratio = 1,
+        plot.subtitle = element_text(
+          size=6.5
+        ),
+        plot.title = element_text(
+          face="bold",
+          size=10,
+          color = "#280434FF"
+        ),
+        axis.text.x = element_text(
+          color = "#8C04C2"
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        ))+
+  labs(title="Histograma variable M.F",
+       subtitle = "Cantidad de hombres cada 1000 mujeres",
+       x="Cantidad de Hombres",
+       y="Cantidad de Estados")
+
+HistPop<-ggplot(Datos,aes(x=Pop))+
+  geom_histogram(bins=Sturges,
+                 fill="#8F3A84FF",
+                 colour="black")+
+  theme(aspect.ratio = 1,
+        plot.subtitle = element_text(
+          size=6.5
+        ),
+        plot.title = element_text(
+          face="bold",
+          size=10,
+          color = "#280434FF"
+        ),
+        axis.text.x = element_text(
+          color = "#8C04C2"
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        ))+
+  labs(title="Histograma variable Pop",
+       subtitle = "Tamaño de la población en cienmiles",
+       x="Pop",
+       y="Cantidad de Estados")
+
+HistNW<-ggplot(Datos,aes(x=NW))+
+  geom_histogram(bins=Sturges,
+                 fill="#8F3A84FF",
+                 colour="black")+
+  theme(aspect.ratio = 1,
+        plot.subtitle = element_text(
+          size=6.5
+        ),
+        plot.title = element_text(
+          face="bold",
+          size=10,
+          color = "#280434FF"
+        ),
+        axis.text.x = element_text(
+          color = "#8C04C2"
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        ))+
+  labs(title="Histograma variable NW",
+       subtitle = "Cantidad de no caucásicos cada 1000 habitantes",
+       x="Cantidad de no caucásicos",
+       y="Cantidad de Estados")
+
+HistU1<-ggplot(Datos,aes(x=U1))+
+  geom_histogram(bins=Sturges,
+                 fill="#8F3A84FF",
+                 colour="black")+
+  theme(aspect.ratio = 1,
+        plot.subtitle = element_text(
+          size=6.5
+        ),
+        plot.title = element_text(
+          face="bold",
+          size=10,
+          color = "#280434FF"
+        ),
+        axis.text.x = element_text(
+          color = "#8C04C2"
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        ))+
+  labs(title="Histograma variable U1",
+       subtitle = "TD cada 1000 habitantes,
+hombres de 14 a 24 ",
+       x="U1",
+       y="Cantidad de Estados")
+
+HistU2<-ggplot(Datos,aes(x=U2))+
+  geom_histogram(bins=Sturges,
+                 fill="#8F3A84FF",
+                 colour="black")+
+  theme(aspect.ratio = 1,
+        plot.subtitle = element_text(
+          size=6.5
+        ),
+        plot.title = element_text(
+          face="bold",
+          size=10,
+          color = "#280434FF"
+        ),
+        axis.text.x = element_text(
+          color = "#8C04C2"
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        ))+
+  labs(title="Histograma variable U2",
+       subtitle = "TD cada 1000 habitantes, 
+hombres de 35 a 39 ",
+       x="U2",
+       y="Cantidad de Estados")
+
+HistGDP<-ggplot(Datos,aes(x=GDP))+
+  geom_histogram(bins=Sturges,
+                 fill="#8F3A84FF",
+                 colour="black")+
+  theme(aspect.ratio = 1,
+        plot.subtitle = element_text(
+          size=6.5
+        ),
+        plot.title = element_text(
+          face="bold",
+          size=10,
+          color = "#280434FF"
+        ),
+        axis.text.x = element_text(
+          color = "#8C04C2"
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        ))+
+  labs(title="Histograma variable GDP",
+       subtitle = "PIB per cápita",
+       x="GDP",
+       y="Cantidad de Estados")+
+  scale_y_continuous(breaks = c(2,4,6,8,10,12,14,16))
+
+HistIneq<-ggplot(Datos,aes(x=Ineq))+
+  geom_histogram(bins=Sturges,
+                 fill="#8F3A84FF",
+                 colour="black")+
+  theme(aspect.ratio = 1,
+        plot.subtitle = element_text(
+          size=6.5
+        ),
+        plot.title = element_text(
+          face="bold",
+          size=10,
+          color = "#280434FF"
+        ),
+        axis.text.x = element_text(
+          color = "#8C04C2"
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        ))+
+  labs(title="Histograma variable Ineq",
+       subtitle = "Desigualdad de Ingresos",
+       x="Ineq",
+       y="Cantidad de Estados")+
+   scale_y_continuous(breaks = c(2,4,6,8,10,12))
+
+HistProb<-ggplot(Datos,aes(x=Prob))+
+  geom_histogram(bins=Sturges,
+                 fill="#8F3A84FF",
+                 colour="black")+
+  theme(aspect.ratio = 1,
+        plot.subtitle = element_text(
+          size=6.5
+        ),
+        plot.title = element_text(
+          face="bold",
+          size=10,
+          color = "#280434FF"
+        ),
+        axis.text.x = element_text(
+          color = "#8C04C2",
+          angle = 90
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        ))+
+  labs(title="Histograma variable Prob",
+       subtitle = "Probabilidad de encarcelamiento",
+       x="P",
+       y="Cantidad de Estados")
+
+HistTime<-ggplot(Datos,aes(x=Time))+
+  geom_histogram(bins=Sturges,
+                 fill="#8F3A84FF",
+                 colour="black")+
+  theme(aspect.ratio = 1,
+        plot.subtitle = element_text(
+          size=6.5
+        ),
+        plot.title = element_text(
+          face="bold",
+          size=10,
+          color = "#280434FF"
+        ),
+        axis.text.x = element_text(
+          color = "#8C04C2"
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        ))+
+  labs(title="Histograma variable Time",
+       subtitle = "Tiempo promedio de estadía en cárceles estatales",
+       x="Tiempo",
+       y="Cantidad de Estados")
+
+multiplot(HistM,BarpSo,HistEd,HistPo1,HistNW,HistPo2,HistLF,HistMF,HistPop,cols=3)
+@
+}
+
+\newpage
+{
+\centering
+<<fig.cap = "Histogramas (2)">>=
+multiplot(HistU1,HistU2,HistGDP,HistIneq,HistProb,HistTime,cols=3)
+@
+}
+
+Como se puede apreciar en los histogramas  presentados anteriormente y haciendo uso de la tabla (más precisamente del \textbf{CV}) es claro que las variables, de manera generalizada, presentan una variabilidad baja.
+\\
+
+De manera más específica, los histogramas de las variables M, Po1, Nw, Po2, M.F, Pop, U1, U2, Prob y Time cuentan con una distribución asimétrica. La variabilidad entre los valores comprendidos hasta la mediana (aunque baja, como ya se mencionó) es menor que en el resto de las observaciones.
+\\
+
+En el caso de la variable GDP y LF, la distribución a diferencia del resto es apróximadamente simétrica. La mediana y la media difieren en un número despreciable.
+\\
+
+La variable Ineq también cuenta con una distribución asimétrica pero a diferencia de las demás,cuenta con menor variabilidad entre las observaciones en el tramo central (primer cuartil a tercer cuartil).
+
+
+\newpage
+
+\subsubsection{Medidas de resumen}
+
+Se presenta en forma de tabla el resumen de las variables numéricas. En el mismo se presenta el valor mínimo y máximo de cada variable, medidas de tendencia central tales como lo son el primer y tercer cuartil, junto a la mediana. 
+\\
+
+A su vez, para estudiar la dispersión se incluye la media aritmética y una medida de variabilidad de la misma, el coeficiente de variación. 
+
+<<>>=
+# Tabla descriptiva
+
+DatosTab <- Datos
+names(DatosTab) <- c(
+  "Número de Hombres 14-24 / 1.000",
+  "Indicadora Estado Sur",
+  "Indice Escolaridad",
+  "Gasto per cápita 1.960",
+  "Gasto per cápita 1.959",
+  "Tasa participación masculina 14-24 por 1.000",
+  "Hombres cada 1.000 mujeres",
+  "Población cada 100.000",
+  "Número de no caucásicos cada 1.000 habitantes",
+  "Tasa desempleo urbana Hombres 14-24 por 1.000",
+  "Tasa desempleo urbana Hombres 35-39 por 1.000",
+  "Producto bruto interno per cápita",
+  "Desigualdad ingreso",
+  "Probabilidad Encarcelamiento",
+  "Tiempo de estadía en cárceles",
+  "Tasa de criminalidad"
+)
+
+summaryMod <- function(x) {
+  c(
+    quantile(x, probs = seq(0, 1, 0.25)),
+    mean(x),
+    (sd(x)/mean(x))*100
+  )
+}
+DatosTab %>%
+  select(
+    -"Indicadora Estado Sur"
+  ) %>% 
+  summarise_if(
+    is.numeric,
+    summaryMod
+  ) %>% 
+  mutate(
+    Estadistico = c(
+      "Min",
+      "1er Qu.",
+      "Mediana",
+      "3er Qu.",
+      "Max",
+      "Media",
+      "CV*100"
+    )
+  ) %>% 
+  relocate(
+    where(is.numeric),
+    .after = where(is.character)
+  ) %>%
+  mutate_if(
+    is.numeric,
+    format,
+    digits = 2
+  ) %>% 
+  pivot_longer(
+    cols = -Estadistico,
+    names_to = "Variable",
+    values_to = "Valor"
+  ) %>% 
+  pivot_wider(
+    values_from = "Valor",
+    names_from = "Estadistico"
+  ) %>% 
+  kbl(
+    booktabs = T, 
+    caption = "Medidas descriptivas para variables numéricas"
+  ) %>% 
+  kable_styling(
+    latex_options = c("striped", "hold_position"),
+    font_size = 8.5
+  )
+@
+
+\subsection{Análisis Bivariado}
+
+\subsubsection{Correlación entre variables}
+
+
+<<fig.cap = "Mapa de correlación de variables incluidas",out.width = "0.5\\textwidth",fig.align = "center">>=
+# Mapa de correlación entre variables
+
+qplot(x=Var1,
+      y=Var2,
+      data = melt(cor(Datos, use = "p")),
+      fill = value,
+      geom="tile"
+)+scale_fill_gradient2(limits = c(-1, 1),
+                       low = "#A50303", high = "#250455")+
+  theme(aspect.ratio = 1,
+        plot.title = element_text(
+          face = "bold",
+          color = "#280434FF"),
+        plot.subtitle = element_text(
+          size=8,
+          color="#5C485F"
+        ),
+        axis.text.x = element_text(
+          color = "#8C04C2",
+          angle=90
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        )
+        )+
+  labs(title="Mapa de correlación de variables",
+       subtitle = "Variables referidas a tasa de criminalidad en USA",
+       x="Variables",
+       y="",
+       fill="Coef Corr.")
+@
+
+
+
+
+\newpage
+
+\section{Introducción al Modelo Completo}
+
+El objetivo de esta sección es la aplicación de las distintas técnicas estadísticas impartidas en el curso para así llegar a un modelo final que no solo sea significativo al momento de estimar a \textbf{y}, sino que también se adecúe a los supuestos y propiedades deseadas (ganando de esta manera fidelidad).
+\\
+
+De manera resumida podría decirse que este informe seguirá fielmente el principio de \textit{parsimonia}\footnote{Frugalidad y moderación en los gastos.}. Respetando en todo momento el objetivo principal, la creación de un modelo lo más certero posible.
+\\
+
+En una primer instancia se planteará el \textbf{Modelo completo} constituído por la totalidad de las variables de las cuales se poseen datos.
+\\
+
+Claro está, se podría haber planteado en primera instancia un \textit{modelo inicial} (es decír, que contenga parte de las variables). No es esto errado, sin embargo es este un procedimiento que requiere de cierta experiencia en el tema de criminología.
+\\
+
+Como ya es sabido, variables que presentan una correlación muy alta no son (en general) marginalmente significativas al momento de definir la variable de respuesta.
+\\
+
+Esto se evidencia en los tests de hipótesis en donde se analiza el aporte de cada variable dada las demás variables. Una correlación alta entre variables, podría indicar que parte de la información que aportan una de ellas está también presente en otra y esa cantidad de información se vió cuantificada de manera previa. Lo que tarde o temprano llevaría a descartar alguna de ellas.
+\\
+
+Al comienzo de este trabajo jugó este principio de la correlación un rol monumental. Basándose en la alta correlación de variables 2 a 2, se procedió a retirar de la dupla a aquella que menor correlación mantenía con \textbf{y}.
+
+Esto es en principio coherente, a pesar de ello y trás el análisis de distintos panoramas, el caso partícular de \textbf{Ineq} y \textbf{GDP} dejó en claro que esta técnica fue en un principio apresurada. Si bien las variables comparten gran nivel de información, trás la aplicación de las técnicas de \textbf{Forward,Backwards,Stepwise} ambas variables eran incluídas en el modelo en todo escenario.
+\\
+
+Esta situación subyace de que incluso cuando ambas comparten un nivel elevado de información, el aporte único de las mismas es alto en comparación con el resto de las variables presentadas.
+\\
+
+Lo último se vió claramente en el $R^{2}_{a}$ de los modelos finales.
+\\
+
+En principio, a partir del ``arsenal`` descriptivo es claro que:
+\begin{itemize}
+\item {\textbf{Ineq} y \textbf{GDP} tienen una correlación negativa altísima (-0.884).}
+\item {\textbf{P01} y \textbf{P02} poseen una correlación negativa casi perfecta (0.994)}
+\item {\textbf{Ineq} y \textbf{Ed} tienen también una correlación negativa bastante alta (-0,794)}
+\item {\textbf{SO} y \textbf{NW} mantienen una correlación positiva y de nivel alto (0,767)}
+\end{itemize}
+
+Como veremos en las siguientes secciones del documento, el caso de \textbf{Ineq} y \textbf{GDP} es partícular. Como se pensó en un principio, en el resto de las duplas muy probablemente sobreviva una sola de las variables (si no es que ambas son descartadas).
+
+
+
+\newpage
+
+\subsection{Modelo Completo}
+
+Como una primera aproximación, se construye un modelo donde se incluyen todas las variables de la tabla de datos, en concreto el siguiente modelo de regresión:
+
+\begin{equation*}
+  \hat{y} = \beta_{0} + \beta_{1}Time + \beta_{2}Prob + \cdots \beta_{M}M
+\end{equation*}
+
+<<>>=
+# Se define el modelo completo
+
+lm(
+    y ~ .,
+    data = Datos
+) %T>% 
+  assign(
+    "ModeloCompleto",
+    .,
+    envir = .GlobalEnv
+  ) %>% 
+  glance() %>% 
+  mutate(
+    "$R^{2}.adj$" = adj.r.squared*100,
+    "RSE" = sigma,
+    "F Obs." = statistic,
+    "P-valor*100" = p.value*100,
+    "Regresión.gl" = df,
+    "Residuos.gl" = df.residual,
+    .keep = "none"
+  ) %>% 
+  summarise_if(
+    is.numeric,
+    ~round(.x,3)
+  ) %>% 
+  kbl(
+    booktabs = T,
+    caption = "Test sobre el modelo completo",
+    escape = FALSE
+  ) %>% 
+    kable_styling(
+    latex_options = c("striped", "hold_position"),
+    font_size = 7.5
+  )
+@
+
+Recordando que el $R^{2}_{a}$ hace referencia al porcentaje de variabilidad de \textbf{y} que es explicada con el modelo estimado,
+se considera al mismo como \textit{aceptable}. Por otro lado, haciendo referencia a la significación del modelo, se considera el siguiente test de hipótesis y el estadístico $F$ :
+
+\begin{equation*}
+  H_{0})\beta_{1} = \beta{2} = \cdots = \beta_{k} = 0
+\end{equation*}
+
+\begin{equation*}
+  H_{1})\text{No }H_{0} 
+\end{equation*}
+
+\begin{align*}
+  F_{obs} = \frac{SCE/Regresion.gl}{RSE^2}  = \frac{SCE/Regresion.gl}{SCR/Residuos.gl} = \frac{\sum{\left(\hat{y}_{i}-\bar{y}\right)^{2}}/Regresion.gl}{\sum{\left(y_{i}-\hat{y}_{i}\right)^{2}}/Residuos.gl}
+\end{align*}
+
+
+Siendo $SCE$ la suma de cuadrados explicados por la regresión y $RSE^{2}$ el cuadrado del error estándar de los residuos, resulta para este caso partícular $SCE = 5.525.982$ y $RSE^{2} = 43707,766$,
+de esta manera se obtiene el $F_{obs}$ que permite rechazar $H_{0}$ y así afirmar que el modelo es estadísticamente significativo para explicar a \textbf{y}.
+\\
+
+A continuación se testea la significación de cada variable en forma independiente, los resultados se muestran en el siguiente cuadro : 
+
+<<>>=
+# Test de forma independiente Modelo Completo
+
+ModeloCompleto %>% 
+  tidy() %>% 
+  summarise_if(
+    is.numeric,
+    ~round(.x,3)
+  ) %>% 
+  mutate(
+    Variable = c(
+      "Intercepto",
+      names(DatosTab)[-length(DatosTab)]
+    ),
+    "Estimación" = estimate,
+    "Error estándar" = std.error,
+    "Estadístico F" = statistic,
+    "P valor" = p.value,
+    "$\\left(H_{0}^{\\alpha = 0.05}\\right)\\beta_{i} = 0$" = case_when(
+      p.value < 0.05 ~ "Se rechaza H0",
+      p.value >= 0.05 ~ "No se rechaza H0"
+    ),
+    .keep = "none"
+  ) %>% 
+  kbl(
+    booktabs = T, 
+    caption = "Estimación,error estándar y test individual del modelo completo ",
+    escape = FALSE
+  ) %>% 
+  kable_styling(
+    latex_options = c("striped", "hold_position"),
+    font_size = 7.5
+  )
+@
+
+\newpage
+A partir del cuadro presentado y conforme a los tests realizados, se ve claramente que son tan solo 4 son las variables que de manera independiente (\textbf{y muy importante, en presencia de todas las demás}) logran un aporte significativo al momento de explicar el comportamiento de la tasa de criminalidad.
+\\
+
+Ellas son \textbf{M},\textbf{PO1},\textbf{U2} y por último \textbf{Prob*100}.
+\\
+
+¿Significa esto que se debe descartar el resto de las variables y plantear un modelo caracterízado por tan solo las 4?, la respuesta es \textbf{no}. 
+\\
+
+Como bien se menciona anteriormente, los tests analizan el aporte dada las demás variables. Una correlación alta entre variables, podría indicar que parte de la información que aportan una de ellas está también presente en otra y esa cantidad de información se vió cuantificada de manera previa.
+\\
+
+Con base en esta última afirmación es que se promueve el uso de distintas técnicas que nos permitirán elegír las variables de manera más acertada (y teniendo en cuenta este panorama).
+
+\section{Diagnóstico}
+
+\subsection{Análisis de multicolinealidad}
+
+Considerando el problema previamente mencionado, se analizará la multicolinealidad (aproximada) de las variables independientes del modelo planteado. 
+Esto es relevante ya que si existe una relación lineal en la matriz de diseño, esto impactaría directamente en la varianza de los regresores $\beta_{k} = \left(X^{T}X\right)^{-1}X^{T}$, 
+haciendo que las estimaciones varíen ante pequeñas perturbaciones en las observaciones, logrando así que predicciones sean menos confiables. 
+\\
+
+Estamos frente a un problema de multicolinealidad aproximada cuando es posible afirmar que existe una relación lineal entre las variables explicativas. 
+El término aproximado refiere al hecho de que en el caso de que se cumpla el fenómeno de forma exacta, la matriz no sería invertible y no existirían estimaciones únicas de los regresores
+(Teorema de Gauss Markov). A su vez no se obtendrían estimadores eficientes (insesgados y de mínima varianza).
+
+Recordando que  :
+\begin{equation*}
+  \hat{\beta_{k}} \sim N\left(\beta,\sigma^{2}\left(X^{T}X\right)^{-1}\right)
+\end{equation*}  
+
+Como se menciono anteriormente, ante una posible relación lineal el determinante de la matriz $X^{T}X$ sería próximo a cero, siendo el determinante de la matriz inversa
+demasiado grande. Es decir para un $\sigma^{2}$ fijo, la incertidumbre sería demasiado alta.
+\\
+
+Como se vió previamente, el modelo presentado hasta el momento es globalmente significativo, sin embargo tan solo 4 de las variables consideradas son significativas de manera independiente (presente todas las demás), es por esto que se cuantificará la intensidad de la multicolinealidad con el \textbf{Factor de inflación de varianza}.
+
+El \textbf{VIF} nos indica en cuantas unidades se incrementa la varianza del estimador ante presencia de colinealidad y se define como : 
+
+\begin{equation*}
+  VIF_{j} = \frac{1}{1-R^{2}_{j}}
+\end{equation*}
+
+Donde $R^{2}_{j}$ hace referencia al coeficiente de determinación de una regresión que intenta establecer una relación lineal de $X_{j}$ con las demás variables explicativas.
+
+\newpage
+
+Pondremos a prueba las variables explicativas del modelo anteriormente mencionado y diremos que estamos frente a 
+problemas de colinealidad con un $VIF \geq 10$, los resultados se muestran en el cuadro a continuación.
+<<>>=
+
+# Multicolinealidad modelo completo
+
+vif(ModeloCompleto) %>% 
+  tidy() %>% 
+  mutate(
+  Variable = c(
+    names(DatosTab)[-length(DatosTab)]
+  ),
+    VIF = x,
+    "Prueba" = case_when(
+      x >= 10 ~ "Problema de colinealidad",
+      x < 10 ~ "No hay problema de colinealidad"
+    ),
+    .keep = "none"
+  ) %>%  
+  mutate_if(
+    is.numeric,
+    round,
+    3
+  ) %>% 
+  kbl(
+    booktabs = T, 
+    caption = "Prueba de multicolinealidad : Factor de incremento de Varianza \\textbf{VIF} ",
+    escape = FALSE
+  ) %>% 
+  kable_styling(
+    latex_options = c("striped", "hold_position"),
+    font_size = 7.5
+  )
+@
+
+Con base en base a esto, podemos afirmar que este modelo presenta problemas de multicolinealidad y es por esto
+que se continuará con la selección a pasos por el método Stepwise.
+
+\subsection{Método Stepwise}
+
+El método de Stepwise (basado en el \textit{F-Test}) inicia seleccionado aquella variable que tiene una mayor correlación con la variable \textbf{y},
+la segunda en ingresar al modelo es aquella que mayor $\text{SCE}(X|\text{demás variables})$.
+
+<<results='hide'>>=
+
+# Stepwise
+
+lm(
+  reformulate(names(Datos)[-16], names(Datos[16])),
+  data = Datos
+) %>% 
+  mixlm::stepWise() %>% 
+  assign(
+    "ModeloRed",
+    .,
+    envir = .GlobalEnv
+  )
+@
+
+<<>>=
+ModeloRed %>%  
+  tidy() %>% 
+  summarise_if(
+    is.numeric,
+    ~round(.x,3)
+  ) %>% 
+  mutate(
+    Variable = c(
+      "Intercepto",
+      "Gasto per capita en policía 1960",
+      "Desigualdad del ingreso",
+      "Indice que refleja la escolaridad del estado",
+      "Número de hombres entre 14 y 24 / 1000",
+      "Probabilidad de encarcelamiento",
+      "Tasa de desempleo urbana hombres 35-39 años x 1000"
+    ),
+    "Estimación" = estimate,
+    "Error estándar" = std.error,
+    "Estadístico F" = statistic,
+    "P valor" = p.value,
+    "$\\left(H_{0}^{\\alpha = 0.05}\\right)\\beta_{i} = 0$" = case_when(
+      p.value < 0.05 ~ "Se rechaza H0",
+      p.value >= 0.05 ~ "No se rechaza H0"
+    ),
+    .keep = "none"
+  ) %>% 
+  kbl(
+    booktabs = T, 
+    caption = "Estimación,error estándar y test individual tras aplicar el método Stepwise ",
+    escape = FALSE
+  ) %>% 
+  kable_styling(
+    latex_options = c("striped", "hold_position"),
+    font_size = 7.5
+  )
+@
+
+Una vez realizado dicho método\footnote{Se pueden encontrar las salidas en el anexo.} podemos encontrarnos con un modelo con 6 variables,
+todas de ellas significativas y sin problemas de multicolinealidad, además de tener un $R^{2}_{a}$ de 
+\Sexpr{ModeloRed %>% glance() %$% adj.r.squared %>% round(2)} mayor que el del modelo completo \Sexpr{ModeloCompleto %>% glance() %$% adj.r.squared %>% round(2)}.
+
+Para continuar con el diagnostico del modelo, en la siguiente sección se hará un estudio de 
+las observaciones atípicas y/o influyentes.
+
+\newpage
+\subsection{Búsqueda de observaciones influyentes}
+
+En esta sección se buscará estudiar cuales de las observaciones presentan valores influyentes,
+para ello se hará uso de la Distancia de Cook.
+\\
+ %$% 
+Esta es una medida del nivel de influencia de la observación i-ésimas sobre la estimación de $\widehat{\beta }$, es decir se busca medir si su presencia o ausencia en el modelo hace que el mismo cambie. 
+
+Una distancia de Cook elevada significa que una observación tiene mayor influencia al momento de determinar los $\widehat{\beta }$.
+
+\begin{equation*}
+D_{i}=\frac{(\widehat{\beta}-\widehat{\beta}{(-i)})^{{}'}X{}'X(\widehat{\beta}-\widehat{\beta}{(-i)})}{(k+1)\widehat{\sigma^{2}}}
+\end{equation*}
+
+<<fig.align= "center",out.width = "0.8\\textwidth",fig.cap = "Distancia de Cook Modelo reducido">>=
+
+# Distancia de Cook
+
+ModeloRed %>% 
+  cooks.distance() %>% 
+  as.data.frame() %>% 
+  mutate(
+    .,
+    Valor = .,
+    .keep = "none"
+  ) %>% 
+  ggplot(
+    aes(
+      x = seq(1, 47, 1), 
+      y = Valor
+    )
+  ) +
+  geom_bar(stat="identity",fill="#8F3A84FF")+
+  labs(title="Distancias de Cook",
+       x="Observación",
+       y="Valor de la distancia de cook")+
+  geom_hline(yintercept = (4/40),
+             colour="#280434FF",
+          size=1)+
+  theme(aspect.ratio = 1,
+        plot.title = element_text(
+          colour = "#280434FF",
+          face="bold"
+        ),
+         axis.text.x = element_text(
+          color = "#8C04C2"
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        ))+
+geom_text( label="Regla empírica",
+           x=3,
+           y=0.105,
+           size=4,
+           colour="#6C246269")
+
+@
+
+Tomando como regla empírica el valor de $\frac{4}{n-k-1} = 4/40$ puede verse que las observaciones \textbf{11}, \textbf{29} (de manera excesiva) y \textbf{18} sobrepasan la regla estipulada.
+
+
+
+\newpage
+
+\subsection{Observaciones atípicas}
+Se analizaran aquellas observaciones que son atípicas, es decir aquellas que tienen una dispersión mayor a las demás, pero no 
+hacen variar las estimaciones de los regresores.
+\\
+
+Para detectar observaciones atípicas, se construye un vector con los residuos studentizados del modelo y se compara con el umbral definido por
+una distribución t y en el caso que la superen, se consideran atípicos.
+
+Se definen los residudos studentizados como :
+
+\begin{equation*}
+  t_{i} = \frac{e}{\sqrt{\hat{\sigma^{2}_{-i}}(1-h_{ii})}}
+\end{equation*}
+
+Una vez calculado los residuos de esta manera, podemos definir a los outliers como aquellas observaciones que sobrepasen el umbral de 
+una distribución $t^{df.res}_{1-0.01/2}$ (lineas continuas horizontales en el gráfico)
+
+<<fig.align= "center",out.width = "0.8\\textwidth",fig.cap = "Análisis de observaciones atípicas">>=
+
+# Observaciones atípicas
+
+ModeloRed  %>% 
+  rstudent() %>% 
+  as.data.frame() %>% 
+  mutate(
+    Ati = case_when(
+      abs(.) >= qt(1-0.01/2,ModeloRed %$% df.residual) ~ .,
+      NA ~ 0
+    )
+  ) %>% 
+  ggplot(
+    aes(
+      x = 1:nrow(Datos),
+      y = .
+    )
+  ) + 
+  geom_point(colour="#8C04C2") + 
+  geom_hline(
+    yintercept = 0,
+    linetype = "dashed",
+    color = "#8F3A847A",
+    size = 1.2
+  ) +
+  geom_hline(
+    yintercept = qt(
+      1-0.01/2,
+      ModeloRed %$% df.residual
+    ),
+    size = 1.2,
+    color = "#280434FF"
+  ) +
+  geom_hline(
+      yintercept = - qt(
+        1-0.01/2,
+        ModeloRed %$% df.residual
+      ),
+      size = 1.2,
+      color = "#280434FF"
+  ) + 
+  geom_point(
+    aes(
+      y = Ati
+    ),
+    shape = 18, 
+    color = "#FC4E07",
+    size = 3
+  ) + 
+  scale_x_continuous(
+    breaks = seq(1,nrow(Datos),2)
+  ) +
+  labs(
+    x = "Observación",
+    y = "Residudos studentizados"
+  ) +
+  theme(
+    aspect.ratio = 1,
+    plot.title = element_text(
+      colour = "#280434FF",
+      face="bold"
+      ),
+    axis.text.x = element_text(
+      color = "#8C04C2"
+      ),
+    axis.text.y = element_text(
+          color="#8C04C2"
+      )
+    )
+@
+
+Recordando el análisis de la sección anterior, el estado número \textbf{11}, \textbf{29} y \textbf{18} presentan problemas con la distancia de Cook, con este gráfico podemos afirmar que las observaciones \textbf{29} y 
+\textbf{11} son influyentes y atípicas, mientras que para la número \textbf{18} podemos ver que es muy cercana a cero, la esperanza de los errores por lo que es solamente atípica.
+
+Por ende, se decide retirarlas del modelo reducido ya que las mismas tienen una influencia preponderante en la estimación. 
+Como se vió en clase, observaciones de este tipo pueden llevar a un modelo alejado de la realidad.
+
+
+<<results = 'hide'>>=
+# Se interviene el modelo
+Datos %<>%
+  slice(
+    -c(
+      11,
+      29,
+      18
+    )
+  )
+
+ModeloRed %>%
+  update(
+    .,
+    data = Datos
+  ) %T>% 
+  assign(
+    "ModeloRedInter",
+    .,
+    envir = .GlobalEnv
+  )
+@
+
+
+\subsection{Normalidad}
+
+Uno de los supuestos fundamentales al momento de construír este modelo lineal, refiere a la distribución de los errores, en este caso se asume que siguen una distribución normal.
+Esto permite realizar las pruebas anteriormente presentadas a lo largo de este trabajo, en el caso que este supuesto no se cumpla los estadísticos no reflejarán 
+lo que se desea probar (su distribución no será la esperada), es por esto que es de crucial importancia chequear la distribución de los errores.
+\\
+
+En primer se hará un primer acercamiento con un gráfico de QQ-Plot, que muestra la similitud de los percentiles de la distribución normal teórica y la observada en nuestros errores, por último un gráfico de residudos contra los valores predichos para ver si existe algún patrón en su recorrido. 
+
+
+<<out.width = "0.65\\textwidth",fig.align = "center",fig.cap = "Normalidad: Residuos vs modelo y Normal QQ-Plot">>=
+
+# Gráfico de errores y qq plot
+ModeloRedInter %>% 
+  autoplot(
+    which = c(1,2)
+  ) + 
+  theme(
+    aspect.ratio = 1,
+    plot.title = element_text(
+      colour = "#280434FF",
+      face="bold"
+    ),
+    axis.text.x = element_text(
+    color = "#8C04C2"
+    ),
+    axis.text.y = element_text(
+      color="#8C04C2"
+    )
+  )
+@
+
+<<out.width = "0.5\\textwidth",fig.align = "center",fig.cap = "Distribución normal y distribución errores (Suavizada distribución Kernel)">>=
+
+# Distribución teórica vs normal 
+
+ModeloRedInter  %>% 
+  rstudent() %>% 
+  as.data.frame() %>% 
+  ggplot(
+    aes(
+      x = .
+    )
+  ) + 
+  geom_density(
+    size = 1.7,
+    colour = "#8F3A84FF"
+  ) + 
+  geom_line(
+    aes(
+      x = seq(-4,4,length.out = 44),
+      y = dnorm(seq(-4,4,length.out = 44))
+    ),
+    colour = "#280434FF",
+    size = 1.7
+  ) + 
+  labs(
+    title = "Valores teóricos y errores studentizados " ,
+    x="x",
+    y = "Densidad"
+  ) +
+  theme(
+    aspect.ratio = 1,
+    plot.title = element_text(
+      colour = "#280434FF",
+      face="bold"
+    ),
+    axis.text.x = element_text(
+      color = "#8C04C2"
+    ),
+    axis.text.y = element_text(
+      color="#8C04C2"
+    )
+  )
+@
+
+
+Con base en los gráficos se observa que la esperanza de los errores se mantiene cercana a cero, con excepción de algunas observaciones.
+También se debe mencionar que no es posible encontrar un patrón en la dispersión de los errores, en cambio en la gráfica QQ-plot muestra como los valores centrales de
+la distribución se asemeja a una distribución normal, a excepción de la observación 17, 20 y 21, lo mismo se puede apreciar en gráfica que compara la distribución de los errores
+(que fue construida con la función \textit{geom density} de ggplot que calcula y dibuja la estimación de la densidad Kernel con valores por defecto) con una distribución normal,
+teniendo problemas en valores particulares y una gran concentración en valores poco antes de cero. 
+\\
+
+Para poder afirmar que se cumple el supuesto de normalidad de los errores se realizan, tres pruebas:
+
+\begin{itemize}
+  \item {\textbf{Test Kolmogrov-Smirnov Lillie:} Compara la distribución teórica $F^{*}$ y la distribución empírica de los errores $S(x)$ $T = sup_{x}|F^{*}(x) - S(X)|$}
+  \item {\textbf{Shapiro-Wilks:} Que plantea un estadístico que es una función de las estadísticas de órden de la distribución de los errores y se compara con un valor de tabla}
+  \item {\textbf{Jarque Bera:} Se basa en los coeficientes de simetría y kurtosis de la muestra, que para una normal son 0 y 3 respectivamente y con estadístico $\chi^{2}_{2}$}
+\end{itemize}
+
+<<>>=
+# Test normalidad
+
+TestNormalidad <- function(lm) {
+  x = rstudent(lm) 
+  Esta = c(
+    lillie.test(x)$statistic,
+    shapiro.test(x)$statistic,
+    jarque.bera.test(x)$statistic
+  )
+  Pvalue = c(
+    lillie.test(x)$p.value,
+    shapiro.test(x)$p.value,
+    jarque.bera.test(x)$p.value
+  )
+  return(
+    data.frame(
+      "Test" = c(
+        "Lillie",
+        "Shapiro",
+        "Jarque Bera"
+      ),
+      "Pvalor" = Pvalue,
+      "Estadístico" = Esta
+    )
+  )
+}
+
+ModeloRedInter %>% 
+  TestNormalidad() %>% 
+  mutate_if(
+    is.numeric,
+    round,
+    3
+  ) %>% 
+  mutate(
+    Resultado = case_when(
+      Pvalor > 0.05 ~ "No rechazo normalidad",
+      NA ~ "Rechazo H0"
+    )
+  ) %>% 
+  kbl(
+    booktabs = T, 
+    caption = "Test de Normalidad $\\alpha = 0.05$",
+    escape = FALSE,
+    row.names = FALSE
+  ) %>% 
+  kable_styling(
+    latex_options = c("striped", "hold_position"),
+    font_size = 7.5
+  )
+@
+
+En base a los test se puede afirmar que la distribución de los errores sigue una distribución Normal, a continuación se hará el análisis de la homocedasticidad.
+
+\newpage
+
+\subsection{Homocedasticidad}
+En esta sección se discutirá lo siguiente:
+\begin{equation*}
+\begin{matrix}
+H_{0})\sigma_{i}^{2}=\sigma^{2},\: \forall i=1,...,6\\ 
+H_{1})\text{No}\,  H_{0}
+\end{matrix}
+\end{equation*}
+
+Para ello se hará uso de los test de Breusch-Pagan, White, y Glejser.
+\\
+
+El test de \textbf{White} consiste en la siguiente serie de pasos:
+\begin{itemize}
+\item {Se estima el modelo y luego se genera el vector de errores estimados.}
+\item{Se ajusta el modelo $e^{2}=X\alpha+Z\beta+W\delta+\mu$, con Z matriz de productos cruzados se las variables originales, W contiene las variables originales al cuadrado. }
+\item{Se calcula $R^{2}$ del modelo.}
+\item{Se calcula el estadístico $nR^{2}$ que se distribuye $\chi _{k}$ con k cantidad de variables del modelo.}
+\item{Se realiza el test.}
+\end{itemize}
+
+El test de \textbf{Breusch-Pagan} empleado se basa en:
+\begin{itemize}
+\item{Se supone que la heterocedasticidad se debe a todas las variables.}
+\item{Se estima el modelo $Y=X\beta+\varepsilon$, en conjunto con $e$ y $\hat{\sigma}$.}
+\item{Se ajusta el modelo $\frac{e}{\hat{\sigma}^{2}}=X\alpha+\mu$.}
+\item{Se define $BP=\frac{SCE}{2}$ estadístico con distribución $\chi _{k}$ bajo H0 cierta.}
+\item{Se testea.}
+\end{itemize}
+
+Finalmente el test de \textbf{Glejser} consiste en:
+\begin{itemize}
+\item {Se estima el modelo y luego se genera el vector de errores estimados.}
+\item{Se calcula $\left | e_{i} \right |$ para toda variable.}
+\item{Se ajustan los siguientes modelos:
+\begin{equation*}
+\left | e \right |=\alpha+\beta X+\mu
+\end{equation*}
+\begin{equation*}
+\left | e \right |=\alpha+\beta \sqrt{X}+\mu
+\end{equation*}
+\begin{equation*}
+\left | e \right |=\alpha+\beta \frac{1}{X}+\mu
+\end{equation*}}
+\item{Se selecciona la regresión con el ajuste más alto}
+\item{Se testea $H_{0})\beta=0$, si se rechaza la hipótesis nula, se rechaza la homocedasticidad}
+\end{itemize}
+<<>>=
+
+# Test de heterocedasticidad
+
+Het<-function(lm) {
+  Esta = c(
+    bptest(lm)$statistic,
+    white_lm(lm)$statistic,
+    glejser(lm)$statistic
+  )
+  Pvalue = c(
+    bptest(lm)$p.value,
+    white_lm(lm)$p.value,
+    glejser(lm)$p.value
+  )
+  return(
+    data.frame(
+      "Test" = c(
+        "Breusch-Pagan",
+        "White",
+        "Glejser"),
+      "Pvalor" = Pvalue,
+      "Estadístico" = Esta
+    )
+  )
+}
+
+Het(ModeloRedInter)%>%
+  mutate_if(
+    is.numeric,
+    round,
+    3
+  ) %>% 
+  mutate(
+    Resultado = case_when(
+      Pvalor > 0.05 ~ "No rechazo Homocedasticidad",
+      NA ~ "Rechazo H0"
+    )
+  ) %>% 
+  kbl(
+    booktabs = T, 
+    caption = "Test de Homocedasticidad ",
+    escape = FALSE,
+    row.names = FALSE
+  ) %>% 
+  kable_styling(
+    latex_options = c("striped", "hold_position"),
+    font_size = 7.5
+  )
+@
+
+Trás la realización de los 3 tests, se confirma con gran nivel de seguridad que el modelo actual no presenta problemas con respecto al supuesto de la homocedasticidad.
+\newpage
+\section{Modelo Final}
+\subsection{Expresión}
+
+Terminados ya todos los procesos referentes a la refinación del modelo completo original, se llega al denominado \textbf{Modelo Final}.El mismo incluye las siguientes variables:
+\begin{itemize}
+\item{\textit{Gasto per cápita en policía en 1960} (\textbf{Po1}).} 
+\item{\textit{Desigualdad en el ingreso} (\textbf{Ineq})}  
+\item{\textit{Índice de la escolaridad del estado} (\textbf{Ed}).}
+\item{\textit{cantidad de hombres entre 14 y 20 años de edad cada 1.000 habitantes.} 
+(\textbf{M})}
+\item{\textit{Tasa de desempleo urbana de hombres de 35 a 39 años por 1000 habitantes.} (\textbf{U2})}
+\item{\textit{Probabilidad de encarcelamiento*100} (\textbf{Prob}).}
+\end{itemize}
+
+De manera resumida : 
+
+<<>>=
+ModeloRedInter %>%  
+  tidy() %>% 
+  summarise_if(
+    is.numeric,
+    ~round(.x,3)
+  ) %>% 
+  mutate(
+    Variable = c(
+      "Intercepto",
+      "Gasto per capita en policía 1960",
+      "Desigualdad del ingreso",
+      "Indice que refleja la escolaridad del estado",
+      "Número de hombres entre 14 y 24 / 1000",
+      "Probabilidad de encarcelamiento",
+      "Tasa de desempleo urbana hombres 35-39 años x 1000"
+    ),
+    "Estimación" = estimate,
+    "Error estándar" = std.error,
+    "$\\left(H_{0}^{\\alpha = 0.05}\\right)\\beta_{i} = 0$" = case_when(
+      p.value < 0.05 ~ "Se rechaza H0",
+      p.value >= 0.05 ~ "No se rechaza H0"
+    ),
+    .keep = "none"
+  ) %>% 
+  kbl(
+    booktabs = T, 
+    caption = "Estimación,error estándar y test individual tras aplicar el método Stepwise intervenido por observaciones influyentes",
+    escape = FALSE
+  ) %>% 
+  kable_styling(
+    latex_options = c("striped", "hold_position"),
+    font_size = 7.5
+  )
+@
+
+
+<<>>=
+ModeloRedInter %>% 
+  glance() %>% 
+  mutate(
+    "$R^{2}.adj$" = adj.r.squared*100,
+    "RSE" = sigma,
+    "SCE" = sum((ModeloRedInter$fitted.values-mean(Datos$y))^(2)),
+    "F Obs." = statistic,
+    "P-valor*100" = p.value*100,
+    "Regresión.gl" = df,
+    "Residuos.gl" = df.residual,
+    .keep = "none"
+  ) %>% 
+  summarise_if(
+    is.numeric,
+    ~round(.x,3)
+  ) %>% 
+assign(
+  "ResumenRedInter",
+  .,
+  envir = .GlobalEnv
+)
+
+ModeloCompleto %>% 
+  glance() %>% 
+  mutate(
+    Modelo = "Modelo Completo",
+    "$R^{2}.adj$" = adj.r.squared*100,
+    "RSE" = sigma,
+    "SCE" = sum((ModeloCompleto$fitted.values-mean(Datos$y))^(2)),
+    "F Obs." = statistic,
+    "P-valor*100" = p.value*100,
+    "Regresión.gl" = df,
+    "Residuos.gl" = df.residual,
+    .keep = "none"
+  ) %>% 
+  summarise_if(
+    is.numeric,
+    ~round(.x,3)
+  ) %>% 
+assign(
+  "ResumenCompleto",
+  .,
+  envir = .GlobalEnv
+)
+
+
+rbind.data.frame(
+  ResumenRedInter,
+  ResumenCompleto
+) %>% 
+mutate(
+  Modelo = c(
+    "Modelo Reducido e intervenido",
+    "Modelo Completo"
+  )
+) %>% 
+relocate(
+  Modelo,
+  .before = `$R^{2}.adj$`
+) %>% 
+  kbl(
+    booktabs = T,
+    caption = "Comparación modelo completo vs reducido e intervenido",
+    escape = FALSE
+  ) %>% 
+    kable_styling(
+    latex_options = c("striped", "hold_position"),
+    font_size = 7.5
+  )
+@
+
+De esta manera, puede verse que ante una variación en un peso en el gasto de la policía la \textit{Tasa de Criminalidad} se esperaría que la tasa de criminalidad aumente en 11.50, dejando
+las demás variables constantes. También es preciso afirmar que en estados donde existe una mayor desigualdad en el ingreso, se espera que la tasa de criminalidad sea mayor, lo mismo ocurre con el
+indice de escolaridad, la cantidad de hombres de 14 y 24 años y la tasa de desempleo de 35 y 39 años (cosa que se podía afirmar desde el análisis descriptivo se encuentra ahora cuantificada de manera más precisa). 
+\\
+
+Las variables relacionadas con la cantidad de hombres o nivel de empleo en un tramo etario dado, se debe considerar si bien se tiene información acerca de 
+la tasa de desempleo en hombres de 14 a 24 años, la cantidad de hombres de 14 a 24 años por cada 1000 habitantes (independientemente de su condición laboral) tiene una mayor fuerza explicativa.
+\\
+
+Realizando una interpretación objetiva, en el modelo influye más la cantidad de adolescentes y jóvenes adultos, que la situación del mercado laboral a la hora de estimar la tasa de delincuencia.
+\\
+
+Por último la estimación del regresor asociado a la \textit{Probabilidad de encarcelamiento} tiene una interpretación bastante fuerte, ya que si se comparan dos estados con
+la misma situación de Gasto,Desigualdad en el ingreso, Desempleo en Hombres de 35 a 39 años, cantidad de hombres de 14 y 24 años y con un mismo nivel educativo, la tasa de criminalidad
+sera sustancialmente menor ante una variación positiva de esta variable.
+\\
+
+\subsection{Conclusiones}
+
+De manera resumida y quizás en cierta parte reiterativa, el proceso de construcción del modelo se basó en 3 pilares fundamentales:
+
+\begin{itemize}
+\item{\textbf{Fidelidad en la representación:} se buscó construír un modelo que efectivamente logre explicar el comportamiento de la tasa de la manera más certera posible. Como se vé en el cuadro anterior, se llegó a una expresión cuyo ajuste es del 80,56\% apróximadamente.}
+\item{\textbf{Balance:} se buscó una cantidad de variables adecuadas, la eliminación de parte de ellas permitió obtener un modelo para nada sobrecargado y sobre todo eficiente. A su vez, la eliminación de variables no fue desmedida, en todo momento una justificación teórica la respalda.}
+\item{\textbf{Control:} si bien la eliminación de observaciones que perturban los supuestos clásicos del modelo puede ser absorbente, en un modelo construído a partir de una cantidad medianamente acotada de observaciones esto lleva sin ninguna duda a la pérdida de fidelidad representativa. Nuevamente, es claro que en el proceso estas decisiones tomaron tiempo de pensamiento y se basaron en los conceptos estudiados en clase. }
+\end{itemize}
+
+Un detalle final a tener nuevamente en consideración es la eliminación de las 3 observaciones que ponen en jaque a los supuestos planteados. Este modelo no se va adecuar "fielmente" a estos 3 estados, una posible solución para futuros trabajos sería aplicar \textit{Bootstrap residuals} en el modelo sin intervenir y aproximar la variabilidad de los estimadores. Esto es sin duda una herramienta que nos propusimos a explorar en el futuro.
+
+
+
+\newpage
+\section{Anexo}
+
+\subsection{Gráfico descriptivo}
+En esta gráfica se puede ver la correlación entre las variables presentadas ,un gráfico de dispersión y la distribución de la variable.
+
+\begin{figure}[h]
+  \includegraphics[width = 1.05\textwidth]{Grafico.png}
+\end{figure}
+
+\newpage
+
+\subsection{Selección de Modelos : stepWise}
+
+En este apartado se muestra la salida de la selección a pasos de Stepwise, se puede ver que el $\alpha$ de entrada y salida es igual a $0.15$, comienza
+solo incluyendo la constante en el modelo, luego agrega \textbf{Po1} hasta llegar al séptimo paso y terminar el algorítmo.
+
+<<>>=
+lm(
+  reformulate(names(Datos)[-16], names(Datos[16])),
+  data = Datos
+) %>% 
+  mixlm::stepWise(full = TRUE)
+@
+
+\newpage
+
+\subsection{Script de R}
+
+Aquí se mostrará el código R utilizado para el trabajo, para reproducirlo solo hace falta incluir en el mismo directorio de trabajo
+el archivo \textbf{USCrime.txt}. En el proceso se desplegarán las diferentes gráficas y tablas, así como también el modelo completo \textit{ModeloCompleto},
+el modelo reducido \textit{ModeloRed} y el modelo reducido intervenido como \textit{ModeloRedInter} en el ambiente de trabajo.
+
+El mismo puede encontrarse en \url{https://gist.github.com/mauroloprete/dcb1c0bba5215baa24311be4e77be8cb}.
+
+<<eval =F,echo = T>>=
+## ----include=FALSE------------------------------------------------------------
+## Configuración 
+knitr::opts_chunk$set(
+  echo = FALSE,
+  fig.pos = 'H',
+  warning = FALSE
+)
+
+## Paquetes
+
+if(!require(pacman)) {
+  install.packages("pacman")
+}
+pacman::p_load(
+  here,
+   reshape2,
+   knitr,
+   tidymodels,
+   kableExtra,
+   magrittr,
+   GGally,
+   car,
+   nortest,
+   tseries,
+   lmtest,
+   tidyverse,
+   ggfortify,
+   skedastic
+ )
+
+# Cargar los datos
+
+read.table(
+  "UScrime.txt",
+  header = TRUE,
+  dec = ","
+) %>% 
+  mutate(
+    Prob = Prob*100
+  ) %>% 
+  assign(
+    "Datos",
+    .,
+    envir = .GlobalEnv
+  )
+
+# Para poder recuperar el script de los chunk
+
+knitr::purl("Entrega.Rnw")
+
+
+
+## ----fig.cap = "Histograma de la Tasa de Criminalidad",out.width = "0.4\\textwidth",fig.align = "center"----
+# Histograma tasa de criminalidad
+
+# Regla de Struges
+
+Sturges<-log2(47)+1
+ggplot(Datos,aes(x=y))+
+  geom_histogram(bins = Sturges,
+                 fill="#8F3A84FF",
+                 colour="black")+
+  theme(aspect.ratio = 1,
+        plot.subtitle = element_text(
+          size=6.5
+        ),
+        plot.title = element_text(
+          face="bold",
+          size=10,
+          color = "#280434FF"
+        ),
+        axis.text.x = element_text(
+          color = "#8C04C2"
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        ))+
+  labs(title="Histograma de Y",
+       subtitle = "Tasa de criminalidad",
+       x="Número de ofensas reportadas",
+       y="Cantidad de Estados")
+
+
+## ----echo=FALSE,fig.cap = "Histogramas (1)"-----------------------------------
+
+# Histogramas múltiples 1
+
+multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
+  library(grid)
+
+  
+  plots <- c(list(...), plotlist)
+
+  numPlots = length(plots)
+
+  
+  if (is.null(layout)) {
+  
+    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
+                    ncol = cols, nrow = ceiling(numPlots/cols))
+  }
+
+ if (numPlots==1) {
+    print(plots[[1]])
+
+  } else {
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+
+    for (i in 1:numPlots) {
+      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+
+      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+                                      layout.pos.col = matchidx$col))
+    }
+  }
+}
+
+HistM<-ggplot(Datos,aes(x=M))+
+  geom_histogram(bins=Sturges,
+                 fill="#8F3A84FF",
+                 colour="black")+
+  theme(aspect.ratio = 1,
+        plot.subtitle = element_text(
+          size=6.5
+        ),
+        plot.title = element_text(
+          face="bold",
+          size=10,
+          color = "#280434FF"
+        ),
+        axis.text.x = element_text(
+          color = "#8C04C2"
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        ))+
+  labs(title="Histograma variable M",
+       subtitle="Número de hombres entre 14 y 24
+       años por 1000 habitantes",
+       x="Cantidad de Hombres",
+       y="Cantidad de Estados")
+
+
+BarpSo<-ggplot(data=Datos, aes(x=factor(So))) +
+  geom_bar(stat="count", 
+           fill="#8F3A84FF",
+           colour="black")+
+  theme(plot.subtitle = element_text(
+          size=6.5
+        ),
+        plot.title = element_text(
+          face = "bold",
+          size=10,
+          color = "#280434FF"
+        ),
+        axis.text.x = element_text(
+          color = "#8C04C2"
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        ),
+        aspect.ratio=1)+
+  labs(title = "Barplot variable So",
+       subtitle = "¿Es este un estado sureño?",
+       x="Respuesta",
+       y="Cantidad de respuestas")
+
+HistEd<-ggplot(Datos,aes(x=Ed))+
+  geom_histogram(bins=Sturges,
+                 fill="#8F3A84FF",
+                 colour="black")+
+  theme(aspect.ratio = 1,
+        plot.subtitle = element_text(
+          size=6.5
+        ),
+        plot.title = element_text(
+          size=10,
+          face="bold",
+          color = "#280434FF"
+        ),
+        axis.text.x = element_text(
+          color = "#8C04C2"
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        ))+
+  labs(title="Histograma variable Ed",
+       subtitle="Escolaridad del Estado",
+       x="Puntuación",
+       y="Cantidad de Estados")
+
+HistPo1<-ggplot(Datos,aes(x=Po1))+
+  geom_histogram(bins=Sturges,
+                 fill="#8F3A84FF",
+                 colour="black")+
+  theme(aspect.ratio = 1,
+        plot.subtitle = element_text(
+          size=6.5
+        ),
+        plot.title = element_text(
+          face="bold",
+          size=10,
+          color = "#280434FF"
+        ),
+        axis.text.x = element_text(
+          color = "#8C04C2"
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        ))+
+  labs(title="Histograma variable Po1",
+       subtitle = "1960",
+       x="Gasto",
+       y="Cantidad de Estados")
+
+HistPo2<-ggplot(Datos,aes(x=Po2))+
+  geom_histogram(bins=Sturges,
+                 fill="#8F3A84FF",
+                 colour="black")+
+  theme(aspect.ratio = 1,
+        plot.subtitle = element_text(
+          size=6.5
+        ),
+        plot.title = element_text(
+          face="bold",
+          size=10,
+          color = "#280434FF"
+        ),
+        axis.text.x = element_text(
+          color = "#8C04C2"
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        ))+
+  labs(title="Histograma variable Po2",
+       subtitle = "1959",
+       x="Gasto",
+       y="Cantidad de Estados")
+
+HistLF<-ggplot(Datos,aes(x=LF))+
+  geom_histogram(bins=Sturges,
+                 fill="#8F3A84FF",
+                 colour="black")+
+  theme(aspect.ratio = 1,
+        plot.subtitle = element_text(
+          size=6.5
+        ),
+        plot.title = element_text(
+          face="bold",
+          size=10,
+          color = "#280434FF"
+        ),
+        axis.text.x = element_text(
+          color = "#8C04C2"
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        ))+
+  labs(title="Histograma variable LF",
+       subtitle = "TPFLM de 14 a 24 años",
+       x="Gasto",
+       y="Cantidad de Estados")
+
+HistMF<-ggplot(Datos,aes(x=M.F))+
+  geom_histogram(bins=Sturges,
+                 fill="#8F3A84FF",
+                 colour="black")+
+  theme(aspect.ratio = 1,
+        plot.subtitle = element_text(
+          size=6.5
+        ),
+        plot.title = element_text(
+          face="bold",
+          size=10,
+          color = "#280434FF"
+        ),
+        axis.text.x = element_text(
+          color = "#8C04C2"
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        ))+
+  labs(title="Histograma variable M.F",
+       subtitle = "Cantidad de hombres cada 1000 mujeres",
+       x="Cantidad de Hombres",
+       y="Cantidad de Estados")
+
+HistPop<-ggplot(Datos,aes(x=Pop))+
+  geom_histogram(bins=Sturges,
+                 fill="#8F3A84FF",
+                 colour="black")+
+  theme(aspect.ratio = 1,
+        plot.subtitle = element_text(
+          size=6.5
+        ),
+        plot.title = element_text(
+          face="bold",
+          size=10,
+          color = "#280434FF"
+        ),
+        axis.text.x = element_text(
+          color = "#8C04C2"
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        ))+
+  labs(title="Histograma variable Pop",
+       subtitle = "Tamaño de la población en cienmiles",
+       x="Pop",
+       y="Cantidad de Estados")
+
+HistNW<-ggplot(Datos,aes(x=NW))+
+  geom_histogram(bins=Sturges,
+                 fill="#8F3A84FF",
+                 colour="black")+
+  theme(aspect.ratio = 1,
+        plot.subtitle = element_text(
+          size=6.5
+        ),
+        plot.title = element_text(
+          face="bold",
+          size=10,
+          color = "#280434FF"
+        ),
+        axis.text.x = element_text(
+          color = "#8C04C2"
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        ))+
+  labs(title="Histograma variable NW",
+       subtitle = "Cantidad de no caucásicos cada 1000 habitantes",
+       x="Cantidad de no caucásicos",
+       y="Cantidad de Estados")
+
+HistU1<-ggplot(Datos,aes(x=U1))+
+  geom_histogram(bins=Sturges,
+                 fill="#8F3A84FF",
+                 colour="black")+
+  theme(aspect.ratio = 1,
+        plot.subtitle = element_text(
+          size=6.5
+        ),
+        plot.title = element_text(
+          face="bold",
+          size=10,
+          color = "#280434FF"
+        ),
+        axis.text.x = element_text(
+          color = "#8C04C2"
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        ))+
+  labs(title="Histograma variable U1",
+       subtitle = "TD cada 1000 habitantes,
+hombres de 14 a 24 ",
+       x="U1",
+       y="Cantidad de Estados")
+
+HistU2<-ggplot(Datos,aes(x=U2))+
+  geom_histogram(bins=Sturges,
+                 fill="#8F3A84FF",
+                 colour="black")+
+  theme(aspect.ratio = 1,
+        plot.subtitle = element_text(
+          size=6.5
+        ),
+        plot.title = element_text(
+          face="bold",
+          size=10,
+          color = "#280434FF"
+        ),
+        axis.text.x = element_text(
+          color = "#8C04C2"
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        ))+
+  labs(title="Histograma variable U2",
+       subtitle = "TD cada 1000 habitantes, 
+hombres de 35 a 39 ",
+       x="U2",
+       y="Cantidad de Estados")
+
+HistGDP<-ggplot(Datos,aes(x=GDP))+
+  geom_histogram(bins=Sturges,
+                 fill="#8F3A84FF",
+                 colour="black")+
+  theme(aspect.ratio = 1,
+        plot.subtitle = element_text(
+          size=6.5
+        ),
+        plot.title = element_text(
+          face="bold",
+          size=10,
+          color = "#280434FF"
+        ),
+        axis.text.x = element_text(
+          color = "#8C04C2"
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        ))+
+  labs(title="Histograma variable GDP",
+       subtitle = "PIB per cápita",
+       x="GDP",
+       y="Cantidad de Estados")+
+  scale_y_continuous(breaks = c(2,4,6,8,10,12,14,16))
+
+HistIneq<-ggplot(Datos,aes(x=Ineq))+
+  geom_histogram(bins=Sturges,
+                 fill="#8F3A84FF",
+                 colour="black")+
+  theme(aspect.ratio = 1,
+        plot.subtitle = element_text(
+          size=6.5
+        ),
+        plot.title = element_text(
+          face="bold",
+          size=10,
+          color = "#280434FF"
+        ),
+        axis.text.x = element_text(
+          color = "#8C04C2"
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        ))+
+  labs(title="Histograma variable Ineq",
+       subtitle = "Desigualdad de Ingresos",
+       x="Ineq",
+       y="Cantidad de Estados")+
+   scale_y_continuous(breaks = c(2,4,6,8,10,12))
+
+HistProb<-ggplot(Datos,aes(x=Prob))+
+  geom_histogram(bins=Sturges,
+                 fill="#8F3A84FF",
+                 colour="black")+
+  theme(aspect.ratio = 1,
+        plot.subtitle = element_text(
+          size=6.5
+        ),
+        plot.title = element_text(
+          face="bold",
+          size=10,
+          color = "#280434FF"
+        ),
+        axis.text.x = element_text(
+          color = "#8C04C2",
+          angle = 90
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        ))+
+  labs(title="Histograma variable Prob",
+       subtitle = "Probabilidad de encarcelamiento",
+       x="P",
+       y="Cantidad de Estados")
+
+HistTime<-ggplot(Datos,aes(x=Time))+
+  geom_histogram(bins=Sturges,
+                 fill="#8F3A84FF",
+                 colour="black")+
+  theme(aspect.ratio = 1,
+        plot.subtitle = element_text(
+          size=6.5
+        ),
+        plot.title = element_text(
+          face="bold",
+          size=10,
+          color = "#280434FF"
+        ),
+        axis.text.x = element_text(
+          color = "#8C04C2"
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        ))+
+  labs(title="Histograma variable Time",
+       subtitle = "Tiempo promedio de estadía en cárceles estatales",
+       x="Tiempo",
+       y="Cantidad de Estados")
+
+multiplot(HistM,BarpSo,HistEd,HistPo1,HistNW,HistPo2,HistLF,HistMF,HistPop,cols=3)
+
+
+## ----fig.cap = "Histogramas (2)"----------------------------------------------
+multiplot(HistU1,HistU2,HistGDP,HistIneq,HistProb,HistTime,cols=3)
+
+
+## -----------------------------------------------------------------------------
+# Tabla descriptiva
+
+DatosTab <- Datos
+names(DatosTab) <- c(
+  "Número de Hombres 14-24 / 1.000",
+  "Indicadora Estado Sur",
+  "Indice Escolaridad",
+  "Gasto per cápita 1.960",
+  "Gasto per cápita 1.959",
+  "Tasa participación masculina 14-24 por 1.000",
+  "Hombres cada 1.000 mujeres",
+  "Población cada 100.000",
+  "Número de no caucásicos cada 1.000 habitantes",
+  "Tasa desempleo urbana Hombres 14-24 por 1.000",
+  "Tasa desempleo urbana Hombres 35-39 por 1.000",
+  "Producto bruto interno per cápita",
+  "Desigualdad ingreso",
+  "Probabilidad Encarcelamiento",
+  "Tiempo de estadía en cárceles",
+  "Tasa de criminalidad"
+)
+
+summaryMod <- function(x) {
+  c(
+    quantile(x, probs = seq(0, 1, 0.25)),
+    mean(x),
+    (sd(x)/mean(x))*100
+  )
+}
+DatosTab %>%
+  select(
+    -"Indicadora Estado Sur"
+  ) %>% 
+  summarise_if(
+    is.numeric,
+    summaryMod
+  ) %>% 
+  mutate(
+    Estadistico = c(
+      "Min",
+      "1er Qu.",
+      "Mediana",
+      "3er Qu.",
+      "Max",
+      "Media",
+      "CV*100"
+    )
+  ) %>% 
+  relocate(
+    where(is.numeric),
+    .after = where(is.character)
+  ) %>%
+  mutate_if(
+    is.numeric,
+    format,
+    digits = 2
+  ) %>% 
+  pivot_longer(
+    cols = -Estadistico,
+    names_to = "Variable",
+    values_to = "Valor"
+  ) %>% 
+  pivot_wider(
+    values_from = "Valor",
+    names_from = "Estadistico"
+  ) %>% 
+  kbl(
+    booktabs = T, 
+    caption = "Medidas descriptivas para variables numéricas"
+  ) %>% 
+  kable_styling(
+    latex_options = c("striped", "hold_position"),
+    font_size = 8.5
+  )
+
+
+## ----fig.cap = "Mapa de correlación de variables incluidas",out.width = "0.5\\textwidth",fig.align = "center"----
+# Mapa de correlación entre variables
+
+qplot(x=Var1,
+      y=Var2,
+      data = melt(cor(Datos, use = "p")),
+      fill = value,
+      geom="tile"
+)+scale_fill_gradient2(limits = c(-1, 1),
+                       low = "#A50303", high = "#250455")+
+  theme(aspect.ratio = 1,
+        plot.title = element_text(
+          face = "bold",
+          color = "#280434FF"),
+        plot.subtitle = element_text(
+          size=8,
+          color="#5C485F"
+        ),
+        axis.text.x = element_text(
+          color = "#8C04C2",
+          angle=90
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        )
+        )+
+  labs(title="Mapa de correlación de variables",
+       subtitle = "Variables referidas a tasa de criminalidad en USA",
+       x="Variables",
+       y="",
+       fill="Coef Corr.")
+
+
+## -----------------------------------------------------------------------------
+# Se define el modelo completo
+
+lm(
+    y ~ .,
+    data = Datos
+) %T>% 
+  assign(
+    "ModeloCompleto",
+    .,
+    envir = .GlobalEnv
+  ) %>% 
+  glance() %>% 
+  mutate(
+    "$R^{2}.adj$" = adj.r.squared*100,
+    "RSE" = sigma,
+    "F Obs." = statistic,
+    "P-valor*100" = p.value*100,
+    "Regresión.gl" = df,
+    "Residuos.gl" = df.residual,
+    .keep = "none"
+  ) %>% 
+  summarise_if(
+    is.numeric,
+    ~round(.x,3)
+  ) %>% 
+  kbl(
+    booktabs = T,
+    caption = "Test sobre el modelo completo",
+    escape = FALSE
+  ) %>% 
+    kable_styling(
+    latex_options = c("striped", "hold_position"),
+    font_size = 7.5
+  )
+
+
+## -----------------------------------------------------------------------------
+# Test de forma independiente Modelo Completo
+
+ModeloCompleto %>% 
+  tidy() %>% 
+  summarise_if(
+    is.numeric,
+    ~round(.x,3)
+  ) %>% 
+  mutate(
+    Variable = c(
+      "Intercepto",
+      names(DatosTab)[-length(DatosTab)]
+    ),
+    "Estimación" = estimate,
+    "Error estándar" = std.error,
+    "Estadístico F" = statistic,
+    "P valor" = p.value,
+    "$\\left(H_{0}^{\\alpha = 0.05}\\right)\\beta_{i} = 0$" = case_when(
+      p.value < 0.05 ~ "Se rechaza H0",
+      p.value >= 0.05 ~ "No se rechaza H0"
+    ),
+    .keep = "none"
+  ) %>% 
+  kbl(
+    booktabs = T, 
+    caption = "Estimación,error estándar y test individual del modelo completo ",
+    escape = FALSE
+  ) %>% 
+  kable_styling(
+    latex_options = c("striped", "hold_position"),
+    font_size = 7.5
+  )
+
+
+## -----------------------------------------------------------------------------
+
+# Multicolinealidad modelo completo
+
+vif(ModeloCompleto) %>% 
+  tidy() %>% 
+  mutate(
+  Variable = c(
+    names(DatosTab)[-length(DatosTab)]
+  ),
+    VIF = x,
+    "Prueba" = case_when(
+      x >= 10 ~ "Problema de colinealidad",
+      x < 10 ~ "No hay problema de colinealidad"
+    ),
+    .keep = "none"
+  ) %>%  
+  mutate_if(
+    is.numeric,
+    round,
+    3
+  ) %>% 
+  kbl(
+    booktabs = T, 
+    caption = "Prueba de multicolinealidad : Factor de incremento de Varianza \\textbf{VIF} ",
+    escape = FALSE
+  ) %>% 
+  kable_styling(
+    latex_options = c("striped", "hold_position"),
+    font_size = 7.5
+  )
+
+
+## ----results='hide'-----------------------------------------------------------
+
+# Stepwise
+
+lm(
+  reformulate(names(Datos)[-16], names(Datos[16])),
+  data = Datos
+) %>% 
+  mixlm::stepWise() %>% 
+  assign(
+    "ModeloRed",
+    .,
+    envir = .GlobalEnv
+  )
+
+
+## -----------------------------------------------------------------------------
+ModeloRed %>%  
+  tidy() %>% 
+  summarise_if(
+    is.numeric,
+    ~round(.x,3)
+  ) %>% 
+  mutate(
+    Variable = c(
+      "Intercepto",
+      "Gasto per capita en policía 1960",
+      "Desigualdad del ingreso",
+      "Indice que refleja la escolaridad del estado",
+      "Número de hombres entre 14 y 24 / 1000",
+      "Probabilidad de encarcelamiento",
+      "Tasa de desempleo urbana hombres 35-39 años x 1000"
+    ),
+    "Estimación" = estimate,
+    "Error estándar" = std.error,
+    "Estadístico F" = statistic,
+    "P valor" = p.value,
+    "$\\left(H_{0}^{\\alpha = 0.05}\\right)\\beta_{i} = 0$" = case_when(
+      p.value < 0.05 ~ "Se rechaza H0",
+      p.value >= 0.05 ~ "No se rechaza H0"
+    ),
+    .keep = "none"
+  ) %>% 
+  kbl(
+    booktabs = T, 
+    caption = "Estimación,error estándar y test individual tras aplicar el método Stepwise ",
+    escape = FALSE
+  ) %>% 
+  kable_styling(
+    latex_options = c("striped", "hold_position"),
+    font_size = 7.5
+  )
+
+
+## ----fig.align= "center",out.width = "0.8\\textwidth"-------------------------
+
+# Distancia de Cook
+
+ModeloRed %>% 
+  cooks.distance() %>% 
+  as.data.frame() %>% 
+  mutate(
+    .,
+    Valor = .,
+    .keep = "none"
+  ) %>% 
+  ggplot(
+    aes(
+      x = seq(1, 47, 1), 
+      y = Valor
+    )
+  ) +
+  geom_bar(stat="identity",fill="#8F3A84FF")+
+  labs(title="Distancias de Cook",
+       x="Observación",
+       y="Valor de la distancia de cook")+
+  geom_hline(yintercept = (4/40),
+             colour="#280434FF",
+          size=1)+
+  theme(aspect.ratio = 1,
+        plot.title = element_text(
+          colour = "#280434FF",
+          face="bold"
+        ),
+         axis.text.x = element_text(
+          color = "#8C04C2"
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        ))+
+geom_text( label="Regla empírica",
+           x=3,
+           y=0.105,
+           size=4,
+           colour="#6C246269")
+
+
+
+## ----fig.align= "center",out.width = "0.8\\textwidth"-------------------------
+
+# Observaciones atípicas
+
+ModeloRed  %>% 
+  rstudent() %>% 
+  as.data.frame() %>% 
+  mutate(
+    Ati = case_when(
+      abs(.) >= qt(1-0.01/2,ModeloRed %$% df.residual) ~ .,
+      NA ~ 0
+    )
+  ) %>% 
+  ggplot(
+    aes(
+      x = 1:nrow(Datos),
+      y = .
+    )
+  ) + 
+  geom_point(colour="#8C04C2") + 
+  geom_hline(
+    yintercept = 0,
+    linetype = "dashed",
+    color = "#8F3A847A",
+    size = 1.2
+  ) +
+  geom_hline(
+    yintercept = qt(
+      1-0.01/2,
+      ModeloRed %$% df.residual
+    ),
+    size = 1.2,
+    color = "#280434FF"
+  ) +
+  geom_hline(
+      yintercept = - qt(
+        1-0.01/2,
+        ModeloRed %$% df.residual
+      ),
+      size = 1.2,
+      color = "#280434FF"
+  ) + 
+  geom_point(
+    aes(
+      y = Ati
+    ),
+    shape = 18, 
+    color = "#FC4E07",
+    size = 3
+  ) + 
+  scale_x_continuous(
+    breaks = seq(1,nrow(Datos),2)
+  ) +
+  labs(
+    x = "Observación",
+    y = "Residudos studentizados"
+  ) +
+  theme(
+    aspect.ratio = 1,
+    plot.title = element_text(
+      colour = "#280434FF",
+      face="bold"
+      ),
+    axis.text.x = element_text(
+      color = "#8C04C2"
+      ),
+    axis.text.y = element_text(
+          color="#8C04C2"
+      )
+    )
+
+
+## ----results = 'hide'---------------------------------------------------------
+# Se interviene el modelo
+Datos %<>%
+  slice(
+    -c(
+      11,
+      29,
+      18
+    )
+  )
+
+ModeloRed %>%
+  update(
+    .,
+    data = Datos
+  ) %T>% 
+  assign(
+    "ModeloRedInter",
+    .,
+    envir = .GlobalEnv
+  )
+
+
+## ----out.width = "0.65\\textwidth",fig.align = "center"-----------------------
+
+# Gráfico de errores y qq plot
+ModeloRedInter %>% 
+  autoplot(
+    which = c(1,2)
+  ) + 
+  theme(
+    aspect.ratio = 1,
+    plot.title = element_text(
+      colour = "#280434FF",
+      face="bold"
+    ),
+    axis.text.x = element_text(
+    color = "#8C04C2"
+    ),
+    axis.text.y = element_text(
+      color="#8C04C2"
+    )
+  )
+
+
+## ----out.width = "0.5\\textwidth",fig.align = "center"------------------------
+
+# Distribución teórica vs normal 
+
+ModeloRedInter  %>% 
+  rstudent() %>% 
+  as.data.frame() %>% 
+  ggplot(
+    aes(
+      x = .
+    )
+  ) + 
+  geom_density(
+    size = 1.7,
+    colour = "#8F3A84FF"
+  ) + 
+  geom_line(
+    aes(
+      x = seq(-4,4,length.out = 44),
+      y = dnorm(seq(-4,4,length.out = 44))
+    ),
+    colour = "#280434FF",
+    size = 1.7
+  ) + 
+  labs(
+    title = "Valores teóricos y errores studentizados " ,
+    x="x",
+    y = "Densidad"
+  ) +
+  theme(
+    aspect.ratio = 1,
+    plot.title = element_text(
+      colour = "#280434FF",
+      face="bold"
+    ),
+    axis.text.x = element_text(
+      color = "#8C04C2"
+    ),
+    axis.text.y = element_text(
+      color="#8C04C2"
+    )
+  )
+
+
+## -----------------------------------------------------------------------------
+# Test normalidad
+
+TestNormalidad <- function(lm) {
+  x = rstudent(lm) 
+  Esta = c(
+    lillie.test(x)$statistic,
+    shapiro.test(x)$statistic,
+    jarque.bera.test(x)$statistic
+  )
+  Pvalue = c(
+    lillie.test(x)$p.value,
+    shapiro.test(x)$p.value,
+    jarque.bera.test(x)$p.value
+  )
+  return(
+    data.frame(
+      "Test" = c(
+        "Lillie",
+        "Shapiro",
+        "Jarque Bera"
+      ),
+      "Pvalor" = Pvalue,
+      "Estadistico" = Esta
+    )
+  )
+}
+
+ModeloRedInter %>% 
+  TestNormalidad() %>% 
+  mutate_if(
+    is.numeric,
+    round,
+    3
+  ) %>% 
+  mutate(
+    Resultado = case_when(
+      Pvalor > 0.05 ~ "No rechazo normalidad",
+      NA ~ "Rechazo H0"
+    )
+  ) %>% 
+  kbl(
+    booktabs = T, 
+    caption = "Test de Normalidad ",
+    escape = FALSE,
+    row.names = FALSE
+  ) %>% 
+  kable_styling(
+    latex_options = c("striped", "hold_position"),
+    font_size = 7.5
+  )
+
+
+## -----------------------------------------------------------------------------
+
+# Test de heterocedasticidad
+
+Het<-function(lm) {
+  Esta = c(
+    bptest(lm)$statistic,
+    white_lm(lm)$statistic,
+    glejser(lm)$statistic
+  )
+  Pvalue = c(
+    bptest(lm)$p.value,
+    white_lm(lm)$p.value,
+    glejser(lm)$p.value
+  )
+  return(
+    data.frame(
+      "Test" = c(
+        "Breusch-Pagan",
+        "White",
+        "Glejser"),
+      "Pvalor" = Pvalue,
+      "Estadistico" = Esta
+    )
+  )
+}
+
+Het(ModeloRedInter)%>%
+  mutate_if(
+    is.numeric,
+    round,
+    3
+  ) %>% 
+  mutate(
+    Resultado = case_when(
+      Pvalor > 0.05 ~ "No rechazo Homocedasticidad",
+      NA ~ "Rechazo H0"
+    )
+  ) %>% 
+  kbl(
+    booktabs = T, 
+    caption = "Test de Homocedasticidad ",
+    escape = FALSE,
+    row.names = FALSE
+  ) %>% 
+  kable_styling(
+    latex_options = c("striped", "hold_position"),
+    font_size = 7.5
+  )
+
+
+## -----------------------------------------------------------------------------
+ModeloRed %>%  
+  tidy() %>% 
+  summarise_if(
+    is.numeric,
+    ~round(.x,3)
+  ) %>% 
+  mutate(
+    Variable = c(
+      "Intercepto",
+      "Gasto per capita en policía 1960",
+      "Desigualdad del ingreso",
+      "Indice que refleja la escolaridad del estado",
+      "Número de hombres entre 14 y 24 / 1000",
+      "Probabilidad de encarcelamiento",
+      "Tasa de desempleo urbana hombres 35-39 años x 1000"
+    ),
+    "Estimación" = estimate,
+    "Error estándar" = std.error,
+    "$\\left(H_{0}^{\\alpha = 0.05}\\right)\\beta_{i} = 0$" = case_when(
+      p.value < 0.05 ~ "Se rechaza H0",
+      p.value >= 0.05 ~ "No se rechaza H0"
+    ),
+    .keep = "none"
+  ) %>% 
+  kbl(
+    booktabs = T, 
+    caption = "Estimación,error estándar y test individual tras aplicar el método Stepwise intervenido por observaciones influyentes",
+    escape = FALSE
+  ) %>% 
+  kable_styling(
+    latex_options = c("striped", "hold_position"),
+    font_size = 6.5
+  )
+
+
+## -----------------------------------------------------------------------------
+ModeloRedInter %>% 
+  glance() %>% 
+  mutate(
+    "$R^{2}.adj$" = adj.r.squared*100,
+    "RSE" = sigma,
+    "SCE" = sum((ModeloRedInter$fitted.values-mean(Datos$y))^(2)),
+    "F Obs." = statistic,
+    "P-valor*100" = p.value*100,
+    "Regresión.gl" = df,
+    "Residuos.gl" = df.residual,
+    .keep = "none"
+  ) %>% 
+  summarise_if(
+    is.numeric,
+    ~round(.x,3)
+  ) %>% 
+  kbl(
+    booktabs = T,
+    caption = "Test sobre el modelo completo",
+    escape = FALSE
+  ) %>% 
+    kable_styling(
+    latex_options = c("striped", "hold_position"),
+    font_size = 6.5
+  )
+
+@
+
+\newpage
+
+\section{Referencias}
+\nocite{*}
+\printbibliography[title={Libros consultados},type=book]
+\printbibliography[title={Paquetes de R},filter=other]
+
+
+\end{document}

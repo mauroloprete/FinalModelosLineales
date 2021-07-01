@@ -1,0 +1,1254 @@
+---
+title : Tasa de criminalidad en USA 1960
+subtitle : Ignacio Acosta, Mauro Loprete y Sofia Itté  
+author : Trabajo final Modelos Lineales
+date : <img src="https://img.icons8.com/ios/50/000000/scales--v1.png"/>
+output :
+  xaringan::moon_reader:
+   css : ["xaringan-themer.css","sydney.css"]
+   lib_dir : libs 
+   nature :
+     ratio : "16:9"
+     highlightStyle: github
+     slideNumberFormat: '%current%'
+     highlightLines: true
+     countIncrementalSlides: false
+
+---
+
+```{r setup, include = F , warning = F }
+
+if(!require(pacman)) {
+  install.packages("pacman")
+}
+
+pacman::p_load(
+  xaringanthemer,
+  here,
+  knitr,
+  data.table,
+  hrbrthemes,
+  ggthemes,
+  RefManageR,
+  plotly,
+  reshape2,
+  tidymodels,
+  kableExtra,
+  GGally,
+  nortest,
+  tidyverse,
+  magrittr,
+  reshape2,
+  tidymodels,
+  tseries,
+  lmtest,
+  ggfortify,
+  skedastic,
+  bibtex,
+  showtext
+)
+
+#Libreria car 
+
+pacman::p_load_gh(
+  "gadenbuie/xaringanExtra"
+)
+
+# Configuración del tema Xaringan:
+
+style_duo_accent(
+  primary_color = "#512E5F",
+  secondary_color = "#280434FF",
+  header_font_google = google_font("Titillium Web", "600"),
+   text_font_google   = google_font("Crimson Pro", "300", "300i"),
+   code_font_google   = google_font("IBM Plex Mono"),
+   base_font_size = "20px",
+   text_font_size = "1rem",
+   code_font_size = "1.2rem",
+   code_inline_font_size = "1.2em",
+   footnote_font_size = "0.6em",
+   header_h1_font_size = "1.7rem",
+   header_h2_font_size = "1.50rem",
+   header_h3_font_size = "1.2rem"
+)
+
+xaringanExtra::use_xaringan_extra(
+  c(
+    "tile_view",
+    "panelset",
+    "progress_bar"
+  )
+)
+
+
+options(htmltools.dir.version = FALSE)
+
+knitr::opts_chunk$set(
+  warning = F, 
+  echo = F ,
+  out.width = "450px",
+  dpi = 200, 
+  fig.retina =2
+)
+
+
+# Bibliografia :
+
+BibOptions(
+  check.entries = FALSE,
+  bib.style = "authortitle",
+  cite.style = "alphabetic",
+  style = "markdown",
+  hyperlink = FALSE,
+  max.names = 2,
+  dashed = FALSE
+)
+
+bib <- ReadBib(
+  here("biblio.bib"),
+  check = FALSE,
+  .Encoding = "UTF-8"
+)
+
+# Cargamos los datos 
+
+read.table(
+  here(
+    "UScrime.txt"
+  ),
+  header = TRUE,
+  dec = ","
+) %>% 
+  mutate(
+    Prob = Prob*100
+  ) %>% 
+  assign(
+    "Datos",
+    .,
+    envir = .GlobalEnv
+  )
+
+DatosTab <- Datos
+names(DatosTab) <- c(
+  "Número de Hombres 14-24 / 1.000",
+  "Indicadora Estado Sur",
+  "Indice Escolaridad",
+  "Gasto per cápita 1.960",
+  "Gasto per cápita 1.959",
+  "Tasa participación masculina 14-24 por 1.000",
+  "Hombres cada 1.000 mujeres",
+  "Población cada 100.000",
+  "Número de no caucásicos cada 1.000 habitantes",
+  "Tasa desempleo urbana Hombres 14-24 por 1.000",
+  "Tasa desempleo urbana Hombres 35-39 por 1.000",
+  "Producto bruto interno per cápita",
+  "Desigualdad ingreso",
+  "Probabilidad Encarcelamiento",
+  "Tiempo de estadía en cárceles",
+  "Tasa de criminalidad"
+)
+
+Sturges <- log2(47) + 1
+
+
+
+
+```
+class: header_background
+
+# Índice 
+<h3>
+  <ol>
+    <li> Objetivo </li>
+    <li> Resumen descriptivo </li>
+    <li> Modelo completo </li>
+    <li> Análisis de multicolinealidad </li> 
+    <li> Selección de modelos  </li> 
+    <li> Busqueda de observaciones atípicas y/o influyentes </li> 
+    <li> Revisión al supuesto de normalidad </li>
+    <li> Chequeo de homocedasticidad </li>
+    <li> Conclusiones </li>
+    <li> Pasos a futuro </li>
+    <li> Referencias </li>
+  </ol>
+</h3>
+---
+
+class: header_background
+# Objetivo
+
+El objetivo de este trabajo es poder construir un modelo de regresión lineal múltiple que explique las tasa de criminalidad en USA (a través del número de ofensas
+reportadas a la policía por habitante). 
+
+Se cuenta con una tabla de datos, constituída por una observación por cada estado y 16 variables (una de ellas la tasa de criminalidad). 
+
+Se construye un modelo :
+
+- Asumiendo relación lineal entre las variables independientes y dependientes.
+- Aditividad en los errores e independencia de las observaciones (Media independiente)
+- Distribución normal, varianza constante y esperanza cero. 
+.center[
+<h3>
+A lo largo de esta presentación se mostrara si esto es válido para nuestro ejemplo o bajo que condiciones se logra.
+</h3>
+]
+---
+
+class: header_background
+# Análisis descriptivo 
+
+.panelset[
+.panel[.panel-name[Tasa de criminalidad]
+.center[
+```{r}
+Datos %>%
+  ggplot(
+    aes(
+      x = y
+    ) 
+  ) +
+  geom_histogram(
+    bins = Sturges,
+    fill = "#8F3A84FF",
+    colour = "black"
+  ) + 
+  labs(
+    y = "Conteo"
+  ) + 
+  theme(
+    plot.subtitle = element_text(
+          size=6.5
+    ),
+    plot.title = element_text(
+          face="bold",
+          size=10,
+          color = "#280434FF"
+    ),
+    axis.text.x = element_text(
+          color = "#8C04C2"
+    ),
+    axis.text.y = element_text(
+          color="#8C04C2"
+    )
+  )
+```
+
+Esta claro que $y$ presenta una distribución mediantamente asimétrica donde se tiene un intervalo modal de 500 y 800 ofensas (por habitante). 
+]
+]
+
+.panel[.panel-name[Histogramas 1]
+
+.center[
+```{r,echo = F}
+Datos %>%
+  select(
+    M,
+    Ed,
+    Po1,
+    NW,
+    Po2,
+    LF
+  ) %>% 
+  pivot_longer(
+    cols = everything(),
+    names_to = "Variable",
+    values_to = "Valor"
+  ) %>% 
+  mutate(
+    Variable = recode(
+      as.factor(Variable),
+      "M" = "Hombres de 14 a 24/1000",
+      "Ed" = "Ind.Escolaridad",
+      "Po1" = "G per Capita 1960",
+      "NW"= "No caucásicos/1000",
+      "Po2" ="G per Capita 1959",
+      "LF" = "Tasa parti. ML Homb 14 a 24" 
+    )
+  ) %>% 
+  ggplot(
+    aes(
+      x = Valor
+    ) 
+  ) +
+  geom_histogram(
+    bins=Sturges,
+    fill = "#8F3A84FF",
+    colour = "black"
+  ) + 
+  facet_wrap(
+    ~Variable,
+    scale = "free_x"
+  ) + 
+  labs(
+    y = "Conteo"
+  ) + 
+  theme(
+    plot.subtitle = element_text(
+          size=6.5
+    ),
+    plot.title = element_text(
+          face="bold",
+          size=10,
+          color = "#280434FF"
+    ),
+    axis.text.x = element_text(
+          color = "#8C04C2"
+    ),
+    axis.text.y = element_text(
+          color="#8C04C2"
+    )
+  )
+```
+]
+
+]
+
+.panel[.panel-name[Histogramas 2]
+.center[
+```{r}
+Datos %>%
+  select(
+    M.F,
+    Pop,
+    U1,
+    U2,
+    GDP,
+    Ineq
+  ) %>% 
+  pivot_longer(
+    cols = everything(),
+    names_to = "Variable",
+    values_to = "Valor"
+  ) %>% 
+    mutate(
+    Variable = recode(
+      as.factor(Variable),
+      "M.F" = "Número de Hombres cada 1000 mujeres",
+      "Pop" = "Tamaño de la población cada 1.000.000",
+      "U1" = "Tasa de desempleo 14-24/1000",
+      "U2" = "Tasa de desempleo 35-39/1000",
+      "GDP" ="Producto Bruto Interno per capita",
+      "Ineq" = "Desigualdad en el ingreso" 
+    )
+  ) %>% 
+  ggplot(
+    aes(
+      x = Valor
+    ) 
+  ) +
+  geom_histogram(
+    bins=Sturges,
+    fill = "#8F3A84FF",
+    colour = "black"
+  ) + 
+  facet_wrap(
+    ~Variable,
+    scale = "free_x"
+  ) +
+  labs(
+    y = "Conteo"
+  ) + 
+  theme(
+    plot.subtitle = element_text(
+          size=6.5
+    ),
+    plot.title = element_text(
+          face="bold",
+          size=10,
+          color = "#280434FF"
+    ),
+    axis.text.x = element_text(
+          color = "#8C04C2"
+    ),
+    axis.text.y = element_text(
+          color="#8C04C2"
+    )
+  )
+```
+]
+]
+
+.panel[.panel-name[Histogramas 3]
+
+.center[
+```{r,echo = F}
+Datos %>%
+  select(
+    Time,
+    Prob
+  ) %>% 
+  pivot_longer(
+    cols = everything(),
+    names_to = "Variable",
+    values_to = "Valor"
+  ) %>% 
+  mutate(
+    Variable = recode(
+      as.factor(Variable),
+      "Time" = "Tiempo promedio de estadía en cárceles",
+      "Prob" = "Probabilidad de encarcelamiento"
+    )
+  ) %>% 
+  ggplot(
+    aes(
+      x = Valor
+    ) 
+  ) +
+  geom_histogram(
+    bins=Sturges,
+    fill = "#8F3A84FF",
+    colour = "black"
+  ) + 
+  facet_wrap(
+    ~Variable,
+    scale = "free_x"
+  ) + 
+  labs(
+    y = "Conteo"
+  ) + 
+  theme(
+    aspect.ratio = 1,
+    plot.subtitle = element_text(
+          size=6.5
+    ),
+    plot.title = element_text(
+          face="bold",
+          size=10,
+          color = "#280434FF"
+    ),
+    axis.text.x = element_text(
+          color = "#8C04C2"
+    ),
+    axis.text.y = element_text(
+          color="#8C04C2"
+    )
+  )
+```
+]
+
+]
+
+.panel[.panel-name[Mapa de correlación]
+.center[
+```{r}
+qplot(x=Var1,
+      y=Var2,
+      data = melt(cor(Datos, use = "p")),
+      fill = value,
+      geom="tile"
+)+scale_fill_gradient2(limits = c(-1, 1),
+                       low = "#A50303", high = "#250455")+
+  theme(
+        aspect.ratio = 1,
+        plot.title = element_text(
+          face = "bold",
+          color = "#280434FF"),
+        plot.subtitle = element_text(
+          size=8,
+          color="#5C485F"
+        ),
+        axis.text.x = element_text(
+          color = "#8C04C2",
+          angle=90
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        )
+        )+
+  labs(
+       fill="Coef Corr."
+       )
+```
+]
+]
+]
+
+---
+
+class: header_background
+
+# Modelo Completo
+
+.panelset[
+.panel[.panel-name[Especificación]
+
+<h2>
+Como primera aproximación, se construye un modelo donde se incluyen todas las variables de la tabla de datos, en concreto el siguiente modelo de regresión lineal múltiple:
+</h2> 
+
+$$\hat{y} = \hat{\beta}_{0} + \hat{\beta}_{1}Time + \cdots + \hat{\beta}_{15}M$$
+
+.center[
+<h2>
+<font color=#000000> 
+El modelo fue estimado médiante MCO, asumiendo el cumplimiento de los supuestos anteriormente mencionados, a continuación se mostraran test de significación y el coeficiente de
+determinación para evaluar esta primera aproximación desde un punto de vista crítico.
+</font>
+</h2>
+]
+]
+
+.panel[.panel-name[Prueba de significación]
+
+Dado el supuesto de normalidad de los errores, podemos definir al estadísitico $F$ como : 
+
+$$F_{obs} = \frac{SCE/Regresion.gl}{RSE^2}  = \frac{SCE/Regresion.gl}{SCR/Residuos.gl} = \frac{\sum{\left(\hat{y}_{i}-\bar{y}\right)^{2}}/Regresion.gl}{\sum{\left(y_{i}-\hat{y}_{i}\right)^{2}}/Residuos.gl}$$
+
+
+```{r}
+lm(
+    y ~ .,
+    data = Datos
+) %T>% 
+  assign(
+    "ModeloCompleto",
+    .,
+    envir = .GlobalEnv
+  ) %>% 
+  glance() %>% 
+  mutate(
+    "$R^{2}$ ajustado" = adj.r.squared*100,
+    "RSE" = sigma,
+    "F Observado" = statistic,
+    "P-valor" = case_when(
+      p.value < 0.04 ~ "Aproximadamente cero"
+    ),
+    "Regresión.gl" = df,
+    "Residuos.gl" = df.residual,
+    .keep = "none"
+  ) %>% 
+  mutate_if(
+    is.numeric,
+    ~round(.x,3)
+  ) %>% 
+  kable(format = "html", escape = F) %>%
+  kable_material(c("striped", "hover")) %>% 
+  kable_styling(
+    font_size = 12
+  )
+```
+
+Como se puede ver tenemos un modelo significativo para cualquier valor de $\alpha$, ahora veamos el nivel de significación de cada variable.
+.panel[.panel-name[Significación de variables]
+
+.scroll-box-16[
+
+```{r}
+ModeloCompleto %>% 
+  tidy() %>% 
+  summarise_if(
+    is.numeric,
+    ~round(.x,3)
+  ) %>% 
+  mutate(
+    Variable = c(
+      "Intercepto",
+      names(DatosTab)[-length(DatosTab)]
+    ),
+    "Estimación" = estimate,
+    "P valor" = p.value,
+    "$\\left(H_{0}^{\\alpha = 0.05}\\right)\\beta_{i} = 0$" = case_when(
+      p.value < 0.05 ~ "Se rechaza H0",
+      p.value >= 0.05 ~ "No se rechaza H0"
+    ),
+    .keep = "none"
+  ) %>% 
+  kbl() %>% 
+  row_spec(
+    c(1,2,4,14,15),
+    bold = T,
+    color = "black",
+    background = "#EBDEF0"
+  ) %>% 
+  kable_material(c("striped", "hover")) %>% 
+  kable_styling(
+    font_size = 12
+  )
+```
+]
+
+Tan solo 4 son las variables que de manera independiente logran un aporte significativo al momento de explicar el comportamiento de la tasa de criminalidad,
+**hay problemas de especificación**.
+]
+]
+]
+---
+class: header_background
+
+# Análisis de multicolinealidad
+
+Como se vió previamente, el modelo presentado hasta el momento es globalmente significativo, sin embargo tan solo 4 de las variables 
+consideradas son significativas de manera independiente (presente todas las demás), es por esto que se cuantificará la intensidad de la multicolinealidad con 
+el **Factor de inflación de varianza**.
+
+El **VIF** nos indica en cuantas unidades se incrementa la varianza del estimador ante presencia de colinealidad y se define como : 
+
+.scroll-box-14[
+
+```{r}
+car::vif(ModeloCompleto) %>% 
+  tidy() %>% 
+  mutate(
+  Variable = c(
+    names(DatosTab)[-length(DatosTab)]
+  ),
+    VIF = x,
+    "Prueba" = case_when(
+      x >= 10 ~ "Problema de colinealidad",
+      x < 10 ~ "No hay problema de colinealidad"
+    ),
+    .keep = "none"
+  ) %>%  
+  mutate_if(
+    is.numeric,
+    round,
+    3
+  ) %>% 
+  kbl(
+    booktabs = F,
+    escape = FALSE
+  ) %>% 
+  row_spec(
+    c(4,5,12),
+    bold = T,
+    color = "black",
+    background = "#EBDEF0"
+  ) %>% 
+  kable_material(c("striped", "hover")) %>% 
+  kable_styling(
+    font_size = 12
+  )
+```
+]
+
+En base a esto, vamos a realizar un proceso de selección por el método de **Stepwise** basado en el F-Test
+
+---
+class: header_background
+
+# Selección de modelos : stepWise
+
+```{r,echo = F,results = "hide"}
+lm(
+  reformulate(names(Datos)[-16], names(Datos[16])),
+  data = Datos
+) %>% 
+  mixlm::stepWise() %>% 
+  assign(
+    "ModeloRed",
+    .,
+    envir = .GlobalEnv
+  )
+```
+
+.scroll-box-14[
+```{r}
+ModeloRed %>%  
+  tidy() %>% 
+  summarise_if(
+    is.numeric,
+    ~round(.x,3)
+  ) %>% 
+  mutate(
+    Variable = c(
+      "Intercepto",
+      "Gasto per capita en policía 1960",
+      "Desigualdad del ingreso",
+      "Indice que refleja la escolaridad del estado",
+      "Número de hombres entre 14 y 24 / 1000",
+      "Probabilidad de encarcelamiento",
+      "Tasa de desempleo urbana hombres 35-39 años x 1000"
+    ),
+    "Estimación" = estimate,
+    "Error estándar" = std.error,
+    "Estadístico F" = statistic,
+    "P valor" = p.value,
+    "$\\left(H_{0}^{\\alpha = 0.05}\\right)\\beta_{i} = 0$" = case_when(
+      p.value < 0.05 ~ "Se rechaza H0",
+      p.value >= 0.05 ~ "No se rechaza H0"
+    ),
+    .keep = "none"
+  ) %>% 
+  kbl(
+    booktabs = T,
+    escape = FALSE
+  ) %>% 
+  kable_material(c("striped", "hover")) %>% 
+  kable_styling(
+    font_size = 12
+  )
+```
+]
+
+.center[
+
+<h3>
+<font color = #00000>
+Obtenemos un modelo con 6 variables explicativas. Desde un plano explicativo podemos hacer mucho enfasís en los movimientos marginales (algo raro es el signo del 
+nivel educativo) pero se pueden afirmar relaciones sumamente interesantes. 
+
+Antes de dar por terminado, estudiaremos observaciones atípicas y el cumplimiento de los supuestos.
+</font>
+</h3>
+]
+
+---
+class: header_background
+
+# Análisis en las observaciones
+.panelset[
+.panel[.panel-name[Influyentes]
+.center[
+```{r}
+ModeloRed %>% 
+  cooks.distance() %>% 
+  as.data.frame() %>% 
+  mutate(
+    .,
+    Valor = .,
+    .keep = "none"
+  ) %>% 
+  ggplot(
+    aes(
+      x = seq(1, 47, 1), 
+      y = Valor
+    )
+  ) +
+  geom_bar(stat="identity",fill="#8F3A84FF")+
+  labs(title="Distancias de Cook",
+       x="Observación",
+       y="Valor de la distancia de cook")+
+  geom_hline(yintercept = (4/40),
+             colour="#280434FF",
+          size=1)+
+  theme(aspect.ratio = 1,
+        plot.title = element_text(
+          colour = "#280434FF",
+          face="bold"
+        ),
+         axis.text.x = element_text(
+          color = "#8C04C2"
+        ),
+        axis.text.y = element_text(
+          color="#8C04C2"
+        ))+
+geom_text( label="Regla empírica",
+           x=3,
+           y=0.105,
+           size=4,
+           colour="#6C246269")
+```
+]
+]
+
+.panel[.panel-name[Atípicas]
+.center[
+
+```{r}
+ModeloRed  %>% 
+  rstudent() %>% 
+  as.data.frame() %>% 
+  mutate(
+    Ati = case_when(
+      abs(.) >= qt(1-0.01/2,ModeloRed %$% df.residual) ~ .,
+      NA ~ 0
+    )
+  ) %>% 
+  ggplot(
+    aes(
+      x = 1:nrow(Datos),
+      y = .
+    )
+  ) + 
+  geom_point(colour="#8C04C2") + 
+  geom_hline(
+    yintercept = 0,
+    linetype = "dashed",
+    color = "#8F3A847A",
+    size = 1.2
+  ) +
+  geom_hline(
+    yintercept = qt(
+      1-0.01/2,
+      ModeloRed %$% df.residual
+    ),
+    size = 1.2,
+    color = "#280434FF"
+  ) +
+  geom_hline(
+      yintercept = - qt(
+        1-0.01/2,
+        ModeloRed %$% df.residual
+      ),
+      size = 1.2,
+      color = "#280434FF"
+  ) + 
+  geom_point(
+    aes(
+      y = Ati
+    ),
+    shape = 18, 
+    color = "#FC4E07",
+    size = 3
+  ) + 
+  scale_x_continuous(
+    breaks = seq(1,nrow(Datos),2)
+  ) +
+  labs(
+    x = "Observación",
+    y = "Residudos studentizados"
+  ) +
+  theme(
+    aspect.ratio = 1,
+    plot.title = element_text(
+      colour = "#280434FF",
+      face="bold"
+      ),
+    axis.text.x = element_text(
+      color = "#8C04C2"
+      ),
+    axis.text.y = element_text(
+          color="#8C04C2"
+      )
+    )
+```
+]
+]
+.panel[.panel-name[Decisión]
+
+<h3>
+El estado número 11, 29 y 18 presentan problemas con la distancia de Cook, con este gráfico podemos afirmar que las observaciones 29 y 
+11 son influyentes y atípicas, mientras que para la número 18 podemos ver que es muy cercana a cero, la esperanza de los errores por lo que es solamente influyente.
+</h3>
+
+<h3>
+<font color = #000000>
+Por ende, se decide retirarlas del modelo reducido ya que las mismas tienen una influencia preponderante en la estimación. 
+Como se vió en clase, observaciones de este tipo pueden llevar a un modelo alejado de la realidad.
+</font>
+</h3>
+]
+]
+---
+
+class: header_background
+# Normalidad
+
+```{r,results = "hide"}
+Datos %<>%
+  slice(
+    -c(
+      11,
+      29,
+      18
+    )
+  )
+
+ModeloRed %>%
+  update(
+    .,
+    data = Datos
+  ) %T>% 
+  assign(
+    "ModeloRedInter",
+    .,
+    envir = .GlobalEnv
+  )
+```
+
+.panelset[
+.panel[.panel-name[Q-Q Plot]
+
+.center[
+```{r}
+ModeloRedInter %>% 
+  rstandard() %>% 
+  as.data.frame() %>% 
+    ggplot(
+        aes(
+            sample = .
+        )
+    ) +
+    stat_qq(
+        size = 1.2,
+        color = "#280434FF"
+    ) + 
+    stat_qq_line(
+        linetype = "dashed",
+        color = "#8F3A847A",
+        size = 1.2,
+        position = "identity"
+    ) + 
+    labs(
+        x = "Cuantiles téoricos",
+        y = "Residuos estandarizados"
+    ) +
+    theme(
+        aspect.ratio = 1,
+        plot.title = element_text(
+        colour = "#280434FF",
+        face = "bold"
+        ),
+        axis.text.x = element_text(
+        color = "#8C04C2"
+        ),
+        axis.text.y = element_text(
+          color = "#8C04C2"
+      )
+    )
+```
+]
+]
+.panel[.panel-name[Densidad teórica vs empírica]
+.center[
+```{r}
+ModeloRedInter  %>% 
+  rstandard() %>% 
+  as.data.frame() %>% 
+  ggplot(
+    aes(
+      x = .
+    )
+  ) + 
+  geom_density(
+    size = 1.7,
+    colour = "#8F3A84FF"
+  ) + 
+  geom_line(
+    aes(
+      x = seq(-4,4,length.out = 44),
+      y = dnorm(seq(-4,4,length.out = 44))
+    ),
+    colour = "#280434FF",
+    size = 1.7
+  ) + 
+  labs(
+    title = "Valores teóricos y errores estandarizados " ,
+    x="x",
+    y = "Densidad"
+  ) +
+  theme(
+    aspect.ratio = 1,
+    plot.title = element_text(
+      colour = "#280434FF",
+      face="bold"
+    ),
+    axis.text.x = element_text(
+      color = "#8C04C2"
+    ),
+    axis.text.y = element_text(
+      color="#8C04C2"
+    )
+  )
+```
+]
+]
+
+.panel[.panel-name[Test]
+
+```{r}
+TestNormalidad <- function(lm) {
+  x = rstudent(lm) 
+  Esta = c(
+    lillie.test(x)$statistic,
+    shapiro.test(x)$statistic,
+    jarque.bera.test(x)$statistic
+  )
+  Pvalue = c(
+    lillie.test(x)$p.value,
+    shapiro.test(x)$p.value,
+    jarque.bera.test(x)$p.value
+  )
+  return(
+    data.frame(
+      "Test" = c(
+        "Lillie",
+        "Shapiro",
+        "Jarque Bera"
+      ),
+      "Pvalor" = Pvalue,
+      "Estadístico" = Esta
+    )
+  )
+}
+
+ModeloRedInter %>% 
+  TestNormalidad() %>% 
+  mutate_if(
+    is.numeric,
+    round,
+    3
+  ) %>% 
+  mutate(
+    Resultado = case_when(
+      Pvalor > 0.05 ~ "No rechazo normalidad",
+      NA ~ "Rechazo H0"
+    )
+  ) %>% 
+  kbl(
+    booktabs = T,
+    escape = FALSE,
+    row.names = FALSE
+  ) %>% 
+  kable_material(c("striped", "hover")) %>% 
+  kable_styling(
+    font_size = 12
+  )
+```
+
+]
+
+]
+---
+
+class: header_background
+
+# Homocedasticidad
+.panelset[
+.panel[.panel-name[Residuos]
+.center[
+```{r}
+ModeloRedInter %>% 
+    ggplot(
+        aes(
+            x = .$fitted,
+            y = .$residuals
+        )
+    ) +
+    geom_point(
+      colour = "#8C04C2"
+    ) + 
+    geom_hline(
+      yintercept = 0,
+      linetype = "dashed",
+      color = "#8F3A847A",
+      size = 1.2
+    ) +
+    labs(
+        x = "Valores predecidos",
+        y = "Residuos"
+    ) +
+    theme(
+        aspect.ratio = 1,
+        plot.title = element_text(
+        colour = "#280434FF",
+        face = "bold"
+        ),
+        axis.text.x = element_text(
+        color = "#8C04C2"
+        ),
+        axis.text.y = element_text(
+          color = "#8C04C2"
+      )
+    )
+```
+]
+]
+.panel[.panel-name[Test]
+```{r}
+Het<-function(lm) {
+  Esta = c(
+    bptest(lm)$statistic,
+    white_lm(lm)$statistic,
+    glejser(lm)$statistic
+  )
+  Pvalue = c(
+    bptest(lm)$p.value,
+    white_lm(lm)$p.value,
+    glejser(lm)$p.value
+  )
+  return(
+    data.frame(
+      "Test" = c(
+        "Breusch-Pagan",
+        "White",
+        "Glejser"),
+      "Pvalor" = Pvalue,
+      "Estadístico" = Esta
+    )
+  )
+}
+
+Het(ModeloRedInter)%>%
+  mutate_if(
+    is.numeric,
+    round,
+    3
+  ) %>% 
+  mutate(
+    Resultado = case_when(
+      Pvalor > 0.05 ~ "No rechazo Homocedasticidad",
+      NA ~ "Rechazo H0"
+    )
+  ) %>% 
+  kbl(
+    booktabs = T,
+    escape = FALSE
+  ) %>% 
+  kable_material(c("striped", "hover")) %>% 
+  kable_styling(
+    font_size = 12
+  )
+```
+
+]
+]
+---
+
+class: header_background
+
+# Modelo final
+
+.panelset[
+.panel[.panel-name[Significación del modelo]
+.scroll-box-14[
+```{r}
+ModeloRedInter %>%  
+  tidy() %>% 
+  summarise_if(
+    is.numeric,
+    ~round(.x,3)
+  ) %>% 
+  mutate(
+    Variable = c(
+      "Intercepto",
+      "Gasto per capita en policía 1960",
+      "Desigualdad del ingreso",
+      "Indice que refleja la escolaridad del estado",
+      "Número de hombres entre 14 y 24 / 1000",
+      "Probabilidad de encarcelamiento",
+      "Tasa de desempleo urbana hombres 35-39 años x 1000"
+    ),
+    "Estimación" = estimate,
+    "Error estándar" = std.error,
+    "$\\left(H_{0}^{\\alpha = 0.05}\\right)\\beta_{i} = 0$" = case_when(
+      p.value < 0.05 ~ "Se rechaza H0",
+      p.value >= 0.05 ~ "No se rechaza H0"
+    ),
+    .keep = "none"
+  ) %>% 
+  kbl(
+    booktabs = T,
+    escape = FALSE
+  ) %>% 
+  kable_material(c("striped", "hover")) %>% 
+  kable_styling(
+    font_size = 12
+  )
+```
+
+]
+- Signos de los regresores , "intuitivos" 
+- Es mas importante la cantidad de hombres en edades jovenes que la situación del mercado labroal.
+- La probabilidad de encarcelamiento impacta demasiado fuerte. 
+]
+.panel[.panel-name[Comparación]
+```{r}
+ModeloRedInter %>% 
+  glance() %>% 
+  mutate(
+    "$R^{2}.adj$" = adj.r.squared*100,
+    "RSE" = sigma,
+    "SCE" = sum((ModeloRedInter$fitted.values-mean(Datos$y))^(2)),
+    "F Obs." = statistic,
+    "P-valor*100" = p.value*100,
+    "Regresión.gl" = df,
+    "Residuos.gl" = df.residual,
+    .keep = "none"
+  ) %>% 
+  summarise_if(
+    is.numeric,
+    ~round(.x,3)
+  ) %>% 
+assign(
+  "ResumenRedInter",
+  .,
+  envir = .GlobalEnv
+)
+
+ModeloCompleto %>% 
+  glance() %>% 
+  mutate(
+    Modelo = "Modelo Completo",
+    "$R^{2}.adj$" = adj.r.squared*100,
+    "RSE" = sigma,
+    "SCE" = sum((ModeloCompleto$fitted.values-mean(Datos$y))^(2)),
+    "F Obs." = statistic,
+    "P-valor*100" = p.value*100,
+    "Regresión.gl" = df,
+    "Residuos.gl" = df.residual,
+    .keep = "none"
+  ) %>% 
+  summarise_if(
+    is.numeric,
+    ~round(.x,3)
+  ) %>% 
+assign(
+  "ResumenCompleto",
+  .,
+  envir = .GlobalEnv
+)
+
+
+rbind.data.frame(
+  ResumenRedInter,
+  ResumenCompleto
+) %>% 
+mutate(
+  Modelo = c(
+    "Modelo Reducido e intervenido",
+    "Modelo Completo"
+  )
+) %>% 
+relocate(
+  Modelo,
+  .before = `$R^{2}.adj$`
+) %>% 
+  kbl(
+    booktabs = T,
+    escape = FALSE
+  ) %>% 
+  kable_material(c("striped", "hover")) %>% 
+  kable_styling(
+    font_size = 12
+  )
+```
+]
+.panel[.panel-name[Reflexiones]
+
+- Signos de los regresores , "intuitivos" 
+- Es mas importante la cantidad de hombres en edades jovenes que la situación del mercado labroal.
+- La probabilidad de encarcelamiento impacta demasiado fuerte. 
+
+]
+]
+
+---
+class: header_background
+
+# Conclusiones
+
+La construcción del modelo se basó en tres pilares fundamentales  : 
+
+- **Fidelidad en la representación**
+
+- **Balance**
+
+- **Control**
+
+Un detalle final es que la eliminación de las 3 observaciones ponen en jaque a los spuestos planteados, este modelo no se va a adecuar a estos 3 Estados,
+una posible solución a futuros trabajos sería aplicar *Boostrap residuals* en el modelo sin intervenir y aproximar la variabilidad de los estimadores.
+
+---
+
+class: header_background
+
+# Referencias
+.scroll-box-26[
+```{r,echo=FALSE, results="asis"}
+NoCite(bib)
+PrintBibliography(bib, .opts = list(bib.style = "alphabetic"))
+```
+]
+
